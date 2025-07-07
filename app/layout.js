@@ -2,6 +2,7 @@ import { Open_Sans, Raleway } from "next/font/google";
 import "./globals.css";
 import Footer from "./components/footer";
 import Header from "./components/navbar";
+import { CssBaseline } from "@mui/material";
 
 
 const openSans = Open_Sans({
@@ -26,9 +27,11 @@ export default function RootLayout({ children }) {
       <body
         className={`${openSans.variable} ${raleway.variable} antialiased`}
       >
+        <CssBaseline/>
         <Header />
         {children}
         <Footer />
+        
       </body>
     </html>
   );
