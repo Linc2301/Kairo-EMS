@@ -7,7 +7,7 @@ const navItems = [
     { label: 'Events', path: '/events' },
     { label: 'About Us', path: '/about' },
     { label: 'Contact Us', path: '/contact' },
-    { label: 'Log in', path: '/login' },
+    { label: 'Review', path: '/review'}
 ];
 
 export default function Navbar() {
@@ -21,9 +21,9 @@ export default function Navbar() {
                             <Button color="inherit">{label}</Button>
                         </Link>
                     ))}
-                    <Link href="/register" passHref>
+                    <Link href="/login" passHref>
                         <Button variant="contained" color="secondary" sx={{ ml: 2, color: '#000' }}>
-                            Register now
+                            Login
                         </Button>
                     </Link>
                 </Box>
