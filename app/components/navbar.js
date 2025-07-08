@@ -7,7 +7,7 @@ const navItems = [
     { label: 'Events', path: '/events' },
     { label: 'About Us', path: '/about' },
     { label: 'Contact Us', path: '/contactpage' },
-    { label: 'Review', path: '/review'}
+    { label: 'Review', path: '/review' }
 ];
 
 export default function Navbar() {
