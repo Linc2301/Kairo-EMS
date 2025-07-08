@@ -12,22 +12,22 @@ const navItems = [
 
 export default function Navbar() {
     return (
-        <AppBar position="static" sx={{ backgroundColor: '#c0392b' }}>
-            <Toolbar sx={{ justifyContent: 'space-between' }}>
-                <Typography variant="h5">Kairo</Typography>
-                <Box>
-                    {navItems.map(({ label, path }) => (
-                        <Link key={label} href={path} passHref>
-                            <Button color="inherit">{label}</Button>
+            <AppBar position="sticky" sx={{ backgroundColor: '#c0392b' }}>
+                <Toolbar sx={{ justifyContent: 'space-between' }}>
+                    <Typography variant="h5">Kairo</Typography>
+                    <Box>
+                        {navItems.map(({ label, path }) => (
+                            <Link key={label} href={path} passHref>
+                                <Button color="inherit">{label}</Button>
+                            </Link>
+                        ))}
+                        <Link href="/login" passHref>
+                            <Button variant="contained" color="secondary" sx={{ ml: 2, color: '#000' }}>
+                                Login
+                            </Button>
                         </Link>
-                    ))}
-                    <Link href="/login" passHref>
-                        <Button variant="contained" color="secondary" sx={{ ml: 2, color: '#000' }}>
-                            Login
-                        </Button>
-                    </Link>
-                </Box>
-            </Toolbar>
-        </AppBar>
+                    </Box>
+                </Toolbar>
+            </AppBar>
     );
 }
