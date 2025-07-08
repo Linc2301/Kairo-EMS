@@ -6,7 +6,7 @@ import Direction from "@/app/homepage/direction"
 export default function Home() {
   return (
     <>
-      <Description />
+      <Description/>
       <Hero />
       <Direction />
     </>
