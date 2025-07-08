@@ -1,116 +1,193 @@
-"use client";
-import { Button, Typography, Box } from '@mui/material';
+'use client';
 
+import {
+    Box,
+    Button,
+    Grid,
+    Paper,
+    TextField,
+    Typography,
+    Stack,
+} from '@mui/material';
 import MarkEmailUnreadIcon from '@mui/icons-material/MarkEmailUnread';
 import AddIcCallIcon from '@mui/icons-material/AddIcCall';
 import FmdGoodIcon from '@mui/icons-material/FmdGood';
 import AccessTimeFilledIcon from '@mui/icons-material/AccessTimeFilled';
 
-export default function Contact() {
+export default function ContactPage() {
     return (
-        <>
-            <div className="max-w-4xl mx-auto px-4 py-8">
-                <h1 className="text-3xl font-bold mb-6">Contact Us</h1>
+        <Box px={10} py={2}>
+            <Typography variant="h4" fontWeight="bold" mb={4} sx={{ textAlign: "center" }}>
+                Contact Us
+            </Typography>
 
-                <div className="grid md:grid-cols-2 gap-8">
-                    {/* Contact Form */}
-                    <div className="bg-white p-6 rounded-lg shadow-md">
-                        <form className="space-y-4">
-                            <div>
-                                <label htmlFor="name" className="block font-semibold mb-1">Name</label>
-                                <input
-                                    type="text"
-                                    id="name"
-                                    className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    placeholder="Your name"
-                                />
-                            </div>
-
-                            <div>
-                                <label htmlFor="email" className="block font-semibold mb-1">Email</label>
-                                <input
-                                    type="email"
-                                    id="email"
-                                    className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    placeholder="Your email"
-                                />
-                            </div>
-
-                            <div>
-                                <label htmlFor="subject" className="block font-semibold mb-1">Subject</label>
-                                <input
-                                    type="text"
-                                    id="subject"
-                                    className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    placeholder="Subject"
-                                />
-                            </div>
-
-                            <div>
-                                <label htmlFor="message" className="block font-semibold mb-1">Message</label>
-                                <textarea
-                                    id="message"
-                                    rows={4}
-                                    className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    placeholder="Your message"
-                                ></textarea>
-                            </div>
-
-                            <button
-                                type="submit"
-                                className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors"
-                            >
+            <Grid container spacing={4} >
+                {/* Contact Form */}
+                <Grid item md={6}>
+                    <Paper elevation={6} sx={{ p: 3, borderRadius: 2 }}>
+                        <Stack component="form" spacing={3}>
+                            <TextField label="Name" variant="outlined" fullWidth />
+                            <TextField label="Email" type="email" variant="outlined" fullWidth />
+                            <TextField label="Subject" variant="outlined" fullWidth />
+                            <TextField label="Message" variant="outlined" fullWidth multiline rows={4} />
+                            <Button variant="contained" color="primary" size="large">
                                 Send Message
-                            </button>
-                        </form>
-                    </div>
+                            </Button>
+                        </Stack>
+                    </Paper>
+                </Grid>
 
-                    {/* Contact Information */}
-                    <div className="bg-white p-6 rounded-lg shadow-md">
-                        <h2 className="text-2xl font-bold mb-4">Contact</h2>
-                        <h3 className="text-xl font-semibold mb-4">Get in touch with us</h3>
+                {/* Contact Info */}
+                <Grid item md={6} mt={8}>
+                    <Paper elevation={3} sx={{ p: 3, borderRadius: 2 }}>
+                        <Typography variant="h5" fontWeight="bold" gutterBottom>
+                            Contact
+                        </Typography>
+                        <Typography variant="subtitle1" fontWeight="medium" gutterBottom>
+                            Get in touch with us
+                        </Typography>
+                        <Typography variant="body1" color="text.secondary" mb={3}>
+                            Whether you have a question, a suggestion, or just want to say hello,
+                            feel free to reach out. Our team is always ready to assist you<br /> and will response as soon as possible.
+                        </Typography>
 
-                        <p className="mb-6 text-gray-700">
-                            Whether you have a question, a suggestion, or just want to say hello, feel free to reach out.
-                            Our team is always ready to assist you and will respond as soon as possible.
-                        </p>
+                        {/* Four contact blocks in a flex row */}
+                        <Box
+                            mt={2}
+                            display="flex"
+                            justifyContent="space-between"
+                            flexWrap="wrap"
+                            gap={3}
+                        >
+                            {/* Email */}
+                            <Box
+                                mt={2}
+                                flex="1 1 200px"
+                                display="flex"
+                                flexDirection="column"
+                                alignItems="center"
+                                textAlign="center"
+                            >
+                                <Box
+                                    bgcolor="primary.main"
+                                    color="white"
+                                    width={64}
+                                    height={64}
+                                    display="flex"
+                                    justifyContent="center"
+                                    alignItems="center"
+                                    borderRadius="50%"
+                                    mb={3}
+                                >
+                                    <MarkEmailUnreadIcon fontSize="large" />
+                                </Box>
+                                <Typography fontWeight="bold" mb={2}>Email Address</Typography>
+                                <Typography color="text.secondary" variant="body2">
+                                    kairo@gmail.com
+                                </Typography>
+                                <Typography color="text.secondary" variant="body2">
+                                    business-kairo@gmail.com
+                                </Typography>
+                            </Box>
 
-                        <div className="space-y-4">
-                            <div>
-                                <div className="flex items-center space-x-2">
-                                    <span className="material-icons-outlined">{<MarkEmailUnreadIcon />}</span>
-                                    <h4 className="font-semibold">Email Address</h4> </div>
-                                <p className="text-gray-700">kairo@gmail.com</p>
-                                <p className="text-gray-700">business-kairo@gmail.com</p>
-                            </div>
+                            {/* Phone */}
+                            <Box
+                                mt={2}
+                                flex="1 1 200px"
+                                display="flex"
+                                flexDirection="column"
+                                alignItems="center"
+                                textAlign="center"
+                            >
+                                <Box
+                                    bgcolor="primary.main"
+                                    color="white"
+                                    width={64}
+                                    height={64}
+                                    display="flex"
+                                    justifyContent="center"
+                                    alignItems="center"
+                                    borderRadius="50%"
+                                    mb={3}
+                                >
+                                    <AddIcCallIcon fontSize="large" />
+                                </Box>
+                                <Typography fontWeight="bold" mb={2}>Phone Number</Typography>
+                                <Typography color="text.secondary" variant="body2">
+                                    09774234382
+                                </Typography>
+                                <Typography color="text.secondary" variant="body2">
+                                    09774234382
+                                </Typography>
+                            </Box>
 
-                            <div>
-                                <div className="flex items-center space-x-2">
-                                    <span className="material-icons-outlined">{<AddIcCallIcon />}</span>
-                                    <h4 className="font-semibold">Phone Number</h4> </div>
-                                <p className="text-gray-700">09774234382</p>
-                                <p className="text-gray-700">09774234382</p>
-                            </div>
+                            {/* Location */}
+                            <Box
+                                mt={2}
+                                flex="1 1 200px"
+                                display="flex"
+                                flexDirection="column"
+                                alignItems="center"
+                                textAlign="center"
+                            >
+                                <Box
+                                    bgcolor="primary.main"
+                                    color="white"
+                                    width={64}
+                                    height={64}
+                                    display="flex"
+                                    justifyContent="center"
+                                    alignItems="center"
+                                    borderRadius="50%"
+                                    mb={3}
+                                >
+                                    <FmdGoodIcon fontSize="large" />
+                                </Box>
+                                <Typography fontWeight="bold" mb={2}>Location</Typography>
+                                <Typography color="text.secondary" variant="body2">
+                                    Yangon, MICT Park
+                                </Typography>
+                                <Typography color="text.secondary" variant="body2">
+                                    Hlaing, MICT Park
+                                </Typography>
+                            </Box>
 
-                            <div>
-                                <div className="flex items-center space-x-2">
-                                    <span className="material-icons-outlined">{<FmdGoodIcon />}</span>
-                                    <h4 className="font-semibold">Location</h4> </div>
-                                <p className="text-gray-700">Yangon, MICT Park</p>
-                                <p className="text-gray-700">Hlaing, MICT Park</p>
-                            </div>
+                            {/* Work Day */}
+                            <Box
+                                mt={2}
+                                flex="1 1 200px"
+                                display="flex"
+                                flexDirection="column"
+                                alignItems="center"
+                                textAlign="center"
+                            >
+                                <Box
+                                    bgcolor="primary.main"
+                                    color="white"
+                                    width={64}
+                                    height={64}
+                                    display="flex"
+                                    justifyContent="center"
+                                    alignItems="center"
+                                    borderRadius="50%"
+                                    mb={3}
+                                >
+                                    <AccessTimeFilledIcon fontSize="large" />
+                                </Box>
+                                <Typography fontWeight="bold" mb={2}>Work Day</Typography>
+                                <Typography color="text.secondary" variant="body2">
+                                    Mon-Fri : 9:00 - 17:00
+                                </Typography>
+                                <Typography color="text.secondary" variant="body2">
+                                    Sat-Sun : 10:00 - 16:00
+                                </Typography>
+                            </Box>
+                        </Box>
+                    </Paper>
+                </Grid>
 
-                            <div>
-                                <div className="flex items-center space-x-2">
-                                    <span className="material-icons-outlined">{<AccessTimeFilledIcon />}</span>
-                                    <h4 className="font-semibold">Work Day</h4> </div>
-                                <p className="text-gray-700">Mon-Fri : 9:00 - 17:00</p>
-                                <p className="text-gray-700">Sat-Sun : 10:00 - 16:00</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </>
+            </Grid>
+
+        </Box>
     );
 }
