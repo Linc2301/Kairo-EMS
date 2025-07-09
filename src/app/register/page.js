@@ -183,9 +183,10 @@ export default function RegisterPage() {
                 opacity: 0,
               },
             }}
-            {...register("password")}
+             {...register("password")}
             error={!!errors.password}
             helperText={errors.password?.message || " "}
+
           />
 
           <Typography sx={{ color: "black", mb: 0.5 }}>
