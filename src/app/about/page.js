@@ -19,7 +19,7 @@ export default function HomePage() {
                 }}
             >
                 <Image
-                    src="/assets/party-hall.jpg" // place your image as /public/hero-bg.png
+                    src="/assets/party-hall.jpg"
                     alt="Hero Background"
                     layout="fill"
                     objectFit="cover"
@@ -49,8 +49,8 @@ export default function HomePage() {
                     sx={{
                         backgroundColor: 'rgba(255, 255, 255, 0.2)',
                         borderRadius: 4,
-                        px: 4,
-                        py: 6,
+                        px: 6,
+                        py: 8,
                         backdropFilter: 'blur(5px)',
                         maxWidth: 700,
                     }}
@@ -67,11 +67,11 @@ export default function HomePage() {
                     </Typography>
 
                     <Typography variant="h6" mb={3}>
-                        your trusted partner in finding the perfect event space.
+                        your trusted partner  <br /> in finding the perfect event space.
                     </Typography>
 
-                    <Typography variant="body1" mb={2}>
-                        We believe great events begin with the right space.
+                    <Typography variant="body1" mb={4}>
+                        We believe great events begin<br /> with the right space.
                     </Typography>
 
                     <Typography variant="body1">

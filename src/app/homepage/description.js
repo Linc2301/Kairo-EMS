@@ -1,4 +1,12 @@
-import { Box, Typography } from '@mui/material';
+import { Box, Grid, Typography, Card, CardMedia, CardContent } from '@mui/material';
+
+const events = [
+    { title: 'Baby Shower', image: '/assets/b5.png' },
+    { title: 'Private Party', image: '/assets/party.png' },
+    { title: 'Wedding Party', image: '/assets/w6.png' },
+    { title: 'Birthday Party', image: '/assets/birthday.png' },
+    { title: 'Bride to Be', image: '/assets/birdal.png' },
+];
 
 export default function HeroSection() {
     return (
@@ -8,6 +16,21 @@ export default function HeroSection() {
                 <Typography variant="subtitle1" color="orange">
                     Enjoying the process of creating unforgettable moments...
                 </Typography>
+            </Box>
+
+            <Box sx={{ py: 4, bgcolor: '#000', color: '#fff' }}>
+                <Grid container spacing={2} justifyContent="center">
+                    {events.map(({ title, image }) => (
+                        <Grid item xs={6} sm={4} md={2} key={title}>
+                            <Card sx={{ backgroundColor: '#222' }}>
+                                <CardMedia component="img" height="140" image={image} />
+                                <CardContent>
+                                    <Typography align="center">{title}</Typography>
+                                </CardContent>
+                            </Card>
+                        </Grid>
+                    ))}
+                </Grid>
             </Box>
 
 
