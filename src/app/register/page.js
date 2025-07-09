@@ -17,8 +17,8 @@ export default function LoginPage() {
       <Box
         sx={{
           flex: { xs: "none", md: 1 }, // On medium+, takes available space
-           backgroundImage: 'url("/login.jpg")',
-          
+          backgroundImage: 'url("/login.jpg")',
+
           backgroundSize: "cover",
           backgroundPosition: "center",
           height: { xs: "30vh", md: "100%" }, // Adjust height for mobile view if image is shown
@@ -26,7 +26,7 @@ export default function LoginPage() {
           display: { xs: "none", md: "block" }, // Hide on small screens, show on medium and up
         }}
       />
-        
+
 
       {/* Right side - Form */}
       <Box
@@ -139,7 +139,7 @@ export default function LoginPage() {
             hiddenLabel
             size="small"
             fullWidth
-             sx={{
+            sx={{
               mb: 2,
               "& .MuiInputBase-input::placeholder": {
                 opacity: 1,
@@ -159,9 +159,12 @@ export default function LoginPage() {
             Register
           </Button>
           <Typography variant="body2" sx={{ color: "black" }} align="center">
-            Already have an account?{" "}
-            <Link passHref href="/login"  sx={{ fontWeight: "bold", color: "#E24C00" }}>
-              Login
+            Already have an account?
+
+            <Link passHref href="/login"  >
+              <Box component="span" sx={{ color: '#E24C00', cursor: 'pointer', fontWeight: "bold" ,ml:0.7 }}>
+                Login
+              </Box>
             </Link>
           </Typography>
         </Box>

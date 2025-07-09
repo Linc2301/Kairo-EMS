@@ -4,7 +4,7 @@ import { Box, Button, formControlClasses, linkClasses, TextField, Typography } f
 import React from "react";
 import { schema } from "../login/validationSchema";
 import { useForm } from "react-hook-form";
-import {yupResolver} from "@hookform/resolvers/yup";
+import { yupResolver } from "@hookform/resolvers/yup";
 import Link from "next/link";
 
 
@@ -14,27 +14,27 @@ import Link from "next/link";
 
 
 export default function LoginPage() {
-    const {
+  const {
     handleSubmit,
     reset,
     register,
-     formState: { errors },
+    formState: { errors },
   } = useForm({
     resolver: yupResolver(schema)
 
   });
 
 
-    const onSubmit = (formData) => {
-        console.log("formData", formData);
-        console.log(("Name Input Data,", formData.name));
-        console.log(("form Data", formData.password));
-        
-        reset();
-    }
- 
+  const onSubmit = (formData) => {
+    console.log("formData", formData);
+    console.log(("Name Input Data,", formData.name));
+    console.log(("form Data", formData.password));
+
+    reset();
+  }
+
   return (
-    
+
     <Box
       sx={{
         display: "flex",
@@ -46,8 +46,8 @@ export default function LoginPage() {
       <Box
         sx={{
           flex: { xs: "none", md: 1 }, // On medium+, takes available space
-           backgroundImage: 'url("/login.jpg")',
-          
+          backgroundImage: 'url("/login.jpg")',
+
           backgroundSize: "cover",
           backgroundPosition: "center",
           height: { xs: "30vh", md: "100%" }, // Adjust height for mobile view if image is shown
@@ -55,7 +55,7 @@ export default function LoginPage() {
           display: { xs: "none", md: "block" }, // Hide on small screens, show on medium and up
         }}
       />
-        
+
 
       {/* Right side - Form */}
       <Box
@@ -108,8 +108,8 @@ export default function LoginPage() {
             }}
 
             {...register("name")}
-            error = {!!errors.name}
-             helperText={errors.name?.message}
+            error={!!errors.name}
+            helperText={errors.name?.message}
           />
 
           <Typography sx={{ color: "black", mb: 0.5 }}>Password</Typography>
@@ -131,11 +131,11 @@ export default function LoginPage() {
             }}
 
             {...register("password")}
-            error = {!!errors.password}
-             helperText={errors.password?.message}
+            error={!!errors.password}
+            helperText={errors.password?.message}
           />
 
-          
+
           <Button
             variant="contained"
             type="submit"
@@ -147,12 +147,15 @@ export default function LoginPage() {
           <Typography variant="body2" sx={{ color: "black" }} align="center">
             Don't you have  account?{" "}
 
-            <Link  passHref href="/register" sx={{color: "yellow"}}>
-            Register
+            <Link passHref href="/register" sx={{ color: "yellow" }}>
+
+              <Box component="span" sx={{ color: '#E24C00', cursor: 'pointer', fontWeight: "bold", ml: 0.5 }}>
+                Register
+              </Box>
             </Link>
-            </Typography>
-          
-          
+          </Typography>
+
+
         </Box>
       </Box>
     </Box>
