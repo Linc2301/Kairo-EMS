@@ -1,15 +1,114 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
-  output   = "../app/generated/prisma"
 }
 
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
+}
+
+model User {
+  id           Int       @id @default(autoincrement())
+  name         String    @db.VarChar(255)
+  email        String?   @db.VarChar(255)
+  phone        String?   @db.VarChar(50)
+  password     String?   @db.VarChar(50)
+  confirm_pass String?   @db.VarChar(50)
+  role         Role      @default(user)
+  status       Status    @default(active)
+  bookings     Booking[]
+  ratings      Rating[]
+  reviews      Review[]
+}
+
+model Category {
+  id     Int     @id @default(autoincrement())
+  name   String  @db.VarChar(50)
+  events Event[]
+}
+
+model Event {
+  id          Int      @id @default(autoincrement())
+  name        String   @db.VarChar(50)
+  description String   @db.Text
+  photo       String
+  category    Category @relation(fields: [category_id], references: [id])
+  category_id Int
+  venues      Venue[]
+}
+
+model Venue {
+  id          Int       @id @default(autoincrement())
+  name        String    @db.VarChar(50)
+  description String    @db.Text
+  price       String    @db.VarChar(255)
+  event       Event     @relation(fields: [event_id], references: [id])
+  event_id    Int
+  bookings    Booking[]
+}
+
+model FloralService {
+  id          Int       @id @default(autoincrement())
+  name        String    @db.VarChar(50)
+  description String    @db.Text
+  price       Int
+  bookings    Booking[]
+}
+
+model TimePackage {
+  id       Int       @id @default(autoincrement())
+  date     DateTime
+  time     DateTime
+  bookings Booking[]
+}
+
+model Booking {
+  id                Int           @id @default(autoincrement())
+  venue             Venue         @relation(fields: [venue_id], references: [id])
+  venue_id          Int
+  floral_service    FloralService @relation(fields: [floral_service_id], references: [id])
+  floral_service_id Int
+  time_package      TimePackage   @relation(fields: [time_package_id], references: [id])
+  time_package_id   Int
+  user              User          @relation(fields: [user_id], references: [id])
+  user_id           Int
+  booking_date      DateTime
+  total_amount      Int
+}
+
+model Contact {
+  id      Int    @id @default(autoincrement())
+  name    String @db.VarChar(255)
+  email   String @db.VarChar(255)
+  subject String @db.VarChar(255)
+  message String @db.VarChar(255)
+}
+
+model Rating {
+  id      Int      @id @default(autoincrement())
+  user    User     @relation(fields: [user_id], references: [id])
+  user_id Int
+  rating  Int
+  reviews Review[] // Changed from Review? to Review[] for one-to-many
+}
+
+model Review {
+  id          Int      @id @default(autoincrement())
+  user        User     @relation(fields: [user_id], references: [id])
+  user_id     Int
+  rating      Rating   @relation(fields: [rating_id], references: [id])
+  rating_id   Int // No @unique needed now
+  review_date DateTime
+  description String   @db.Text
+  photo       String?  @db.Text
+}
+
+enum Role {
+  user
+  admin
+}
+
+enum Status {
+  active
+  inactive
 }
