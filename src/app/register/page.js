@@ -3,8 +3,39 @@
 import { Box, Button, TextField, Typography } from "@mui/material";
 import React from "react";
 import Link from "next/link";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { schema } from "./validationSchema";
+import { useEffect } from "react";
 
-export default function LoginPage() {
+export default function RegisterPage() {
+  const {
+    handleSubmit,
+    register,
+    reset,
+    clearErrors,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(schema),
+  });
+
+  useEffect(() => {
+    if (Object.keys(errors).length > 0) {
+      const timer = setTimeout(() => {
+        clearErrors();
+      }, 2000); // 2000ms = 2 seconds
+
+      return () => clearTimeout(timer); // Cleanup on unmount or errors change
+    }
+  }, [errors, clearErrors]);
+
+  const onSubmit = (formData) => {
+    console.log(formData);
+    console.log("Name input Data", formData.name);
+    console.log("formdata", formData.password);
+    reset();
+  };
+
   return (
     <Box
       sx={{
@@ -27,26 +58,38 @@ export default function LoginPage() {
         }}
       />
 
-
       {/* Right side - Form */}
       <Box
         sx={{
-          flex: { xs: "none", md: 1 }, // On medium+, takes available space
+          // flex: { xs: "none", md: 1 }, // On medium+, takes available space
+          // bgcolor: "white",
+          // minHeight: "100vh",
+          // // height: { xs: "auto", md: "100%" }, // Auto height on mobile, full on desktop
+          // display: "flex",
+          // alignItems: "center",
+          // justifyContent: "center",
+          // p: 3, // Add some padding
+
+          flex: { xs: "none", md: 1 },
           bgcolor: "white",
-          height: { xs: "auto", md: "100%" }, // Auto height on mobile, full on desktop
+          minHeight: "100vh", // ✅ fixes shrinking
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          p: 3, // Add some padding
+          p: 3,
         }}
       >
-        <Box component="form" sx={{ m: { xs: 2, md: 10 }, width: "100%", maxWidth: 500 }}>
+        <Box
+          component="form"
+          sx={{ m: { xs: 2, md: 10 }, width: "100%", maxWidth: 500 }}
+          onSubmit={handleSubmit(onSubmit)}
+        >
           <Typography
             sx={{
               color: "red",
               textAlign: "center",
               fontSize: { xs: 40, md: 60 },
-              mb: 2,
+              mb: 1,
             }}
           >
             Kairo
@@ -55,7 +98,7 @@ export default function LoginPage() {
             sx={{
               color: "black",
               textAlign: "start",
-              mb: 2,
+            
               fontSize: { xs: 24, md: 30 },
             }}
           >
@@ -68,15 +111,18 @@ export default function LoginPage() {
             fullWidth
             size="small"
             sx={{
-              mb: 2,
+              
               "& .MuiInputBase-input::placeholder": {
-                opacity: 1,
+                opacity: 0.3,
                 transition: "opacity 0.2s",
               },
               "& .MuiInputBase-input:focus::placeholder": {
                 opacity: 0,
               },
             }}
+            {...register("name")}
+            error={!!errors.name}
+            helperText={errors.name?.message || " "}
           />
 
           <Typography sx={{ color: "black", mb: 0.5 }}>Email</Typography>
@@ -86,15 +132,18 @@ export default function LoginPage() {
             fullWidth
             size="small"
             sx={{
-              mb: 2,
+          
               "& .MuiInputBase-input::placeholder": {
-                opacity: 1,
+                opacity: 0.3,
                 transition: "opacity 0.2s",
               },
               "& .MuiInputBase-input:focus::placeholder": {
                 opacity: 0,
               },
             }}
+            {...register("email")}
+            error={!!errors.email}
+            helperText={errors.email?.message || " "}
           />
 
           <Typography sx={{ color: "black", mb: 0.5 }}>Phone No.</Typography>
@@ -104,15 +153,18 @@ export default function LoginPage() {
             fullWidth
             size="small"
             sx={{
-              mb: 2,
+              
               "& .MuiInputBase-input::placeholder": {
-                opacity: 1,
+                opacity: 0.3,
                 transition: "opacity 0.2s",
               },
               "& .MuiInputBase-input:focus::placeholder": {
                 opacity: 0,
               },
             }}
+            {...register("phone")}
+            error={!!errors.phone}
+            helperText={errors.phone?.message || " "}
           />
 
           <Typography sx={{ color: "black", mb: 0.5 }}>Password</Typography>
@@ -122,47 +174,71 @@ export default function LoginPage() {
             fullWidth
             size="small"
             sx={{
-              mb: 2,
+              
               "& .MuiInputBase-input::placeholder": {
-                opacity: 1,
+                opacity: 0.3,
                 transition: "opacity 0.2s",
               },
               "& .MuiInputBase-input:focus::placeholder": {
                 opacity: 0,
               },
             }}
+            {...register("password")}
+            error={!!errors.password}
+            helperText={errors.password?.message || " "}
           />
 
-          <Typography sx={{ color: "black", mb: 0.5 }}>Confirm Password</Typography>
+          <Typography sx={{ color: "black", mb: 0.5 }}>
+            Confirm Password
+          </Typography>
           <TextField
             placeholder="Confirm your password"
             hiddenLabel
             size="small"
             fullWidth
             sx={{
-              mb: 2,
+              
               "& .MuiInputBase-input::placeholder": {
-                opacity: 1,
+                opacity: 0.3,
                 transition: "opacity 0.2s",
               },
               "& .MuiInputBase-input:focus::placeholder": {
                 opacity: 0,
               },
             }}
+            {...register("confirmPassword")}
+            error={!!errors.confirmPassword}
+            helperText={errors.confirmPassword?.message || " "}
           />
 
           <Button
             variant="contained"
+            type="submit"
             fullWidth
-            sx={{ mb: 2, bgcolor: "#E24C00", "&:hover": { bgcolor: "#cc4400" } }}
+            sx={{
+              mb: 0.5,
+              bgcolor: "#E24C00",
+              "&:hover": { bgcolor: "#cc4400" },
+            }}
           >
             Register
           </Button>
           <Typography variant="body2" sx={{ color: "black" }} align="center">
             Already have an account?
-
-            <Link passHref href="/login"  >
-              <Box component="span" sx={{ color: '#E24C00', cursor: 'pointer', fontWeight: "bold" ,ml:0.7 }}>
+            <Link passHref href="/login">
+              <Box
+                component="span"
+                sx={{
+                  color: "#E24C00",
+                  cursor: "pointer",
+                  fontWeight: "bold",
+                  ml: 0.7,
+                  "&:hover": {
+                    color: "#cc4400",
+                    textDecoration: "underline",
+                  },
+                }}
+              >
                 Login
               </Box>
             </Link>

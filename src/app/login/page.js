@@ -1,17 +1,12 @@
 "use client";
 
-import { Box, Button, formControlClasses, linkClasses, TextField, Typography } from "@mui/material";
+import { useEffect } from "react";
+import { Box, Button, TextField, Typography } from "@mui/material";
 import React from "react";
 import { schema } from "../login/validationSchema";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import Link from "next/link";
-
-
-
-
-
-
 
 export default function LoginPage() {
   const {
@@ -19,11 +14,20 @@ export default function LoginPage() {
     reset,
     register,
     formState: { errors },
+    clearErrors,
   } = useForm({
-    resolver: yupResolver(schema)
-
+    resolver: yupResolver(schema),
   });
 
+  useEffect(() => {
+    if (Object.keys(errors).length > 0) {
+      const timer = setTimeout(() => {
+        clearErrors();
+      }, 2000); // 2000ms = 2 seconds
+
+      return () => clearTimeout(timer); // Cleanup on unmount or errors change
+    }
+  }, [errors, clearErrors]);
 
   const onSubmit = (formData) => {
     console.log("formData", formData);
@@ -31,10 +35,9 @@ export default function LoginPage() {
     console.log(("form Data", formData.password));
 
     reset();
-  }
+  };
 
   return (
-
     <Box
       sx={{
         display: "flex",
@@ -56,7 +59,6 @@ export default function LoginPage() {
         }}
       />
 
-
       {/* Right side - Form */}
       <Box
         sx={{
@@ -69,7 +71,11 @@ export default function LoginPage() {
           p: 3, // Add some padding
         }}
       >
-        <Box component="form" sx={{ m: { xs: 2, md: 10 }, width: "100%", maxWidth: 500 }} onSubmit={handleSubmit(onSubmit)}>
+        <Box
+          component="form"
+          sx={{ m: { xs: 2, md: 10 }, width: "100%", maxWidth: 500 }}
+          onSubmit={handleSubmit(onSubmit)}
+        >
           <Typography
             sx={{
               color: "red",
@@ -84,7 +90,7 @@ export default function LoginPage() {
             sx={{
               color: "black",
               textAlign: "start",
-              mb: 2,
+              mb: 1,
               fontSize: { xs: 24, md: 30 },
             }}
           >
@@ -97,19 +103,18 @@ export default function LoginPage() {
             fullWidth
             size="small"
             sx={{
-              mb: 2,
+              mb: 0.5,
               "& .MuiInputBase-input::placeholder": {
-                opacity: 1,
+                opacity: 0.3,
                 transition: "opacity 0.2s",
               },
               "& .MuiInputBase-input:focus::placeholder": {
                 opacity: 0,
               },
             }}
-
             {...register("name")}
             error={!!errors.name}
-            helperText={errors.name?.message}
+            helperText={errors.name?.message || " "}
           />
 
           <Typography sx={{ color: "black", mb: 0.5 }}>Password</Typography>
@@ -120,42 +125,52 @@ export default function LoginPage() {
             size="small"
             type="password"
             sx={{
-              mb: 2,
+              mb: 0.5,
               "& .MuiInputBase-input::placeholder": {
-                opacity: 1,
+                opacity: 0.3,
                 transition: "opacity 0.2s",
               },
               "& .MuiInputBase-input:focus::placeholder": {
                 opacity: 0,
               },
             }}
-
             {...register("password")}
             error={!!errors.password}
-            helperText={errors.password?.message}
+            helperText={errors.password?.message || " "}
           />
-
 
           <Button
             variant="contained"
             type="submit"
             fullWidth
-            sx={{ mb: 2, bgcolor: "#E24C00", "&:hover": { bgcolor: "#cc4400" } }}
+            sx={{
+              mb: 2,
+              bgcolor: "#E24C00",
+              "&:hover": { bgcolor: "#cc4400" },
+            }}
           >
             Login
           </Button>
           <Typography variant="body2" sx={{ color: "black" }} align="center">
-            Don't you have  account?{" "}
-
-            <Link passHref href="/register" sx={{ color: "yellow" }}>
-
-              <Box component="span" sx={{ color: '#E24C00', cursor: 'pointer', fontWeight: "bold", ml: 0.5 }}>
+            Don't you have account?{" "}
+            <Link passHref href="/register">
+              <Box
+                component="span"
+                sx={{
+                  color: "#E24C00",
+                  cursor: "pointer",
+                  fontWeight: "bold",
+                  ml: 0.5,
+                  "&:hover": {
+                    color: "#cc4400",
+                    textDecoration: "underline",
+                  },
+                }}
+              >
                 Register
               </Box>
             </Link>
           </Typography>
-
-
         </Box>
       </Box>
     </Box>
