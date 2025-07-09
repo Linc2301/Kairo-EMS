@@ -1,10 +1,14 @@
 "use client";
 
-import { Box, Button, formControlClasses, TextField, Typography } from "@mui/material";
+import { Box, Button, formControlClasses, linkClasses, TextField, Typography } from "@mui/material";
 import React from "react";
 import { schema } from "../login/validationSchema";
 import { useForm } from "react-hook-form";
 import {yupResolver} from "@hookform/resolvers/yup";
+import Link from "next/link";
+
+
+
 
 
 
@@ -142,10 +146,12 @@ export default function LoginPage() {
           </Button>
           <Typography variant="body2" sx={{ color: "black" }} align="center">
             Don't you have  account?{" "}
-            <a href="/register" style={{ fontWeight: "bold", color: "#E24C00" }}>
-              Register
-            </a>
-          </Typography>
+
+            <Link  passHref href="/register" sx={{color: "yellow"}}>
+            Register
+            </Link>
+            </Typography>
+          
           
         </Box>
       </Box>

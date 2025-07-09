@@ -9,7 +9,7 @@ import {
   Grid,
   Box,
 } from "@mui/material";
-import CustomerReviewCard from "@/app/components/CustomerReviewCard";
+import CustomerReviewCard from "@/src/components/CustomerReviewCard";
 
 const reviews = [
   {

@@ -1,8 +1,8 @@
 "use client";
 import { Open_Sans, Raleway } from "next/font/google";
 import "./globals.css";
-import Footer from "./components/footer";
-import Header from "./components/navbar";
+import Footer from "@/src/components/footer"
+import Header from "@/src/components/navbar"
 import { CssBaseline } from "@mui/material";
 
 

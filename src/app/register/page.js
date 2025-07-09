@@ -160,9 +160,9 @@ export default function LoginPage() {
           </Button>
           <Typography variant="body2" sx={{ color: "black" }} align="center">
             Already have an account?{" "}
-            <a href="/login" passHref style={{ fontWeight: "bold", color: "#E24C00" }}>
+            <Link passHref href="/login"  sx={{ fontWeight: "bold", color: "#E24C00" }}>
               Login
-            </a>
+            </Link>
           </Typography>
         </Box>
       </Box>
