@@ -16,7 +16,7 @@ const reviews = [
     name: "Wai Lynn Oo",
     avatar: "/avatars/avatar1.png",
     venue: "Crystal Ballroom (Corporate Event)",
-    date: "2.5.2024",
+    date: "3.5.2024",
     feedback:
       "I like the way they plan events and I like their services. It makes me feel like I’m planning by myself.",
     image: "/events/event1.jpg",
@@ -25,7 +25,7 @@ const reviews = [
     name: "Ye Htut Naung",
     avatar: "/avatars/avatar2.png",
     venue: "Crystal Ballroom (Corporate Event)",
-    date: "2.5.2024",
+    date: "5.5.2024",
     feedback:
       "I like the way they plan events and I like their services. It makes me feel like I’m planning by myself.",
     image: "/events/event2.jpg",
@@ -52,7 +52,7 @@ const reviews = [
     name: "Kaung Htet Lin",
     avatar: "/avatars/avatar5.png",
     venue: "Crystal Ballroom (Corporate Event)",
-    date: "2.5.2024",
+    date: "7.6.2024",
     feedback:
       "I like the way they plan events and I like their services. It makes me feel like I’m planning by myself.",
     image: "/events/event5.jpg",
@@ -61,7 +61,7 @@ const reviews = [
     name: "Thiha Oo",
     avatar: "/avatars/avatar6.png",
     venue: "Crystal Ballroom (Corporate Event)",
-    date: "2.5.2024",
+    date: "6.5.2024",
     feedback:
       "I like the way they plan events and I like their services. It makes me feel like I’m planning by myself.",
     image: "/events/event6.jpg",
