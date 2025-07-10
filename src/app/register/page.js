@@ -173,6 +173,7 @@ export default function RegisterPage() {
             hiddenLabel
             fullWidth
             size="small"
+            type="password"
             sx={{
               
               "& .MuiInputBase-input::placeholder": {
@@ -197,6 +198,7 @@ export default function RegisterPage() {
             hiddenLabel
             size="small"
             fullWidth
+            type="password"
             sx={{
               
               "& .MuiInputBase-input::placeholder": {
