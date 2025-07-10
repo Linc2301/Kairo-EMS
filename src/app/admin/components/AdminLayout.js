@@ -1,5 +1,3 @@
-
-import React from 'react';
 import {
     Box,
     Drawer,
@@ -107,11 +105,11 @@ export default function AdminLayout({ children }) {
                 sx={{
                     flexGrow: 1,
                     bgcolor: '#fff',
-                    mt: 2,
+                    mt: 8,
                     p: 4,
                     borderRadius: 2,
                     boxShadow: 2,
-                    mx: 2,
+                    mx: 1,
                 }}
             >
                 {children}

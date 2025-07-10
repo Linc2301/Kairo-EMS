@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { Box, Button, TextField, Typography } from "@mui/material";
 import React from "react";
-import { schema } from "../login/validationSchema";
+import { schema } from "./validationSchema";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import Link from "next/link";
