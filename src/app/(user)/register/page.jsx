@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { schema } from "./validationSchema";
 import { useEffect } from "react";
+import axios from "axios";
 
 export default function RegisterPage() {
   const {
@@ -29,12 +30,29 @@ export default function RegisterPage() {
     }
   }, [errors, clearErrors]);
 
-  const onSubmit = (formData) => {
-    console.log(formData);
-    console.log("Name input Data", formData.name);
-    console.log("formdata", formData.password);
-    reset();
-  };
+  // const onSubmit = (formData) => {
+  //   console.log(formData);
+  //   console.log("Name input Data", formData.name);
+  //   console.log("formdata", formData.password);
+  //   reset();
+  // };
+  const onSubmit = async (formData) => {
+        try {
+            console.log("formData", formData);
+            const bodyData = {
+                name: formData.name,
+                email: formData.email,
+                phone: formData.phone,
+                password: formData.password,
+                confirm_pass: formData.confirm_pass,
+            };
+            const response = await axios.post("http://localhost:3000/api/users", bodyData);
+            reset();
+            console.log("Successfully Saved.");
+        } catch (error) {
+            console.error(error);
+        }
+    }
 
   return (
     <Box
@@ -209,7 +227,7 @@ export default function RegisterPage() {
                 opacity: 0,
               },
             }}
-            {...register("confirmPassword")}
+            {...register("confirm_pass")}
             error={!!errors.confirmPassword}
             helperText={errors.confirmPassword?.message || " "}
           />

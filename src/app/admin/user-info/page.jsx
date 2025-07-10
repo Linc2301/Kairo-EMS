@@ -28,7 +28,7 @@ export default function UserList() {
     }, [])
 
     return (
-        <Box sx={{ bgcolor: "cyan", p: 5 }}>
+        <Box sx={{  p: 3 }}>
             <Stack alignItems="flex-end">
                 <Link passHref href="/users/create"><Button variant="contained">ADD Users</Button></Link>
             </Stack>
@@ -36,24 +36,24 @@ export default function UserList() {
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell>No</TableCell>
-                            <TableCell>User Name</TableCell>
-                            <TableCell>Email</TableCell>
-                            <TableCell>Phone No.</TableCell>                    
-                            <TableCell>Password</TableCell>
-                            <TableCell>Confirm Password</TableCell>
+                            <TableCell align='center'>No</TableCell>
+                            <TableCell align='center'>User Name</TableCell>
+                            <TableCell align='center'>Email</TableCell>
+                            <TableCell align='center'>Phone No.</TableCell>                    
+                            <TableCell align='center'>Password</TableCell>
+                            <TableCell align='center'>Confirm Password</TableCell>
                             <TableCell align='center'>Action</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {users.map((users, index) => (        //we can place student cause that can be different 
                             <TableRow key={users.id}>
-                                <TableCell>{index + 1}</TableCell>
-                                <TableCell>{users.name}</TableCell>
-                                <TableCell>{users.email}</TableCell>
-                                <TableCell>{users.phone}</TableCell>
-                                <TableCell>{users.password}</TableCell>
-                                <TableCell>{users.confirm_pass}</TableCell>
+                                <TableCell align='center'>{index + 1}</TableCell>
+                                <TableCell align='center'>{users.name}</TableCell>
+                                <TableCell align='center'>{users.email}</TableCell>
+                                <TableCell align='center'>{users.phone}</TableCell>
+                                <TableCell align='center'>{users.password}</TableCell>
+                                <TableCell align='center'>{users.confirm_pass}</TableCell>
                                 <TableCell align='center'>
                                     <Link passHref href={`/users/${users.id}`}>
                                         <IconButton sx={{ color: "green" }}>

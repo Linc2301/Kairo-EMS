@@ -50,7 +50,7 @@ export default function AdminLayout({ children }) {
                 position="fixed"
                 sx={{
                     width: `calc(100% - ${drawerWidth}px)`,
-                    ml: `${drawerWidth}px`,
+                     ml: `${drawerWidth}px`,
                     bgcolor: 'white',
                     color: 'black',
                     boxShadow: 1,

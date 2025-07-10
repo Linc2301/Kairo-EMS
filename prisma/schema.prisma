@@ -14,11 +14,16 @@ model User {
   phone        String?   @db.VarChar(50)
   password     String?   @db.VarChar(50)
   confirm_pass String?   @db.VarChar(50)
-  isAdmin      String    @default("user") @db.VarChar(50)
-  status       Status    @default(active)
-  bookings     Booking[]
-  ratings      Rating[]
-  reviews      Review[]
+  Booking      Booking[]
+  Rating       Rating[]
+  Review       Review[]
+
+  // isAdmin      String    @default("user") @db.VarChar(50)
+  // status       Status    @default(active)
+  // bookings     Booking[]
+  // ratings      Rating[]
+  // reviews      Review[]
+  @@map("user")
 }
 
 model Category {
