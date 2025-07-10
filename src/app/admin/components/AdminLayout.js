@@ -1,3 +1,4 @@
+
 import React from 'react';
 import {
     Box,
@@ -37,15 +38,21 @@ const navItems = [
     { text: 'Feedback', icon: <Feedback /> },
 ];
 
-export default function DashboardLayout() {
+export default function AdminLayout({ children }) {
     return (
         <Box sx={{ display: 'flex', height: '100vh' }}>
             <AppBar
                 position="fixed"
-                sx={{ width: `calc(100% - ${drawerWidth}px)`, ml: `${drawerWidth}px`, bgcolor: 'white', color: 'black', boxShadow: 1 }}
+                sx={{
+                    width: `calc(100% - ${drawerWidth}px)`,
+                    ml: `${drawerWidth}px`,
+                    bgcolor: 'white',
+                    color: 'black',
+                    boxShadow: 1,
+                }}
             >
                 <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Typography variant="h6" noWrap component="div" sx={{ fontFamily: 'serif', color: 'black' }}>
+                    <Typography variant="h6" noWrap component="div" sx={{ fontFamily: 'serif' }}>
                         <span style={{ color: '#ef6c00', fontWeight: 'bold', fontSize: '32px' }}>K</span>airo
                     </Typography>
                     <IconButton>
@@ -61,7 +68,11 @@ export default function DashboardLayout() {
                 sx={{
                     width: drawerWidth,
                     flexShrink: 0,
-                    [`& .MuiDrawer-paper`]: { width: drawerWidth, boxSizing: 'border-box', pt: 8 },
+                    [`& .MuiDrawer-paper`]: {
+                        width: drawerWidth,
+                        boxSizing: 'border-box',
+                        pt: 8,
+                    },
                 }}
             >
                 <Toolbar />
@@ -81,7 +92,9 @@ export default function DashboardLayout() {
                                     pl: 3,
                                 }}
                             >
-                                <ListItemIcon sx={{ color: index === 0 ? '#ef6c00' : 'inherit' }}>{item.icon}</ListItemIcon>
+                                <ListItemIcon sx={{ color: index === 0 ? '#ef6c00' : 'inherit' }}>
+                                    {item.icon}
+                                </ListItemIcon>
                                 <ListItemText primary={item.text} />
                             </ListItemButton>
                         </ListItem>
@@ -98,14 +111,11 @@ export default function DashboardLayout() {
                     p: 4,
                     borderRadius: 2,
                     boxShadow: 2,
-                    mx: 2, // Add some horizontal margin
+                    mx: 2,
                 }}
             >
-                <Typography variant="h4" gutterBottom>
-                    Welcome to the Dashboard
-                </Typography>
+                {children}
             </Box>
-
         </Box>
     );
 }
