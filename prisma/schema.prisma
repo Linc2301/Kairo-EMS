@@ -14,7 +14,7 @@ model User {
   phone        String?   @db.VarChar(50)
   password     String?   @db.VarChar(50)
   confirm_pass String?   @db.VarChar(50)
-  role         Role      @default(user)
+  isAdmin      String    @default("user") @db.VarChar(50)
   status       Status    @default(active)
   bookings     Booking[]
   ratings      Rating[]

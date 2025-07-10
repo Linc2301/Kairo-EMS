@@ -1,4 +1,4 @@
-"use client";
+"use client"
 
 import { Box, Button, IconButton, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import Link from 'next/link';
@@ -17,7 +17,7 @@ export default function UserList() {
             // console.log("getStudentList()")
             const response = await axios.get("/api/users")
             // console.log("API response", response.data)
-            setStudents(response.data);
+            setUsers(response.data);
         } catch (error) {
             console.error(error)
         }
@@ -30,48 +30,42 @@ export default function UserList() {
     return (
         <Box sx={{ bgcolor: "cyan", p: 5 }}>
             <Stack alignItems="flex-end">
-                <Link passHref href="/students/create"><Button variant="contained">ADD Student</Button></Link>
+                <Link passHref href="/users/create"><Button variant="contained">ADD Users</Button></Link>
             </Stack>
             <TableContainer component={Paper}>
                 <Table>
                     <TableHead>
                         <TableRow>
                             <TableCell>No</TableCell>
-                            <TableCell>Name</TableCell>
-                            <TableCell>Phone</TableCell>
-                            <TableCell>Dob</TableCell>
-                            <TableCell>FatherName</TableCell>
-                            <TableCell>Age</TableCell>
-                            <TableCell>Gender</TableCell>
-                            <TableCell>Address</TableCell>
-                            <TableCell>Major</TableCell>
+                            <TableCell>User Name</TableCell>
+                            <TableCell>Email</TableCell>
+                            <TableCell>Phone No.</TableCell>                    
+                            <TableCell>Password</TableCell>
+                            <TableCell>Confirm Password</TableCell>
                             <TableCell align='center'>Action</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {students.map((students, index) => (        //we can place student cause that can be different 
-                            <TableRow key={students.id}>
+                        {users.map((users, index) => (        //we can place student cause that can be different 
+                            <TableRow key={users.id}>
                                 <TableCell>{index + 1}</TableCell>
-                                <TableCell>{students.name}</TableCell>
-                                <TableCell>{students.phone}</TableCell>
-                                <TableCell>{students.dob}</TableCell>
-                                <TableCell>{students.father_name}</TableCell>
-                                <TableCell>{students.age}</TableCell>
-                                <TableCell>{students.gender}</TableCell>
-                                <TableCell>{students.address}</TableCell>
-                                <TableCell>{students.major}</TableCell>
+                                <TableCell>{users.name}</TableCell>
+                                <TableCell>{users.email}</TableCell>
+                                <TableCell>{users.phone}</TableCell>
+                                <TableCell>{users.password}</TableCell>
+                                <TableCell>{users.confirm_pass}</TableCell>
                                 <TableCell align='center'>
-                                    <Link passHref href={`/students/${students.id}`}>
+                                    <Link passHref href={`/users/${users.id}`}>
                                         <IconButton sx={{ color: "green" }}>
                                             <VisibilityIcon />
                                         </IconButton>
                                     </Link>
-                                    <Link passHref href={`/students/${students.id}/edit`}>
+                                    <Link passHref href={`/users/${users.id}/edit`}>
                                         <IconButton sx={{ color: "blue" }}>
                                             <EditIcon />
                                         </IconButton>
                                     </Link>
-                                    <Link passHref href={"/students/1"}>
+                                    <Link passHref href={"/users/1"}>
                                         <IconButton sx={{ color: "red" }}>
                                             <DeleteIcon />
                                         </IconButton>
