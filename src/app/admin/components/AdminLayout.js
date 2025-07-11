@@ -84,33 +84,34 @@ export default function AdminLayout({ children }) {
                 <List>
                     {navItems.map((item) => {
                         const isSelected = pathname === item.path;
+
                         return (
                             <ListItem disablePadding key={item.text}>
-                                <Link href={item.path} passHref legacyBehavior>
-                                    <ListItemButton
-                                        component="a"
-                                        selected={isSelected}
-                                        sx={{
-                                            '&.Mui-selected': {
-                                                color: '#ef6c00',
-                                                borderRight: '4px solid #ef6c00',
-                                            },
-                                            '&:hover': {
-                                                backgroundColor: '#f5f5f5',
-                                            },
-                                            pl: 3,
-                                        }}
-                                    >
-                                        <ListItemIcon sx={{ color: isSelected ? '#ef6c00' : 'inherit' }}>
-                                            {item.icon}
-                                        </ListItemIcon>
-                                        <ListItemText primary={item.text} />
-                                    </ListItemButton>
-                                </Link>
+                                <ListItemButton
+                                    component={Link}
+                                    href={item.path}
+                                    selected={isSelected}
+                                    sx={{
+                                        '&.Mui-selected': {
+                                            color: '#ef6c00',
+                                            borderRight: '4px solid #ef6c00',
+                                        },
+                                        '&:hover': {
+                                            backgroundColor: '#f5f5f5',
+                                        },
+                                        pl: 3,
+                                    }}
+                                >
+                                    <ListItemIcon sx={{ color: isSelected ? '#ef6c00' : 'inherit' }}>
+                                        {item.icon}
+                                    </ListItemIcon>
+                                    <ListItemText primary={item.text} />
+                                </ListItemButton>
                             </ListItem>
                         );
                     })}
                 </List>
+
             </Drawer>
 
             <Box
