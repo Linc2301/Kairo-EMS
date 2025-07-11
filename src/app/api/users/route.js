@@ -20,13 +20,12 @@ export async function GET() {
     return NextResponse.json(users);
 }
 
-
 //Register User API
 export async function POST(req) {
     try {
         const body = await req.json();
-
-        const validatedData = await schema.validate(body, { abortEarly: false });  //we used await cause the schema is the async function //use abortEarly for testing validate that is true or false
+        const validatedData = await schema.validate(body, { abortEarly: false });
+        validatedData.password = await bcrypt.hash(validatedData.password, 10);
         const user = await prisma.user.create({
             data: validatedData,
         })

@@ -4,7 +4,7 @@ import "./globals.css";
 import Footer from "@/src/components/footer"
 import Header from "@/src/components/navbar"
 import { CssBaseline } from "@mui/material";
-
+import { SessionProvider } from "next-auth/react";
 
 const openSans = Open_Sans({
   variable: "--font-open-sans",
@@ -26,9 +26,8 @@ export default function RootLayout({ children }) {
       >
         <CssBaseline/>
         <Header />
-        {children}
+       <SessionProvider>{children}</SessionProvider>
         <Footer />
-        
       </body>
     </html>
   );

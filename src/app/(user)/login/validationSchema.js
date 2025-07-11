@@ -2,7 +2,11 @@ import { Password } from "@mui/icons-material";
 import * as yup from "yup";
 
 export const schema = yup.object().shape({
-  name: yup.string().required("Name is required"),
+  email: yup
+      .string()
+      .required("Email is required")
+      .email("Invalid email format")
+      .required("Email is required"),
   password: yup
     .string()
     .required("Password is required")
