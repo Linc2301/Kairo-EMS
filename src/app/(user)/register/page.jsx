@@ -40,6 +40,7 @@ export default function RegisterPage() {
     }
   }, [errors, clearErrors]);
   const onSubmit = async (formData) => {
+    
     try {
       const bodyData = {
         name: formData.name,
@@ -266,10 +267,11 @@ export default function RegisterPage() {
         </Box>
       </Box>
       <Snackbar
+        sx={{ mb: 6 }}
         open={snackbar.open}
         autoHideDuration={4000}
         onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: "top", horizontal: "left" }}
+        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
       >
         <Alert
           severity={snackbar.severity}

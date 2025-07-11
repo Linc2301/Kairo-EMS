@@ -52,7 +52,7 @@ export default function LoginPage() {
           severity: "success",
         });
         reset();
-        router.push("/home");
+        router.push("/");
       } else {
         setSnackbar({
           open: true,
@@ -72,6 +72,7 @@ export default function LoginPage() {
 
   return (
     <>
+    
       <Box
         sx={{
           display: "flex",

@@ -1,5 +1,13 @@
 'use client';
 
+import React from "react";
+import Link from "next/link";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { schema } from "./validationSchema";
+import { useEffect } from "react";
+import axios from "axios";
+
 import {
     Box,
     Button,
@@ -15,6 +23,43 @@ import FmdGoodIcon from '@mui/icons-material/FmdGood';
 import AccessTimeFilledIcon from '@mui/icons-material/AccessTimeFilled';
 
 export default function ContactPage() {
+
+    const {
+        handleSubmit,
+        register,
+        reset,
+        clearErrors,
+        formState: { errors },
+    } = useForm({
+        resolver: yupResolver(schema),
+    });
+
+    useEffect(() => {
+        if (Object.keys(errors).length > 0) {
+            const timer = setTimeout(() => {
+                clearErrors();
+            }, 2000); // 2000ms = 2 seconds
+
+            return () => clearTimeout(timer); // Cleanup on unmount or errors change
+        }
+    }, [errors, clearErrors]);
+
+    const onSubmit = async (formData) => {
+        try {
+            console.log("formData", formData);
+            const bodyData = {
+                name: formData.name,
+                email: formData.email,
+                subject: formData.subject,
+                message: formData.message,
+            };
+            const response = await axios.post("http://localhost:3000/api/contact", bodyData);
+            reset();
+            console.log("Successfully Saved.");
+        } catch (error) {
+            console.error(error);
+        }
+    }
     return (
         <Box px={10} py={2}>
             <Typography variant="h4" fontWeight="bold" mb={4} sx={{ textAlign: "center" }}>
@@ -23,20 +68,47 @@ export default function ContactPage() {
 
             <Grid container spacing={4} >
                 {/* Contact Form */}
-                <Grid item md={6}>
-                    <Paper elevation={6} sx={{ p: 3, borderRadius: 2 }}>
-                        <Stack component="form" spacing={3}>
-                            <TextField label="Name" variant="outlined" fullWidth />
-                            <TextField label="Email" type="email" variant="outlined" fullWidth />
-                            <TextField label="Subject" variant="outlined" fullWidth />
-                            <TextField label="Message" variant="outlined" fullWidth multiline rows={4} />
-                            <Button variant="contained" color="primary" size="large">
-                                Send Message
-                            </Button>
-                        </Stack>
-                    </Paper>
-                </Grid>
-
+                <Box component="form" onSubmit={handleSubmit(onSubmit)}>
+                    <Grid item md={6}>
+                        <Paper elevation={6} sx={{ p: 3, borderRadius: 2 }}>
+                            <Stack spacing={3}>
+                                <TextField label="Name"
+                                    variant="outlined"
+                                    fullWidth
+                                    {...register("name")}
+                                    error={!!errors.name}
+                                    helperText={errors.name?.message || " "}
+                                />
+                                <TextField label="Email"
+                                    type="email"
+                                    variant="outlined"
+                                    fullWidth
+                                    {...register("email")}
+                                    error={!!errors.email}
+                                    helperText={errors.email?.message || " "}
+                                />
+                                <TextField label="Subject"
+                                    variant="outlined"
+                                    fullWidth
+                                    {...register("subject")}
+                                    error={!!errors.subject}
+                                    helperText={errors.subject?.message || " "}
+                                />
+                                <TextField label="Message"
+                                    variant="outlined"
+                                    fullWidth
+                                    multiline rows={4}
+                                    {...register("message")}
+                                    error={!!errors.message}
+                                    helperText={errors.message?.message || " "}
+                                />
+                                <Button variant="contained" color="primary" size="large" type='submit'>
+                                    Send Message
+                                </Button>
+                            </Stack>
+                        </Paper>
+                    </Grid>
+                </Box>
                 {/* Contact Info */}
                 <Grid item md={6} mt={8}>
                     <Paper elevation={3} sx={{ p: 3, borderRadius: 2 }}>

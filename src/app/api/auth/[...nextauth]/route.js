@@ -13,16 +13,18 @@ const handler = NextAuth({
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials) {
+      async authorize(credentials) { 
         const user = await prisma.user.findUnique({
           where: { email: credentials.email },
         });
-
+      console.log("User found:", user);
         if (!user || !user.password) {
           throw new Error("Invalid email or password");
         }
 
         const isValid = await bcrypt.compare(credentials.password, user.password);
+        console.log("Password match:", credentials.password, user.password);
+        console.log("Password match:", isValid);
         if (!isValid) {
           throw new Error("Invalid email or password");
         }
