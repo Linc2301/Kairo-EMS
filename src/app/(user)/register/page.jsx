@@ -228,8 +228,8 @@ export default function RegisterPage() {
               },
             }}
             {...register("confirm_pass")}
-            error={!!errors.confirmPassword}
-            helperText={errors.confirmPassword?.message || " "}
+            error={!!errors.confirm_pass}
+            helperText={errors.confirm_pass?.message || " "}
           />
 
           <Button

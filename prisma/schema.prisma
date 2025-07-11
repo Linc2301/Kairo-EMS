@@ -14,11 +14,12 @@ model User {
   phone        String?   @db.VarChar(50)
   password     String?   @db.VarChar(50)
   confirm_pass String?   @db.VarChar(50)
+  isAdmin      String    @default("user") @db.VarChar(50)
   Booking      Booking[]
   Rating       Rating[]
   Review       Review[]
 
-  // isAdmin      String    @default("user") @db.VarChar(50)
+  //isAdmin      String    @default("user") @db.VarChar(50)
   // status       Status    @default(active)
   // bookings     Booking[]
   // ratings      Rating[]
@@ -26,30 +27,31 @@ model User {
   @@map("user")
 }
 
-model Category {
-  id     Int     @id @default(autoincrement())
-  name   String  @db.VarChar(50)
-  events Event[]
-}
-
 model Event {
-  id          Int      @id @default(autoincrement())
-  name        String   @db.VarChar(50)
-  description String   @db.Text
+  id          Int     @id @default(autoincrement())
+  name        String  @db.VarChar(50)
+  description String  @db.Text
   photo       String
-  category    Category @relation(fields: [category_id], references: [id])
-  category_id Int
-  venues      Venue[]
+  Venue       Venue[]
 }
 
 model Venue {
-  id          Int       @id @default(autoincrement())
-  name        String    @db.VarChar(50)
-  description String    @db.Text
-  price       String    @db.VarChar(255)
-  event       Event     @relation(fields: [event_id], references: [id])
-  event_id    Int
-  bookings    Booking[]
+  id        Int         @id @default(autoincrement())
+  name      String      @db.VarChar(50)
+  photo     String?
+  eventId   Int
+  Event     Event       @relation(fields: [eventId], references: [id])
+  Booking   Booking[]
+  VenueType VenueType[]
+}
+
+model VenueType {
+  id          Int    @id @default(autoincrement())
+  name        String @db.VarChar(50)
+  description String @db.Text
+  price       String @db.VarChar(255)
+  venue_id    Int
+  Venue       Venue  @relation(fields: [venue_id], references: [id])
 }
 
 model FloralService {
@@ -87,6 +89,8 @@ model Contact {
   email   String @db.VarChar(255)
   subject String @db.VarChar(255)
   message String @db.VarChar(255)
+
+  @@map("contact")
 }
 
 model Rating {
