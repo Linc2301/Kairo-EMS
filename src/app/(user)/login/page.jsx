@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Box,
   Button,
@@ -8,7 +8,10 @@ import {
   Typography,
   Snackbar,
   Alert,
+  IconButton,
+  InputAdornment,
 } from "@mui/material";
+import { Visibility, VisibilityOff } from "@mui/icons-material"; // 👈 Import icons
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { schema } from "./validationSchema";
@@ -18,6 +21,7 @@ import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const router = useRouter();
+
   const {
     handleSubmit,
     reset,
@@ -30,11 +34,17 @@ export default function LoginPage() {
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
-    severity: "success", 
+    severity: "success",
   });
+
+  const [showPassword, setShowPassword] = useState(false); // 👈 For password toggle
 
   const handleSnackbarClose = () => {
     setSnackbar((prev) => ({ ...prev, open: false }));
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword((prev) => !prev);
   };
 
   const onSubmit = async (formData) => {
@@ -72,7 +82,6 @@ export default function LoginPage() {
 
   return (
     <>
-    
       <Box
         sx={{
           display: "flex",
@@ -159,7 +168,7 @@ export default function LoginPage() {
               hiddenLabel
               fullWidth
               size="small"
-              type="password"
+              type={showPassword ? "text" : "password"}
               sx={{
                 mb: 0.5,
                 "& .MuiInputBase-input::placeholder": {
@@ -173,6 +182,20 @@ export default function LoginPage() {
               {...register("password")}
               error={!!errors.password}
               helperText={errors.password?.message || " "}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={togglePasswordVisibility}
+                      edge="end"
+                      size="small"
+                      sx={{ color: "rgba(0,0,0,0.5)" }}
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
             />
 
             <Button
@@ -211,6 +234,7 @@ export default function LoginPage() {
           </Box>
         </Box>
       </Box>
+
       <Snackbar
         sx={{ mb: 6 }}
         open={snackbar.open}

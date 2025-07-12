@@ -22,12 +22,13 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body
-        className={`${openSans.variable} ${raleway.variable} antialiased`}
-      >
-        <CssBaseline/>
-        <Header />
-       <SessionProvider>{children}</SessionProvider>
-        <Footer />
+        className={`${openSans.variable} ${raleway.variable} antialiased`}>
+        <CssBaseline />
+        <SessionProvider>
+          <Header />
+          {children}
+          <Footer />
+        </SessionProvider>
       </body>
     </html>
   );

@@ -36,7 +36,7 @@ export default function Direction() {
                         Begins
                     </Typography>
 
-                    <Link passHref href="/">
+                    <Link passHref href="/events">
                         <Button
                             variant="contained"
                             size="large"

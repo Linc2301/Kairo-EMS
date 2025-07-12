@@ -8,15 +8,16 @@ datasource db {
 }
 
 model User {
-  id           Int       @id @default(autoincrement())
-  name         String    @db.VarChar(255)
-  email        String?   @db.VarChar(255) @unique
-  phone        String?   @db.VarChar(50)
-  password     String?   @db.VarChar(255)
-  isAdmin      String    @default("user") @db.VarChar(50)
-  Booking      Booking[]
-  Rating       Rating[]
-  Review       Review[]
+  id       Int       @id @default(autoincrement())
+  name     String    @db.VarChar(255)
+  email    String?   @unique @db.VarChar(255)
+  phone    String?   @db.VarChar(50)
+  password String?   @db.VarChar(255)
+  isAdmin  String    @default("user") @db.VarChar(50)
+  Booking  Booking[]
+  Rating   Rating[]
+  Review   Review[]
+
   @@map("user")
 }
 

@@ -1,14 +1,23 @@
 "use client";
 
-import { Alert, Box, Button, Snackbar, TextField, Typography } from "@mui/material";
-import React, { useState } from "react";
+import {
+  Alert,
+  Box,
+  Button,
+  IconButton,
+  InputAdornment,
+  Snackbar,
+  TextField,
+  Typography,
+} from "@mui/material";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { schema } from "./validationSchema";
-import { useEffect } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { Visibility, VisibilityOff } from "@mui/icons-material"; // 👈 import icons
 
 export default function RegisterPage() {
   const {
@@ -20,27 +29,35 @@ export default function RegisterPage() {
   } = useForm({
     resolver: yupResolver(schema),
   });
+
   const router = useRouter();
+
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
     severity: "success",
   });
 
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
+  const toggleConfirmPasswordVisibility = () => setShowConfirmPassword((prev) => !prev);
+
   const handleSnackbarClose = () => {
     setSnackbar((prev) => ({ ...prev, open: false }));
   };
+
   useEffect(() => {
     if (Object.keys(errors).length > 0) {
       const timer = setTimeout(() => {
         clearErrors();
       }, 2000);
-
-      return () => clearTimeout(timer); // Cleanup on unmount or errors change
+      return () => clearTimeout(timer);
     }
   }, [errors, clearErrors]);
+
   const onSubmit = async (formData) => {
-    
     try {
       const bodyData = {
         name: formData.name,
@@ -49,7 +66,9 @@ export default function RegisterPage() {
         password: formData.password,
         confirm_pass: formData.confirm_pass,
       };
-      const response = await axios.post("/api/users", bodyData);
+
+      await axios.post("/api/users", bodyData);
+
       reset();
       setSnackbar({
         open: true,
@@ -61,8 +80,7 @@ export default function RegisterPage() {
       console.error(error);
       setSnackbar({
         open: true,
-        message:
-          error.response?.data?.message || "Registration failed. Try again.",
+        message: error.response?.data?.message || "Registration failed. Try again.",
         severity: "error",
       });
     }
@@ -73,20 +91,20 @@ export default function RegisterPage() {
       <Box
         sx={{
           display: "flex",
-          flexDirection: { xs: "column", md: "row" }, // Stacks vertically on small, rows on medium+
-          height: "100vh", // Makes the container take full viewport height
+          flexDirection: { xs: "column", md: "row" },
+          height: "100vh",
         }}
       >
         {/* Left side - Image */}
         <Box
           sx={{
-            flex: { xs: "none", md: 1 }, // On medium+, takes available space
+            flex: { xs: "none", md: 1 },
             backgroundImage: 'url("/login.jpg")',
             backgroundSize: "cover",
             backgroundPosition: "center",
-            height: { xs: "30vh", md: "100%" }, // Adjust height for mobile view if image is shown
+            height: { xs: "30vh", md: "100%" },
             width: "100%",
-            display: { xs: "none", md: "block" }, // Hide on small screens, show on medium and up
+            display: { xs: "none", md: "block" },
           }}
         />
 
@@ -95,7 +113,7 @@ export default function RegisterPage() {
           sx={{
             flex: { xs: "none", md: 1 },
             bgcolor: "white",
-            minHeight: "100vh", // ✅ fixes shrinking
+            minHeight: "100vh",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -121,12 +139,13 @@ export default function RegisterPage() {
               sx={{
                 color: "black",
                 textAlign: "start",
-
                 fontSize: { xs: 24, md: 30 },
               }}
             >
               Create an Account
             </Typography>
+
+            {/* Name */}
             <Typography sx={{ color: "black", mb: 0.5 }}>User Name</Typography>
             <TextField
               placeholder="Enter your name"
@@ -147,6 +166,7 @@ export default function RegisterPage() {
               helperText={errors.name?.message || " "}
             />
 
+            {/* Email */}
             <Typography sx={{ color: "black", mb: 0.5 }}>Email</Typography>
             <TextField
               placeholder="Enter your email"
@@ -167,6 +187,7 @@ export default function RegisterPage() {
               helperText={errors.email?.message || " "}
             />
 
+            {/* Phone */}
             <Typography sx={{ color: "black", mb: 0.5 }}>Phone No.</Typography>
             <TextField
               placeholder="Enter your phone no."
@@ -187,13 +208,14 @@ export default function RegisterPage() {
               helperText={errors.phone?.message || " "}
             />
 
+            {/* Password */}
             <Typography sx={{ color: "black", mb: 0.5 }}>Password</Typography>
             <TextField
               placeholder="Enter your password"
               hiddenLabel
               fullWidth
               size="small"
-              type="password"
+              type={showPassword ? "text" : "password"}
               sx={{
                 "& .MuiInputBase-input::placeholder": {
                   opacity: 0.3,
@@ -206,17 +228,25 @@ export default function RegisterPage() {
               {...register("password")}
               error={!!errors.password}
               helperText={errors.password?.message || " "}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton onClick={togglePasswordVisibility} edge="end">
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
             />
 
-            <Typography sx={{ color: "black", mb: 0.5 }}>
-              Confirm Password
-            </Typography>
+            {/* Confirm Password */}
+            <Typography sx={{ color: "black", mb: 0.5 }}>Confirm Password</Typography>
             <TextField
               placeholder="Confirm your password"
               hiddenLabel
-              size="small"
               fullWidth
-              type="password"
+              size="small"
+              type={showConfirmPassword ? "text" : "password"}
               sx={{
                 "& .MuiInputBase-input::placeholder": {
                   opacity: 0.3,
@@ -229,8 +259,18 @@ export default function RegisterPage() {
               {...register("confirm_pass")}
               error={!!errors.confirm_pass}
               helperText={errors.confirm_pass?.message || " "}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton onClick={toggleConfirmPasswordVisibility} edge="end">
+                      {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
             />
 
+            {/* Submit Button */}
             <Button
               variant="contained"
               type="submit"
@@ -243,6 +283,8 @@ export default function RegisterPage() {
             >
               Register
             </Button>
+
+            {/* Link to login */}
             <Typography variant="body2" sx={{ color: "black" }} align="center">
               Already have an account?
               <Link passHref href="/login">
@@ -266,6 +308,8 @@ export default function RegisterPage() {
           </Box>
         </Box>
       </Box>
+
+      {/* Snackbar */}
       <Snackbar
         sx={{ mb: 6 }}
         open={snackbar.open}
@@ -273,11 +317,7 @@ export default function RegisterPage() {
         onClose={handleSnackbarClose}
         anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
       >
-        <Alert
-          severity={snackbar.severity}
-          onClose={handleSnackbarClose}
-          sx={{ width: "100%" }}
-        >
+        <Alert severity={snackbar.severity} onClose={handleSnackbarClose} sx={{ width: "100%" }}>
           {snackbar.message}
         </Alert>
       </Snackbar>

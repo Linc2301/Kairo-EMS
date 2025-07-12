@@ -55,7 +55,6 @@ export default function UserList() {
                             <TableCell align='center'>Email</TableCell>
                             <TableCell align='center'>Phone No.</TableCell>
                             <TableCell align='center'>Password</TableCell>
-                            <TableCell align='center'>Confirm Password</TableCell>
                             <TableCell align='center'>Action</TableCell>
                         </TableRow>
                     </TableHead>
@@ -67,7 +66,6 @@ export default function UserList() {
                                 <TableCell align='center'>{users.email}</TableCell>
                                 <TableCell align='center'>{users.phone}</TableCell>
                                 <TableCell align='center'>{users.password}</TableCell>
-                                <TableCell align='center'>{users.confirm_pass}</TableCell>
                                 <TableCell align='center'>
                                     <IconButton
                                         sx={{ color: "red" }}
