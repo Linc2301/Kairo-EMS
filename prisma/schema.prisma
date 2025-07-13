@@ -40,17 +40,19 @@ model Venue {
 }
 
 model VenueType {
-  id          Int    @id @default(autoincrement())
-  name        String @db.VarChar(50)
-  description String @db.Text
-  price       String @db.VarChar(255)
+  id          Int     @id @default(autoincrement())
+  name        String  @db.VarChar(50)
+  photo       String?
+  description String  @db.Text
+  price       String  @db.VarChar(255)
   venue_id    Int
-  Venue       Venue  @relation(fields: [venue_id], references: [id])
+  Venue       Venue   @relation(fields: [venue_id], references: [id])
 }
 
 model FloralService {
   id          Int       @id @default(autoincrement())
   name        String    @db.VarChar(50)
+  photo       String?
   description String    @db.Text
   price       Int
   bookings    Booking[]
@@ -58,6 +60,7 @@ model FloralService {
 
 model TimePackage {
   id       Int       @id @default(autoincrement())
+  photo    String?
   date     DateTime
   time     DateTime
   bookings Booking[]
