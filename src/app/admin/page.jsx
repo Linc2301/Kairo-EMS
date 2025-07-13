@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import { Box, Grid, Typography } from '@mui/material';
+import { Box, Grid, Typography, Container, Paper } from '@mui/material';
 import DashboardCard from '@/src/app/admin/components/DashboardCard';
 import VisitorChart from '@/src/app/admin/components/VisitorChart';
 import TaskChart from '@/src/app/admin/components/TaskChart';
@@ -10,46 +10,55 @@ import EventIcon from '@mui/icons-material/Event';
 
 export default function DashboardPage() {
   return (
-    <Box sx={{ bgcolor: '#0c0b1a', px: 4 }}>
-      <Typography variant="h4" color="white" mb={2}>
-        Dashboard
-      </Typography>
+    <Box>
+      <Container maxWidth="xl">
+        <Typography variant="h4" mb={2}>
+          Dashboard
+        </Typography>
 
-      <Grid container spacing={3} mb={4}>
-        <Grid item xs={12} md={4}>
-          <DashboardCard
-            title="Total Customers"
-            value="153"
-            icon={<GroupIcon fontSize="large" />}
-            bgColor="#3f51b5"
-          />
+        {/* Top Cards */}
+        <Grid container spacing={3} mb={4}>
+          <Grid item md={4}>
+            <DashboardCard
+              title="Total Customers"
+              value="153"
+              icon={<GroupIcon fontSize="large" />}
+              bgColor="#3f51b5"
+            />
+          </Grid>
+          <Grid item md={4}>
+            <DashboardCard
+              title="New Customers"
+              value="5"
+              icon={<PersonIcon fontSize="large" />}
+              bgColor="#fbc02d"
+            />
+          </Grid>
+          <Grid item md={4}>
+            <DashboardCard
+              title="Total Events"
+              value="10"
+              icon={<EventIcon fontSize="large" />}
+              bgColor="#0288d1"
+            />
+          </Grid>
         </Grid>
-        <Grid item xs={12} md={4}>
-          <DashboardCard
-            title="New Customers"
-            value="5"
-            icon={<PersonIcon fontSize="large" />}
-            bgColor="#fbc02d"
-          />
+
+        {/* Charts Section */}
+        <Grid container spacing={6} mt={2}>
+        {/* Visitor Statistics - 8/12 */}
+        <Grid item md={8}>
+            <VisitorChart />
         </Grid>
-        <Grid item xs={12} md={4}>
-          <DashboardCard
-            title="Total Events"
-            value="10"
-            icon={<EventIcon fontSize="large" />}
-            bgColor="#0288d1"
-          />
+
+        {/* Task This Month - 4/12 */}
+        <Grid item md={4}>
+          
+            <TaskChart />
         </Grid>
       </Grid>
 
-      <Grid  spacing={3}>
-        <Grid >
-          <VisitorChart />
-        </Grid>
-        <Grid  >
-          <TaskChart />
-        </Grid>
-      </Grid>
+      </Container>
     </Box>
   );
 }

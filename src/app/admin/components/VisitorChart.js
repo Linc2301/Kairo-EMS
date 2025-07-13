@@ -7,7 +7,6 @@ import {
   XAxis,
   YAxis,
   Tooltip,
-  ResponsiveContainer,
   Legend,
 } from 'recharts';
 
@@ -25,35 +24,49 @@ export default function VisitorChart() {
   return (
     <Box
       sx={{
-        bgcolor: '#dcdcdc',
+        width: 650,       // fixed width (adjust as needed)
+        height: 350,      // fixed height (adjust as needed)
+        bgcolor: '#f5f5f5',
         borderRadius: 2,
         p: 2,
-        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        boxShadow: 1,
       }}
     >
-      <Typography variant="subtitle1" gutterBottom>
-        Visitor Statistics
-      </Typography>
-      <Typography variant="body2" gutterBottom>
-        Nov - July
-      </Typography>
+      <Box>
+        <Typography variant="subtitle1" fontWeight={600}>
+          Visitor Statistics
+        </Typography>
+        <Typography variant="body2" color="textSecondary" mb={2}>
+          Nov - July
+        </Typography>
+      </Box>
 
-      <ResponsiveContainer width="100%" height={250}>
-        <LineChart data={data}>
+      <Box>
+        <LineChart
+          width={650}   // slightly less than parent width for padding
+          height={280}  // fixed height for the chart area
+          data={data}
+          margin={{ top: 10, right: 30, bottom: 0, left: 0 }}
+        >
           <XAxis dataKey="name" />
           <YAxis />
           <Tooltip />
           <Legend
+            verticalAlign="top"
+            height={36}
             formatter={(value) =>
               value === 'last6'
                 ? 'Last 6 Months (2578)'
                 : 'Previous Months (560)'
             }
           />
-          <Line type="monotone" dataKey="last6" stroke="#3f51b5" />
-          <Line type="monotone" dataKey="prev" stroke="#43a047" />
+          <Line type="monotone" dataKey="last6" stroke="#3f51b5" strokeWidth={2} />
+          <Line type="monotone" dataKey="prev" stroke="#4caf50" strokeWidth={2} />
         </LineChart>
-      </ResponsiveContainer>
+      </Box>
     </Box>
   );
 }

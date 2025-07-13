@@ -1,68 +1,45 @@
-'use client';
-import React from 'react';
-import {
-    Box,
-    Typography,
-    MenuItem,
-    Select,
-    FormControl,
-    CircularProgress,
-} from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import {
     PieChart,
     Pie,
     Cell,
-    ResponsiveContainer,
-    Legend,
+    Tooltip,
+    Legend
 } from 'recharts';
 
 const data = [
-    { name: 'Checkin', value: 60, color: '#e65100' },
-    { name: 'Booking', value: 20, color: '#43a047' },
-    { name: 'Ended', value: 20, color: '#3f51b5' },
+    { name: 'Booking', value: 400 },
+    { name: 'Check-in', value: 300 },
+    { name: 'Enquiry', value: 300 },
 ];
+
+const COLORS = ['#0088FE', '#00C49F', '#FF8042'];
 
 export default function TaskChart() {
     return (
-        <Box
-            sx={{
-                bgcolor: 'white',
-                borderRadius: 2,
-                p: 2,
-                height: '100%',
-            }}
-        >
-            <Box display="flex" justifyContent="space-between" alignItems="center">
-                <Typography variant="subtitle1">Tasks</Typography>
-                <FormControl size="small">
-                    <Select
-                        defaultValue="this"
-                        variant="standard"
-                        disableUnderline
-                        sx={{ fontSize: 14 }}
-                    >
-                        <MenuItem value="this">This Month</MenuItem>
-                        <MenuItem value="last">Last Month</MenuItem>
-                    </Select>
-                </FormControl>
-            </Box>
-
-            <ResponsiveContainer width="100%" height={220}>
-                <PieChart>
-                    <Pie
-                        data={data}
-                        innerRadius={60}
-                        outerRadius={80}
-                        dataKey="value"
-                        label={({ percent }) => `${(percent * 100).toFixed(0)}%`}
-                    >
-                        {data.map((entry, index) => (
-                            <Cell key={entry.name} fill={entry.color} />
-                        ))}
-                    </Pie>
-                    <Legend layout="vertical" align="right" verticalAlign="middle" />
-                </PieChart>
-            </ResponsiveContainer>
+        <Box sx={{ width: 350, height: 350, bgcolor: '#f9f9f9', borderRadius: 2, p: 2, boxShadow: 1 }}>
+            <Box>
+                <Typography variant="subtitle1" fontWeight={600}>
+                    Tasks this Month
+                </Typography></Box>
+            <PieChart width={350} height={300}>
+                <Pie
+                    data={data}
+                    cx={175}  // center x = half of width
+                    cy={150}  // center y = half of height
+                    labelLine={false}
+                    outerRadius={100}
+                    fill="#8884d8"
+                    dataKey="value"
+                    label
+                >
+                    {data.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                </Pie>
+                <Tooltip />
+                <Legend verticalAlign="bottom" height={36} />
+            </PieChart>
         </Box>
     );
 }
