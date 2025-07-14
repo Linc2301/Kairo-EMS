@@ -16,8 +16,8 @@ const schema = yup.object().shape({
 
 
 export async function GET() {
-    const eventData = await prisma.event.findMany();
-    return NextResponse.json(eventData);
+    const serviceData = await prisma.floralservice.findMany();
+    return NextResponse.json(serviceData);
 }
 
 
@@ -27,11 +27,11 @@ export async function POST(req) {
         const body = await req.json();
 
         const validatedData = await schema.validate(body, { abortEarly: false });  //we used await cause the schema is the async function //use abortEarly for testing validate that is true or false
-        const data = await prisma.event.create({
+        const data = await prisma.floralservice.create({
             data: validatedData,
         })
         return NextResponse.json({
-            message: "Event is successfully created.",
+            message: "Service is successfully created.",
             event: data
         })
     } catch (error) {

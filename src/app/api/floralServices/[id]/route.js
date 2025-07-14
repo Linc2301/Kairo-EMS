@@ -15,18 +15,18 @@ const schema = yup.object().shape({
 
 //DELETE API
 export async function DELETE(req, { params }) {
-    const eventId = parseInt(params.id);
+    const serviceId = parseInt(params.id);
     try {
-        await prisma.event.delete({
-            where: { id: eventId },
+        await prisma.floralservice.delete({
+            where: { id: serviceId },
         });
         return NextResponse.json({
-            message: "Event is successfully deleted.",
-            eventId,
+            message: "Service is successfully deleted.",
+            serviceId,
         });
     } catch (error) {
         return NextResponse.json({
-            message: "Event not found or event deletion failed!"
+            message: "Service not found or service deletion failed!"
         }, { status: 404 })
     }
 
@@ -36,16 +36,16 @@ export async function DELETE(req, { params }) {
 //Update event API
 export async function PUT(req, { params }) {
     try {
-        const eventId = parseInt(params.id);
+        const serviceId = parseInt(params.id);
         const body = await req.json();
         const validatedData = await schema.validate(body, { abortEarly: false, stripUnknown: true }); //use stripUnknown that might notice the change data in the validation fields
-        await prisma.event.update({
-            where: { id: eventId },
+        await prisma.floralservice.update({
+            where: { id: serviceId },
             data: validatedData,
         })
         return NextResponse.json({
-            message: "Event is successfully updated.",
-            eventId,
+            message: "Service is successfully updated.",
+            serviceId,
         });
     } catch (error) {
         if (error.name === "ValidationError") {
@@ -72,11 +72,11 @@ export async function PUT(req, { params }) {
 
 //Get event Detail API
 export async function GET(req, { params }) {
-    const eventId = parseInt(params.id); //get URL params fields,
+    const serviceId = parseInt(params.id); //get URL params fields,
     //Find student in database
-    const event = await prisma.event.findUnique({
+    const event = await prisma.floralservice.findUnique({
         where: {
-            id: eventId,
+            id: serviceId,
         }
     })
     return NextResponse.json(event)

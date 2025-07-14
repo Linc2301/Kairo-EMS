@@ -9,14 +9,19 @@ const schema = yup.object().shape({
     photo: yup.string()
         .url("Photo must be a valid URL")
         .required("Photo is required"),
-    price: yup.number().required("Price is required!")
-
+    date: yup.date()
+        .typeError("Date must be a valid date")
+        .required("Date is required"),
+    time: yup.string()
+        .matches(/^([01]\d|2[0-3]):([0-5]\d)$/, "Time must be in HH:MM format")
+        .required("Time is required"),
 });
 
 
 
+
 export async function GET() {
-    const eventData = await prisma.event.findMany();
+    const eventData = await prisma.timepackage.findMany();
     return NextResponse.json(eventData);
 }
 
@@ -27,11 +32,11 @@ export async function POST(req) {
         const body = await req.json();
 
         const validatedData = await schema.validate(body, { abortEarly: false });  //we used await cause the schema is the async function //use abortEarly for testing validate that is true or false
-        const data = await prisma.event.create({
+        const data = await prisma.timepackage.create({
             data: validatedData,
         })
         return NextResponse.json({
-            message: "Event is successfully created.",
+            message: "Package is successfully created.",
             event: data
         })
     } catch (error) {

@@ -25,7 +25,7 @@ model Event {
   id          Int     @id @default(autoincrement())
   name        String  @db.VarChar(50)
   description String  @db.Text
-  photo       String
+  photo       String  @db.LongText
   Venue       Venue[]
 }
 
@@ -52,7 +52,7 @@ model VenueType {
 model FloralService {
   id          Int       @id @default(autoincrement())
   name        String    @db.VarChar(50)
-  photo       String?
+  photo       String
   description String    @db.Text
   price       Int
   bookings    Booking[]
@@ -60,7 +60,7 @@ model FloralService {
 
 model TimePackage {
   id       Int       @id @default(autoincrement())
-  photo    String?
+  photo    String
   date     DateTime
   time     DateTime
   bookings Booking[]

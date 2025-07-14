@@ -8,25 +8,30 @@ const schema = yup.object().shape({
     photo: yup.string()
         .url("Photo must be a valid URL")
         .required("Photo is required"),
-    price: yup.number().required("Price is required!")
-
+    date: yup.date()
+        .typeError("Date must be a valid date")
+        .required("Date is required"),
+    time: yup.string()
+        .matches(/^([01]\d|2[0-3]):([0-5]\d)$/, "Time must be in HH:MM format")
+        .required("Time is required"),
 });
+
 
 
 //DELETE API
 export async function DELETE(req, { params }) {
     const eventId = parseInt(params.id);
     try {
-        await prisma.event.delete({
+        await prisma.timepackage.delete({
             where: { id: eventId },
         });
         return NextResponse.json({
-            message: "Event is successfully deleted.",
+            message: "Package is successfully deleted.",
             eventId,
         });
     } catch (error) {
         return NextResponse.json({
-            message: "Event not found or event deletion failed!"
+            message: "Package not found or package deletion failed!"
         }, { status: 404 })
     }
 
@@ -38,13 +43,13 @@ export async function PUT(req, { params }) {
     try {
         const eventId = parseInt(params.id);
         const body = await req.json();
-        const validatedData = await schema.validate(body, { abortEarly: false, stripUnknown: true }); //use stripUnknown that might notice the change data in the validation fields
-        await prisma.event.update({
+        const packageData = await schema.validate(body, { abortEarly: false, stripUnknown: true }); //use stripUnknown that might notice the change data in the validation fields
+        await prisma.timepackage.update({
             where: { id: eventId },
-            data: validatedData,
+            data: packageData,
         })
         return NextResponse.json({
-            message: "Event is successfully updated.",
+            message: "Package is successfully updated.",
             eventId,
         });
     } catch (error) {
@@ -72,11 +77,11 @@ export async function PUT(req, { params }) {
 
 //Get event Detail API
 export async function GET(req, { params }) {
-    const eventId = parseInt(params.id); //get URL params fields,
+    const packageId = parseInt(params.id); //get URL params fields,
     //Find student in database
-    const event = await prisma.event.findUnique({
+    const event = await prisma.timepackage.findUnique({
         where: {
-            id: eventId,
+            id: packageId,
         }
     })
     return NextResponse.json(event)
