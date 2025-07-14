@@ -65,7 +65,7 @@ export default function EventCarousel() {
               // Adjusted width for a more visually appealing card size, similar to the image.
               // You might need to fine-tune this value further based on your desired exact look.
               // A percentage like '90%' or 'calc(100% - 20px)' (if you add margin) can also work.
-              width: 50, // Example responsive widths
+              width: '50px !important', // Example responsive widths
               height: 350,
               borderRadius: 25, // Reduced border-radius to match the image more closely (it's less rounded than 20)
               overflow: "hidden",

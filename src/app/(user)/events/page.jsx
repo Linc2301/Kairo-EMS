@@ -96,7 +96,7 @@ export default function EventPage() {
     [{ type: "text", name: "Engagement", id: 1, highlighted: true }],
 
     [
-      { type: "image", src: "/images/img1.png" },
+      { type: "image", src: "/assets/w6.png" },
       { type: "text", name: "Bridal Shower", id: 2 },
       { type: "text", name: "Wedding", id: 3 },
       { type: "image", src: "/images/img2.png" },
