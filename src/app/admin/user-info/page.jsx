@@ -21,16 +21,16 @@ export default function UserList() {
         }
     }
     const handleDelete = async (id) => {
-        const confirmed = window.confirm("Are you sure you want to delete this contact?");
+        const confirmed = window.confirm("Are you sure you want to delete this user?");
         if (!confirmed) return;
 
         try {
             await axios.delete(`/api/users/${id}`); // call dynamic DELETE route
 
             //Immediately remove deleted contact from UI
-            setUsers((prevContacts) => prevContacts.filter((users) => users.id !== id));
+            setUsers((prev) => prev.filter((users) => users.id !== id));
 
-            alert("Contact deleted successfully!");
+            alert("User deleted successfully!");
         } catch (error) {
             console.error("Failed to delete:", error);
             alert("Something went wrong while deleting.");

@@ -94,10 +94,11 @@ export default function UserList() {
                                 </TableCell>
                                 <TableCell align="center">
 
-                                    <Link passHref href={`/events/${event.id}/edit`}>
+                                    <Link passHref href={`/admin/events/${event.id}/edit`}>
                                         <IconButton sx={{ color: "blue" }}>
                                             <EditIcon />
                                         </IconButton>
+
                                     </Link>
                                     <IconButton sx={{ color: "red" }} onClick={() => handleDelete(event.id)}>
                                         <DeleteIcon />

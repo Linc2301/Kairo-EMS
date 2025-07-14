@@ -8,13 +8,13 @@ export async function DELETE(req, { params }) {
             return NextResponse.json({ message: "ID is required" }, { status: 400 });
         }
 
-        const deleted = await prisma.contact.delete({
+        const deleted = await prisma.user.delete({
             where: { id }, //need to mark this
         });
 
         return NextResponse.json({
             message: "Contact successfully deleted",
-            contact: deleted,
+            user: deleted,
         });
     } catch (error) {
         console.error("Delete API Error:", error);
