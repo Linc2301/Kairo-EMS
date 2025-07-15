@@ -72,11 +72,11 @@ export default function Navbar() {
                                             px: 2,
                                             py: 1.5,
                                             backdropFilter: 'blur(12px)',
-                                            backgroundColor: 'rgba(30, 30, 30, 0.8)', // ⬅️ Darker bg to avoid white bleed-through
+                                            backgroundColor: 'rgba(30, 30, 30, 0.8)', //  Darker bg to avoid white bleed-through
                                             border: '1px solid rgba(255, 255, 255, 0.25)',
                                             boxShadow: '0 8px 32px rgba(31, 38, 135, 0.2)',
                                             color: '#fff',
-                                            zIndex: 1300, // ⬅️ Make sure it's above other elements
+                                            zIndex: 1300, // Make sure it's above other elements
                                         },
                                     },
                                 }}

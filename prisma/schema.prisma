@@ -25,26 +25,28 @@ model Event {
   id          Int     @id @default(autoincrement())
   name        String  @db.VarChar(50)
   description String  @db.Text
-  photo       String  @db.LongText
+  photo       String? @db.LongText
   Venue       Venue[]
 }
 
 model Venue {
   id        Int         @id @default(autoincrement())
   name      String      @db.VarChar(50)
-  photo     String?
+  photo1    String?     @db.LongText
+  photo2    String?     @db.LongText
+  photo3    String?     @db.LongText
   eventId   Int
   Event     Event       @relation(fields: [eventId], references: [id])
-  Booking   Booking[]
   VenueType VenueType[]
+  Booking   Booking[]
 }
 
 model VenueType {
   id          Int     @id @default(autoincrement())
   name        String  @db.VarChar(50)
-  photo       String?
+  photo       String? @db.LongText
   description String  @db.Text
-  price       String  @db.VarChar(255)
+  price       Float
   venue_id    Int
   Venue       Venue   @relation(fields: [venue_id], references: [id])
 }
@@ -52,15 +54,15 @@ model VenueType {
 model FloralService {
   id          Int       @id @default(autoincrement())
   name        String    @db.VarChar(50)
-  photo       String
+  photo       String?   @db.LongText
   description String    @db.Text
-  price       Int
+  price       Float
   bookings    Booking[]
 }
 
 model TimePackage {
   id       Int       @id @default(autoincrement())
-  photo    String
+  photo    String?   @db.LongText
   date     DateTime
   time     DateTime
   bookings Booking[]
