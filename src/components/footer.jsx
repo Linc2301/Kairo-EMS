@@ -4,7 +4,7 @@ import { Facebook, Twitter, LinkedIn } from '@mui/icons-material';
 
 export default function Footer() {
     return (
-        <Box component="footer"  sx={{ backgroundColor: '#000', color: '#fff', p: 2, alignItems: 'center', flexWrap: 'wrap', gap: 2, display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+        <Box component="footer"  sx={{position:"sticky", backgroundColor: '#000', color: '#fff', p: 2, alignItems: 'center', flexWrap: 'wrap', gap: 2, display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
 
             <Typography>&copy; 2025 All rights reserved by society</Typography>
 
