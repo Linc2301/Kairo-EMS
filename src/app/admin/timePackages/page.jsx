@@ -1,46 +1,38 @@
 "use client";
 
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import axios from "axios";
 import {
   Box,
   Button,
-  IconButton,
   Paper,
-  Stack,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
+  Typography,
 } from "@mui/material";
-import Link from "next/link";
-import DeleteIcon from "@mui/icons-material/Delete";
-import EditIcon from "@mui/icons-material/Edit";
-import axios from "axios";
-import { useEffect, useState } from "react";
 
-export default function TimePackageList() {
-  const [events, setEvents] = useState([]);
-  const [error, setError] = useState(null);
+export default function TimePackagesPage() {
+  const router = useRouter();
+  const [timePackages, setTimePackages] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   const fetchTimePackages = async () => {
     try {
-      const res = await axios.get("/api/timePackages");
-      setEvents(res.data);
+      setLoading(true);
+      const response = await axios.get("/api/timePackages");
+      setTimePackages(response.data);
+      setError("");
     } catch (err) {
-      console.error(err);
-      setError("Failed to load packages");
-    }
-  };
-
-  const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this package?")) return;
-
-    try {
-      await axios.delete(`/api/timePackages/${id}`);
-      setEvents((prev) => prev.filter((e) => e.id !== id));
-    } catch (err) {
-      alert("Delete failed");
+      console.error("Failed to fetch time packages:", err);
+      setError("Failed to load time packages. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -48,56 +40,51 @@ export default function TimePackageList() {
     fetchTimePackages();
   }, []);
 
+  if (loading) {
+    return <Typography>Loading time packages...</Typography>;
+  }
+
+  if (error) {
+    return <Typography color="error">{error}</Typography>;
+  }
+
   return (
     <Box sx={{ p: 3 }}>
-      <Stack alignItems="flex-end">
-        <Link href="/admin/timePackages/create" passHref>
-          <Button sx={{ mb: 2 }} variant="contained">
-            ADD Time Package
-          </Button>
-        </Link>
-      </Stack>
-
-      {error && <Box color="red">{error}</Box>}
+      <Box sx={{ display: "flex", justifyContent: "space-between", mb: 3 }}>
+        <Typography variant="h4">Time Packages</Typography>
+        <Button
+          variant="contained"
+          onClick={() => router.push("/admin/timePackages/create")}
+        >
+          Create New
+        </Button>
+      </Box>
 
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell align="center">No</TableCell>
-              <TableCell align="center">Start Time</TableCell>
-              <TableCell align="center">End Time</TableCell>
-              <TableCell align="center">Venue</TableCell>
-              <TableCell align="center">Actions</TableCell>
+              <TableCell>ID</TableCell>
+              <TableCell>Start Time</TableCell>
+              <TableCell>End Time</TableCell>
+              <TableCell>Venue</TableCell>
+              <TableCell>Actions</TableCell>
             </TableRow>
           </TableHead>
-
           <TableBody>
-            {events.map((event, index) => (
-              <TableRow key={event.id}>
-                <TableCell align="center">{index + 1}</TableCell>
-                <TableCell align="center">
-                  {new Date(event.startTime).toLocaleString()}
-                </TableCell>
-                <TableCell align="center">
-                  {new Date(event.endTime).toLocaleString()}
-                </TableCell>
-                <TableCell align="center">
-                  {event.venueName}
-                </TableCell>
-                <TableCell align="center">
-                  <IconButton
-                    onClick={() => handleDelete(event.id)}
-                    sx={{ color: "red" }}
+            {timePackages.map((tp) => (
+              <TableRow key={tp.id}>
+                <TableCell>{tp.id}</TableCell>
+                <TableCell>{tp.startTime}</TableCell>
+                <TableCell>{tp.endTime}</TableCell>
+                <TableCell>{tp.venueName}</TableCell>
+                <TableCell>
+                  <Button
+                    size="small"
+                    onClick={() => router.push(`/admin/timePackages/${tp.id}`)}
                   >
-                    <DeleteIcon />
-                  </IconButton>
-
-                  <Link href={`/admin/timePackages/edit/${event.id}`} passHref>
-                    <IconButton>
-                      <EditIcon />
-                    </IconButton>
-                  </Link>
+                    Edit
+                  </Button>
                 </TableCell>
               </TableRow>
             ))}

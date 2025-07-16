@@ -19,26 +19,28 @@ import axios from "axios";
 
 export default function CreateTimePackagePage() {
   const router = useRouter();
-
   const [venues, setVenues] = useState([]);
   const [formData, setFormData] = useState({
     startTime: null,
     endTime: null,
     venue_id: "",
   });
-
   const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleStartTimeChange = (newValue) => {
     setFormData((prev) => ({ ...prev, startTime: newValue }));
+    if (errors.startTime) setErrors(prev => ({ ...prev, startTime: '' }));
   };
 
   const handleEndTimeChange = (newValue) => {
     setFormData((prev) => ({ ...prev, endTime: newValue }));
+    if (errors.endTime) setErrors(prev => ({ ...prev, endTime: '' }));
   };
 
   const handleVenueChange = (e) => {
     setFormData((prev) => ({ ...prev, venue_id: e.target.value }));
+    if (errors.venue_id) setErrors(prev => ({ ...prev, venue_id: '' }));
   };
 
   const validate = () => {
@@ -61,52 +63,26 @@ export default function CreateTimePackagePage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const validationErrors = validate();
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-      return;
-    }
 
     try {
-      if (!formData.startTime || !formData.endTime) {
-        alert("Start and End time are required");
-        return;
-      }
-
-      const startTime = dayjs(`${today} ${dayjs(formData.startTime).format("HH:mm")}`).toISOString();
-      const endTime = dayjs(`${today} ${dayjs(formData.endTime).format("HH:mm")}`).toISOString();
-
       const payload = {
-        startTime,
-        endTime,
-        venue_id: Number(formData.venue_id),
+        startTime: formData.startTime.format("HH:mm"), // Send as HH:mm
+        endTime: formData.endTime.format("HH:mm"),     // Send as HH:mm
+        venue_id: formData.venue_id,
       };
 
-      console.log("Submitting payload:", payload);
+      const response = await axios.post("/api/timePackages", payload);
 
-      const res = await axios.post("/api/timePackages", payload);
-
-      if (res.status === 201) {
-        alert("Time package created!");
+      if (response.data.success) {
+        alert("Time package created successfully!");
         router.push("/admin/timePackages");
-      } else {
-        alert("Unexpected server response");
       }
     } catch (error) {
-      console.error("Submit error:", error);
-
-      if (error.response) {
-        console.error("Server response:", error.response.data);
-        alert(
-          error.response.data.message ||
-          "Server responded with an error."
-        );
-      } else {
-        alert(error.message || "Unexpected error occurred.");
-      }
+      console.error("Error creating time package:", error);
+    } finally {
+      setIsLoading(false);
     }
-  }
-
+  };
   useEffect(() => {
     const fetchVenues = async () => {
       try {
@@ -114,14 +90,15 @@ export default function CreateTimePackagePage() {
         setVenues(res.data);
       } catch (error) {
         console.error("Failed to fetch venues:", error);
+        alert("Failed to load venues");
       }
     };
     fetchVenues();
   }, []);
 
   return (
-    <Box sx={{ maxWidth: 600, mx: "auto" }}>
-      <Paper sx={{ p: 4, borderRadius: 3, boxShadow: 3 }}>
+    <Box sx={{ maxWidth: 600, mx: "auto", mt: 4 }}>
+      <Paper sx={{ p: 4, borderRadius: 2 }}>
         <Typography variant="h5" gutterBottom>
           Create New Time Package
         </Typography>
@@ -132,6 +109,8 @@ export default function CreateTimePackagePage() {
                 label="Start Time"
                 value={formData.startTime}
                 onChange={handleStartTimeChange}
+                ampm={true}
+                format="hh:mm A"
                 slotProps={{
                   textField: {
                     fullWidth: true,
@@ -145,6 +124,8 @@ export default function CreateTimePackagePage() {
                 label="End Time"
                 value={formData.endTime}
                 onChange={handleEndTimeChange}
+                ampm={true}
+                format="hh:mm A"
                 slotProps={{
                   textField: {
                     fullWidth: true,
@@ -177,11 +158,16 @@ export default function CreateTimePackagePage() {
                 variant="outlined"
                 color="secondary"
                 onClick={() => router.push("/admin/timePackages")}
+                disabled={isSubmitting}
               >
                 Cancel
               </Button>
-              <Button variant="contained" type="submit">
-                Create Time Package
+              <Button
+                variant="contained"
+                type="submit"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "Creating..." : "Create Time Package"}
               </Button>
             </Stack>
           </Stack>

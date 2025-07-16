@@ -65,12 +65,11 @@ model FloralService {
 }
 
 model TimePackage {
-  id       Int      @id @default(autoincrement())
-  photo    String?  @db.LongText
-  date     DateTime
-  time     DateTime
-  venue_id Int
-  Venue    Venue    @relation(fields: [venue_id], references: [id])
+  id        Int      @id @default(autoincrement())
+  startTime DateTime
+  endTime   DateTime
+  venue_id  Int
+  Venue     Venue    @relation(fields: [venue_id], references: [id])
 }
 
 model Booking {
