@@ -67,7 +67,7 @@ export default function UserList() {
                             <TableCell align="center">Photo</TableCell>
                             <TableCell align="center">Description</TableCell>
                             <TableCell align="center">Price</TableCell>
-                            <TableCell align="center">Venue ID</TableCell>
+                            <TableCell align="center">Venue Type</TableCell>
                             <TableCell align="center">Action</TableCell>
                         </TableRow>
                     </TableHead>
@@ -76,7 +76,6 @@ export default function UserList() {
                             <TableRow key={event.id}>
                                 <TableCell align="center">{index + 1}</TableCell>
                                 <TableCell align="center">{event.name}</TableCell>
-                                <TableCell align="center">{event.description}</TableCell>
                                 <TableCell align="center">
                                     {event.photo ? (
                                         <img
@@ -93,9 +92,14 @@ export default function UserList() {
                                         "No Photo"
                                     )}
                                 </TableCell>
+
+                                <TableCell align="center">{event.description}</TableCell>
+                                <TableCell align="center">{event.price}</TableCell>
+                                <TableCell align="center">{event.Venue.name}</TableCell>
+                                
                                 <TableCell align="center">
 
-                                    <Link passHref href={`/admin/events/${event.id}/edit`}>
+                                    <Link passHref href={`/admin/venueType/${event.id}/edit`}>
                                         <IconButton sx={{ color: "blue" }}>
                                             <EditIcon />
                                         </IconButton>

@@ -30,15 +30,17 @@ model Event {
 }
 
 model Venue {
-  id        Int         @id @default(autoincrement())
-  name      String      @db.VarChar(50)
-  photo1    String?     @db.LongText
-  photo2    String?     @db.LongText
-  photo3    String?     @db.LongText
-  eventId   Int
-  Event     Event       @relation(fields: [eventId], references: [id])
-  VenueType VenueType[]
-  Booking   Booking[]
+  id            Int             @id @default(autoincrement())
+  name          String          @db.VarChar(50)
+  photo1        String?         @db.LongText
+  photo2        String?         @db.LongText
+  photo3        String?         @db.LongText
+  eventId       Int
+  Event         Event           @relation(fields: [eventId], references: [id])
+  VenueType     VenueType[]
+  Booking       Booking[]
+  FloralService FloralService[]
+  TimePackage   TimePackage[]
 }
 
 model VenueType {
@@ -57,29 +59,34 @@ model FloralService {
   photo       String?   @db.LongText
   description String    @db.Text
   price       Float
-  bookings    Booking[]
+  venue_id    Int
+  Venue       Venue     @relation(fields: [venue_id], references: [id])
+  Booking     Booking[]
 }
 
 model TimePackage {
-  id       Int       @id @default(autoincrement())
-  photo    String?   @db.LongText
+  id       Int      @id @default(autoincrement())
+  photo    String?  @db.LongText
   date     DateTime
   time     DateTime
-  bookings Booking[]
+  venue_id Int
+  Venue    Venue    @relation(fields: [venue_id], references: [id])
 }
 
 model Booking {
-  id                Int           @id @default(autoincrement())
-  venue             Venue         @relation(fields: [venue_id], references: [id])
-  venue_id          Int
-  floral_service    FloralService @relation(fields: [floral_service_id], references: [id])
+  id       Int   @id @default(autoincrement())
+  venue_id Int
+  venue    Venue @relation(fields: [venue_id], references: [id])
+
   floral_service_id Int
-  time_package      TimePackage   @relation(fields: [time_package_id], references: [id])
-  time_package_id   Int
-  user              User          @relation(fields: [user_id], references: [id])
-  user_id           Int
-  booking_date      DateTime
-  total_amount      Int
+  floralService     FloralService @relation(fields: [floral_service_id], references: [id]) // ADD THIS
+
+  time_package_id Int
+  user_id         Int
+  user            User @relation(fields: [user_id], references: [id])
+
+  booking_date DateTime
+  total_amount Int
 }
 
 model Contact {

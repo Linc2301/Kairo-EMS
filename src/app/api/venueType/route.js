@@ -6,7 +6,7 @@ export async function POST(req) {
         const body = await req.json();
         const { name, description, photo, price, venue_id } = body;
 
-        if (!name || !description || !price || !venue_id) {
+        if (!name || !description || !photo || !price || !venue_id) {
             return NextResponse.json({ message: "Missing required fields" }, { status: 400 });
         }
 
@@ -14,7 +14,7 @@ export async function POST(req) {
             data: {
                 name,
                 description,
-                photo,
+                photo, // photo in base64
                 price: parseFloat(price),
                 venue_id: parseInt(venue_id),
             },
@@ -26,7 +26,6 @@ export async function POST(req) {
         return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
     }
 }
-
 
 export async function GET() {
     try {
@@ -57,4 +56,3 @@ export async function GET() {
         return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
     }
 }
-

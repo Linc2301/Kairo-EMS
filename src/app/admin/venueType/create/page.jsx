@@ -3,22 +3,26 @@
 import {
   Box,
   Button,
+  MenuItem,
   Paper,
   Stack,
   TextField,
   Typography,
+  InputAdornment,
 } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 
-export default function CreateEventPage() {
+export default function CreateVenueTypePage() {
   const router = useRouter();
 
+  const [venues, setVenues] = useState([]);
   const [formData, setFormData] = useState({
     name: "",
     price: "",
     description: "",
+    venue_id: "",
   });
 
   const [photoFile, setPhotoFile] = useState(null);
@@ -49,6 +53,7 @@ export default function CreateEventPage() {
     if (!photoFile) newErrors.photo = "Event photo is required";
     if (!formData.description.trim()) newErrors.description = "Description is required";
     if (!formData.price.trim()) newErrors.price = "Price is required";
+    if (!String(formData.venue_id).trim()) newErrors.venue_id = "Venue ID is required";
     return newErrors;
   };
 
@@ -61,34 +66,51 @@ export default function CreateEventPage() {
       return;
     }
 
-    const form = new FormData();
-    form.append("name", formData.name);
-    form.append("photo", photoFile);
-    form.append("description", formData.description);
-    form.append("price", formData.price);
+    const reader = new FileReader();
+    reader.onloadend = async () => {
+      const base64Image = reader.result;
 
-    try {
-      const res = await axios.post("/api/venueType", form, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      try {
+        const res = await axios.post("/api/venueType", {
+          name: formData.name,
+          description: formData.description,
+          price: formData.price,
+          venue_id: formData.venue_id,
+          photo: base64Image,
+        });
 
-      if (res.status === 201) {
-        alert("Event created successfully!");
-        router.push("/admin/venueType");
-      } else {
-        alert("Unexpected server response.");
+        if (res.status === 201) {
+          alert("Venue type created!");
+          router.push("/admin/venueType");
+        } else {
+          alert("Unexpected server response");
+        }
+      } catch (error) {
+        console.error("Form submission error:", error);
+        alert(error?.response?.data?.message || "An unexpected error occurred.");
       }
-    } catch (error) {
-      console.error("Form submission error:", error);
-      alert(error?.response?.data?.message || "An unexpected error occurred.");
-    }
+    };
+
+    reader.readAsDataURL(photoFile);
   };
 
+  useEffect(() => {
+    const fetchVenues = async () => {
+      try {
+        const res = await axios.get("/api/venue");
+        setVenues(res.data);
+      } catch (error) {
+        console.error("Failed to fetch venues:", error);
+      }
+    };
+    fetchVenues();
+  }, []);
+
   return (
-    <Box sx={{ p: 4, maxWidth: 600, mx: "auto" }}>
+    <Box sx={{ maxWidth: 600, mx: "auto" }}>
       <Paper sx={{ p: 4, borderRadius: 3, boxShadow: 3 }}>
         <Typography variant="h5" gutterBottom>
-          Create New Venue
+          Create New Venue Type
         </Typography>
         <form onSubmit={handleSubmit}>
           <Stack spacing={3}>
@@ -104,12 +126,7 @@ export default function CreateEventPage() {
 
             <Button variant="outlined" component="label">
               Upload Photo
-              <input
-                type="file"
-                accept="image/*"
-                hidden
-                onChange={handlePhotoChange}
-              />
+              <input type="file" accept="image/*" hidden onChange={handlePhotoChange} />
             </Button>
             {errors.photo && (
               <Typography color="error" variant="body2">
@@ -140,16 +157,37 @@ export default function CreateEventPage() {
               rows={4}
               fullWidth
             />
+
             <TextField
               name="price"
-              label="Event Price"
-              type="number"
+              label="Price"
               value={formData.price}
               onChange={handleChange}
               error={!!errors.price}
               helperText={errors.price}
+              InputProps={{
+                endAdornment: <InputAdornment position="end">MMK</InputAdornment>,
+              }}
               fullWidth
             />
+
+            <TextField
+              select
+              name="venue_id"
+              label="Select Venue"
+              value={formData.venue_id}
+              onChange={handleChange}
+              error={!!errors.venue_id}
+              helperText={errors.venue_id}
+              fullWidth
+            >
+              {venues.map((venue) => (
+                <MenuItem key={venue.id} value={venue.id}>
+                  {venue.name}
+                </MenuItem>
+              ))}
+            </TextField>
+
             <Stack direction="row" justifyContent="flex-end" spacing={2}>
               <Button
                 variant="outlined"
@@ -159,7 +197,7 @@ export default function CreateEventPage() {
                 Cancel
               </Button>
               <Button variant="contained" type="submit">
-                Create Event
+                Create Venue Type
               </Button>
             </Stack>
           </Stack>

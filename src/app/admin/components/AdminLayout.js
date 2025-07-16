@@ -185,8 +185,8 @@ export default function AdminLayout({ children }) {
                             <ListItem disablePadding>
                                 <ListItemButton
                                     component={Link}
-                                    href="/admin/floral_service"
-                                    selected={isSelected('/admin/floral_service')}
+                                    href="/admin/floralServices"
+                                    selected={isSelected('/admin/floralServices')}
                                     sx={{
                                         pl: 6,
                                         '&.Mui-selected': {
@@ -206,8 +206,8 @@ export default function AdminLayout({ children }) {
                             <ListItem disablePadding>
                                 <ListItemButton
                                     component={Link}
-                                    href="/admin/time_package"
-                                    selected={isSelected('/admin/time_package')}
+                                    href="/admin/timePackage"
+                                    selected={isSelected('/admin/timePackage')}
                                     sx={{
                                         pl: 6,
                                         '&.Mui-selected': {
@@ -328,6 +328,7 @@ export default function AdminLayout({ children }) {
             <Box
                 component="main"
                 sx={{
+                    height: 1100,
                     flexGrow: 1,
                     bgcolor: '#fff',
                     mt: 8,

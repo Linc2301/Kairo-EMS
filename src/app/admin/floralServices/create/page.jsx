@@ -11,46 +11,23 @@ import {
   InputAdornment,
 } from "@mui/material";
 import { useEffect, useState } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import axios from "axios";
 
-export default function EditVenueTypePage() {
+export default function CreateVenueTypePage() {
   const router = useRouter();
-  const params = useParams();
-  const id = params.id;
 
   const [venues, setVenues] = useState([]);
   const [formData, setFormData] = useState({
     name: "",
-    description: "",
     price: "",
+    description: "",
     venue_id: "",
   });
+
+  const [photoFile, setPhotoFile] = useState(null);
   const [photoPreview, setPhotoPreview] = useState(null);
-  const [newPhotoFile, setNewPhotoFile] = useState(null);
   const [errors, setErrors] = useState({});
-
-  useEffect(() => {
-    const fetchInitialData = async () => {
-      try {
-        const [venueRes, typeRes] = await Promise.all([
-          axios.get("/api/venue"),
-          axios.get(`/api/venueType/${id}`),
-        ]);
-
-        setVenues(venueRes.data);
-
-        const { name, description, price, venue_id, photo } = typeRes.data;
-        setFormData({ name, description, price: String(price), venue_id });
-        setPhotoPreview(photo);
-      } catch (error) {
-        console.error("Error loading venue type:", error);
-        alert("Failed to load venue type data.");
-      }
-    };
-
-    fetchInitialData();
-  }, [id]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -59,7 +36,8 @@ export default function EditVenueTypePage() {
 
   const handlePhotoChange = (e) => {
     const file = e.target.files[0];
-    setNewPhotoFile(file);
+    setPhotoFile(file);
+
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => setPhotoPreview(reader.result);
@@ -72,6 +50,7 @@ export default function EditVenueTypePage() {
   const validate = () => {
     const newErrors = {};
     if (!formData.name.trim()) newErrors.name = "Event name is required";
+    if (!photoFile) newErrors.photo = "Event photo is required";
     if (!formData.description.trim()) newErrors.description = "Description is required";
     if (!formData.price.trim()) newErrors.price = "Price is required";
     if (!String(formData.venue_id).trim()) newErrors.venue_id = "Venue ID is required";
@@ -80,44 +59,58 @@ export default function EditVenueTypePage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     const validationErrors = validate();
-    setErrors(validationErrors);
-    if (Object.keys(validationErrors).length > 0) return;
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
 
-    const payload = {
-      ...formData,
-      price: parseFloat(formData.price),
-    };
+    const reader = new FileReader();
+    reader.onloadend = async () => {
+      const base64Image = reader.result;
 
-    const submitRequest = async (finalPayload) => {
       try {
-        await axios.put(`/api/venueType/${id}`, finalPayload);
-        alert("Venue type updated!");
-        router.push("/admin/venueType");
-      } catch (err) {
-        console.error("Update failed:", err);
-        alert("Failed to update venue type");
+        const res = await axios.post("/api/floralServices", {
+          name: formData.name,
+          description: formData.description,
+          price: formData.price,
+          venue_id: formData.venue_id,
+          photo: base64Image,
+        });
+
+        if (res.status === 201) {
+          alert("Venue type created!");
+          router.push("/admin/floralServices");
+        } else {
+          alert("Unexpected server response");
+        }
+      } catch (error) {
+        console.error("Form submission error:", error);
+        alert(error?.response?.data?.message || "An unexpected error occurred.");
       }
     };
 
-    if (newPhotoFile) {
-      const reader = new FileReader();
-      reader.onloadend = async () => {
-        payload.photo = reader.result;
-        await submitRequest(payload);
-      };
-      reader.readAsDataURL(newPhotoFile);
-    } else {
-      payload.photo = photoPreview; // keep existing photo
-      await submitRequest(payload);
-    }
+    reader.readAsDataURL(photoFile);
   };
+
+  useEffect(() => {
+    const fetchVenues = async () => {
+      try {
+        const res = await axios.get("/api/venue");
+        setVenues(res.data);
+      } catch (error) {
+        console.error("Failed to fetch venues:", error);
+      }
+    };
+    fetchVenues();
+  }, []);
 
   return (
     <Box sx={{ maxWidth: 600, mx: "auto" }}>
       <Paper sx={{ p: 4, borderRadius: 3, boxShadow: 3 }}>
         <Typography variant="h5" gutterBottom>
-          Edit Venue Type
+          Create New Floral Service
         </Typography>
         <form onSubmit={handleSubmit}>
           <Stack spacing={3}>
@@ -132,7 +125,7 @@ export default function EditVenueTypePage() {
             />
 
             <Button variant="outlined" component="label">
-              Upload New Photo
+              Upload Photo
               <input type="file" accept="image/*" hidden onChange={handlePhotoChange} />
             </Button>
             {errors.photo && (
@@ -199,12 +192,12 @@ export default function EditVenueTypePage() {
               <Button
                 variant="outlined"
                 color="secondary"
-                onClick={() => router.push("/admin/venueType")}
+                onClick={() => router.push("/admin/floralServices")}
               >
                 Cancel
               </Button>
               <Button variant="contained" type="submit">
-                Update Venue Type
+                Create Venue Type
               </Button>
             </Stack>
           </Stack>

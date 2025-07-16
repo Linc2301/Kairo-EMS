@@ -29,26 +29,31 @@ export async function POST(req) {
 }
 
 
-
 export async function GET() {
-  const events = await prisma.venue.findMany({
-    select: {
-      id: true,
-      name: true,
-      photo1: true,
-      photo2: true,
-      photo3: true,
-      eventId: true, // keep the raw ID if needed
-      Event: {
-        select: {
-          name: true,
+  try {
+    const events = await prisma.venue.findMany({
+      select: {
+        id: true,
+        name: true,
+        photo1: true,
+        photo2: true,
+        photo3: true,
+        eventId: true,
+        Event: {
+          select: {
+            name: true,
+          },
         },
       },
-    },
-  });
+    });
 
-  return Response.json(events);
+    return NextResponse.json(events); 
+  } catch (error) {
+    console.error("GET venue error:", error);
+    return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
+  }
 }
+
 
 // export async function GET() {
 //   try {
