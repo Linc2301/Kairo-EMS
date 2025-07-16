@@ -22,7 +22,6 @@ export default function EditEventPage() {
     name: "",
     description: "",
   });
-
   const [photoFile, setPhotoFile] = useState(null);
   const [photoPreview, setPhotoPreview] = useState(null);
   const [errors, setErrors] = useState({});
@@ -85,14 +84,28 @@ export default function EditEventPage() {
       return;
     }
 
-    const form = new FormData();
-    form.append("name", formData.name);
-    form.append("description", formData.description);
-    if (photoFile) form.append("photo", photoFile);
+    let photoUrl = photoPreview;
+
+    if (photoFile) {
+      try {
+        photoUrl = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result);
+          reader.onerror = reject;
+          reader.readAsDataURL(photoFile);
+        });
+      } catch (err) {
+        console.error("Error reading image file:", err);
+        alert("Failed to read image file.");
+        return;
+      }
+    }
 
     try {
-      const res = await axios.put(`/api/events/${eventId}`, form, {
-        headers: { "Content-Type": "multipart/form-data" },
+      const res = await axios.put(`/api/events/${eventId}`, {
+        name: formData.name,
+        description: formData.description,
+        photo: photoUrl,
       });
 
       if (res.status === 200) {
@@ -122,7 +135,7 @@ export default function EditEventPage() {
           Edit Event
         </Typography>
 
-        <form onSubmit={handleSubmit} encType="multipart/form-data">
+        <form onSubmit={handleSubmit}>
           <Stack spacing={3}>
             <TextField
               name="name"

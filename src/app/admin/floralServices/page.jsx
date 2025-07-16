@@ -14,6 +14,7 @@ import {
     TableHead,
     TableRow,
     CircularProgress,
+    Typography,
 } from "@mui/material";
 import Link from "next/link";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -56,7 +57,8 @@ export default function UserList() {
 
     return (
         <Box sx={{ p: 3 }}>
-            <Stack alignItems="flex-end">
+            <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
+                    <Typography variant="h4">Floral Services</Typography>
                 <Link href="/admin/floralServices/create" passHref>
                     <Button sx={{ mb: 2 }} variant="contained">
                         Add New Floral Service

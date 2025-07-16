@@ -1,5 +1,8 @@
 "use client";
 
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import axios from "axios";
 import {
   Box,
   Button,
@@ -13,9 +16,6 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { TimePicker } from "@mui/x-date-pickers/TimePicker";
 import dayjs from "dayjs";
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import axios from "axios";
 
 export default function CreateTimePackagePage() {
   const router = useRouter();
@@ -28,20 +28,17 @@ export default function CreateTimePackagePage() {
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleStartTimeChange = (newValue) => {
-    setFormData((prev) => ({ ...prev, startTime: newValue }));
-    if (errors.startTime) setErrors(prev => ({ ...prev, startTime: '' }));
-  };
-
-  const handleEndTimeChange = (newValue) => {
-    setFormData((prev) => ({ ...prev, endTime: newValue }));
-    if (errors.endTime) setErrors(prev => ({ ...prev, endTime: '' }));
-  };
-
-  const handleVenueChange = (e) => {
-    setFormData((prev) => ({ ...prev, venue_id: e.target.value }));
-    if (errors.venue_id) setErrors(prev => ({ ...prev, venue_id: '' }));
-  };
+  useEffect(() => {
+    async function loadVenues() {
+      try {
+        const res = await axios.get("/api/venue");
+        setVenues(res.data);
+      } catch (error) {
+        alert("Failed to load venues");
+      }
+    }
+    loadVenues();
+  }, []);
 
   const validate = () => {
     const newErrors = {};
@@ -56,45 +53,34 @@ export default function CreateTimePackagePage() {
     ) {
       newErrors.endTime = "End time must be after start time";
     }
-
     return newErrors;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const validationErrors = validate();
+    setErrors(validationErrors);
+    if (Object.keys(validationErrors).length > 0) return;
 
-
+    setIsSubmitting(true);
     try {
       const payload = {
-        startTime: formData.startTime.format("HH:mm"), // Send as HH:mm
-        endTime: formData.endTime.format("HH:mm"),     // Send as HH:mm
+        startTime: formData.startTime.format("HH:mm"),
+        endTime: formData.endTime.format("HH:mm"),
         venue_id: formData.venue_id,
       };
-
       const response = await axios.post("/api/timePackages", payload);
 
-      if (response.data.success) {
-        alert("Time package created successfully!");
+      if (response.status === 201) {
+        alert("Time package created successfully");
         router.push("/admin/timePackages");
       }
     } catch (error) {
-      console.error("Error creating time package:", error);
+      alert("Error creating time package");
     } finally {
-      setIsLoading(false);
+      setIsSubmitting(false);
     }
   };
-  useEffect(() => {
-    const fetchVenues = async () => {
-      try {
-        const res = await axios.get("/api/venue");
-        setVenues(res.data);
-      } catch (error) {
-        console.error("Failed to fetch venues:", error);
-        alert("Failed to load venues");
-      }
-    };
-    fetchVenues();
-  }, []);
 
   return (
     <Box sx={{ maxWidth: 600, mx: "auto", mt: 4 }}>
@@ -108,8 +94,8 @@ export default function CreateTimePackagePage() {
               <TimePicker
                 label="Start Time"
                 value={formData.startTime}
-                onChange={handleStartTimeChange}
-                ampm={true}
+                onChange={(newVal) => setFormData(prev => ({ ...prev, startTime: newVal }))}
+                ampm
                 format="hh:mm A"
                 slotProps={{
                   textField: {
@@ -123,8 +109,8 @@ export default function CreateTimePackagePage() {
               <TimePicker
                 label="End Time"
                 value={formData.endTime}
-                onChange={handleEndTimeChange}
-                ampm={true}
+                onChange={(newVal) => setFormData(prev => ({ ...prev, endTime: newVal }))}
+                ampm
                 format="hh:mm A"
                 slotProps={{
                   textField: {
@@ -138,15 +124,14 @@ export default function CreateTimePackagePage() {
 
             <TextField
               select
-              name="venue_id"
               label="Select Venue"
               value={formData.venue_id}
-              onChange={handleVenueChange}
+              onChange={(e) => setFormData(prev => ({ ...prev, venue_id: e.target.value }))}
               error={!!errors.venue_id}
               helperText={errors.venue_id}
               fullWidth
             >
-              {venues.map((venue) => (
+              {venues.map(venue => (
                 <MenuItem key={venue.id} value={venue.id}>
                   {venue.name}
                 </MenuItem>
@@ -156,17 +141,12 @@ export default function CreateTimePackagePage() {
             <Stack direction="row" justifyContent="flex-end" spacing={2}>
               <Button
                 variant="outlined"
-                color="secondary"
                 onClick={() => router.push("/admin/timePackages")}
                 disabled={isSubmitting}
               >
                 Cancel
               </Button>
-              <Button
-                variant="contained"
-                type="submit"
-                disabled={isSubmitting}
-              >
+              <Button variant="contained" type="submit" disabled={isSubmitting}>
                 {isSubmitting ? "Creating..." : "Create Time Package"}
               </Button>
             </Stack>
