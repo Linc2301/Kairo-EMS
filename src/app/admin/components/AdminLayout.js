@@ -206,8 +206,8 @@ export default function AdminLayout({ children }) {
                             <ListItem disablePadding>
                                 <ListItemButton
                                     component={Link}
-                                    href="/admin/timePackage"
-                                    selected={isSelected('/admin/timePackage')}
+                                    href="/admin/timePackages"
+                                    selected={isSelected('/admin/timePackages')}
                                     sx={{
                                         pl: 6,
                                         '&.Mui-selected': {
