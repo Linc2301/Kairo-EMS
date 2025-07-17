@@ -229,8 +229,8 @@ export default function AdminLayout({ children }) {
                     <ListItem disablePadding>
                         <ListItemButton
                             component={Link}
-                            href="/admin/book-info"
-                            selected={isSelected('/admin/book-info')}
+                            href="/admin/booking-info"
+                            selected={isSelected('/admin/booking-info')}
                             sx={{
                                 '&.Mui-selected': {
                                     color: '#ef6c00',
