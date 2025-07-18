@@ -1,84 +1,90 @@
-import { NextResponse } from "next/server";
 import { prisma } from "@/src/lib/prisma";
-import * as yup from "yup";
+import { NextResponse } from "next/server";
 
-const schema = yup.object().shape({
-    name: yup.string().required("Name is required"),
-    description: yup.string().required("Description is required"),
-    photo: yup.string()
-        .url("Photo must be a valid URL")
-        .required("Photo is required"),
-    price: yup.number().required("Price is required!")
-
-});
-
-
-//DELETE API
 export async function DELETE(req, { params }) {
-    const eventId = parseInt(params.id);
-    try {
-        await prisma.event.delete({
-            where: { id: eventId },
-        });
-        return NextResponse.json({
-            message: "Event is successfully deleted.",
-            eventId,
-        });
-    } catch (error) {
-        return NextResponse.json({
-            message: "Event not found or event deletion failed!"
-        }, { status: 404 })
-    }
+    const { id } = params;
 
+    try {
+        await prisma.venueType.delete({
+            where: { id: parseInt(id) },
+        });
+
+        return NextResponse.json({ message: "VenueType deleted" });
+    } catch (error) {
+        console.error("Delete error:", error);
+        return NextResponse.json({ message: "Failed to delete VenueType" }, { status: 500 });
+    }
 }
 
 
-//Update event API
+export async function GET(_req, { params }) {
+    const id = parseInt(params.id);
+
+    if (isNaN(id)) {
+        return NextResponse.json({ message: "Invalid ID" }, { status: 400 });
+    }
+
+    try {
+        const venueType = await prisma.venueType.findUnique({
+            where: { id },
+            select: {
+                id: true,
+                name: true,
+                description: true,
+                photo: true,
+                price: true,
+                venue_id: true,
+                Venue: {
+                    select: {
+                        name: true,
+                    },
+                },
+            },
+        });
+
+        if (!venueType) {
+            return NextResponse.json({ message: "VenueType not found" }, { status: 404 });
+        }
+
+        return NextResponse.json({
+            ...venueType,
+            venueName: venueType.Venue?.name || null,
+        });
+    } catch (error) {
+        console.error("GET /venue-type/[id] error:", error);
+        return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
+    }
+}
+
 export async function PUT(req, { params }) {
-    try {
-        const eventId = parseInt(params.id);
-        const body = await req.json();
-        const validatedData = await schema.validate(body, { abortEarly: false, stripUnknown: true }); //use stripUnknown that might notice the change data in the validation fields
-        await prisma.event.update({
-            where: { id: eventId },
-            data: validatedData,
-        })
-        return NextResponse.json({
-            message: "Event is successfully updated.",
-            eventId,
-        });
-    } catch (error) {
-        if (error.name === "ValidationError") {
-            return NextResponse.json(
-                {
-                    message: "Validation Failed",
-                    errors: error.inner.map((e) => ({       //we used map for the output that we want 
-                        path: e.path,
-                        message: e.message,
-                    })),
-                }, { status: 400 }
-            );
-        }
-        return NextResponse.json({
-            message: "Unexpected error",
-            error: error.message,
-        }, {
-            status: 500
-        });
+    const id = parseInt(params.id);
+
+    if (isNaN(id)) {
+        return NextResponse.json({ message: "Invalid ID" }, { status: 400 });
     }
 
-}
+    try {
+        const body = await req.json();
+        const { name, description, photo, price, venue_id } = body;
 
-
-//Get event Detail API
-export async function GET(req, { params }) {
-    const eventId = parseInt(params.id); //get URL params fields,
-    //Find student in database
-    const event = await prisma.event.findUnique({
-        where: {
-            id: eventId,
+        if (!name || !description || !price || !venue_id) {
+            return NextResponse.json({ message: "Missing required fields" }, { status: 400 });
         }
-    })
-    return NextResponse.json(event)
 
+        const updatedVenueType = await prisma.venueType.update({
+            where: { id },
+            data: {
+                name,
+                description,
+                photo,
+                price: parseFloat(price),
+                venue_id: parseInt(venue_id),
+            },
+        });
+
+        return NextResponse.json({ message: "VenueType updated", venueType: updatedVenueType });
+    } catch (error) {
+        console.error("PUT /venue-type/[id] error:", error);
+        return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
+    }
 }

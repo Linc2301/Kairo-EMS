@@ -1,55 +1,87 @@
-import { NextResponse } from "next/server";
-import * as yup from "yup";
+
 import { prisma } from "@/src/lib/prisma";
+import { NextResponse } from "next/server";
 
+export async function POST(req) {
+  try {
+    const body = await req.json();
+    const { name, photo1, photo2, photo3, eventId } = body;
 
-const schema = yup.object().shape({
-    name: yup.string().required("Name is required"),
-    photo: yup.string()
-        .url("Photo must be a valid URL")
-        .required("Photo is required")
+    if (!name || !eventId) {
+      return NextResponse.json({ message: "Missing required fields" }, { status: 400 });
+    }
 
-});
+    const newVenue = await prisma.venue.create({
+      data: {
+        name,
+        photo1,
+        photo2,
+        photo3,
+        eventId: parseInt(eventId), // IMPORTANT
+      },
+    });
 
+    return NextResponse.json({ message: "Venue created", venue: newVenue }, { status: 201 });
+  } catch (error) {
+    console.error("Venue creation error:", error);
+    return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
+  }
+}
 
 
 export async function GET() {
-    const venueData = await prisma.venue.findMany();
-    return NextResponse.json(venueData);
+  try {
+    const events = await prisma.venue.findMany({
+      select: {
+        id: true,
+        name: true,
+        photo1: true,
+        photo2: true,
+        photo3: true,
+        eventId: true,
+        Event: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    });
+
+    return NextResponse.json(events); 
+  } catch (error) {
+    console.error("GET venue error:", error);
+    return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
+  }
 }
 
 
-//Register User API
-export async function POST(req) {
-    try {
-        const body = await req.json();
+// export async function GET() {
+//   try {
+//     const events = await prisma.venue.findMany({
+//       select: {
+//         id: true,
+//         name: true,
+//         photo1: true,
+//         photo2: true,
+//         photo3: true,
+//         eventId: true, // keep the raw ID if needed
+//         event: {
+//           select: {
+//             name: true,
+//           },
+//         },
+//       },
+//     });
 
-        const validatedData = await schema.validate(body, { abortEarly: false });  //we used await cause the schema is the async function //use abortEarly for testing validate that is true or false
-        const data = await prisma.venue.create({
-            data: validatedData,
-        })
-        return NextResponse.json({
-            message: "Venue is successfully created.",
-            venue: data
-        })
-    } catch (error) {
-        // return NextResponse.json({ message: "Internal Server Error" }, { status: 500 }); //we need to mark that error message have the (status) attrubute
-        if (error.name === "ValidationError") {
-            return NextResponse.json(
-                {
-                    message: "Validation Failed",
-                    errors: error.inner.map((e) => ({       //we used map for the output that we want 
-                        path: e.path,
-                        message: e.message,
-                    })),
-                }, { status: 400 }
-            );
-        }
-        return NextResponse.json({
-            message: "Unexpected error",
-            error: error.message || error,
-        }, {
-            status: 500
-        });
-    }
-}
+//     // Format the response to flatten event.name
+//     const formatted = events.map((venue) => ({
+//       ...venue,
+//       eventName: venue.event?.name || null,
+//     }));
+
+//     return NextResponse.json(formatted);
+//   } catch (error) {
+//     console.error("GET venue error:", error);
+//     return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
+//   }
+// }

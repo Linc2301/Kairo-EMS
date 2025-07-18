@@ -13,9 +13,9 @@ model User {
   email    String?   @unique @db.VarChar(255)
   phone    String    @db.VarChar(50)
   password String    @db.VarChar(255)
+  photo    String?   @db.LongText
   isAdmin  String    @default("user") @db.VarChar(50)
   Booking  Booking[]
-  Rating   Rating[]
   Review   Review[]
 
   @@map("user")
@@ -25,59 +25,74 @@ model Event {
   id          Int     @id @default(autoincrement())
   name        String  @db.VarChar(50)
   description String  @db.Text
-  photo       String  @db.LongText
+  photo       String? @db.LongText
   Venue       Venue[]
 }
 
 model Venue {
-  id        Int         @id @default(autoincrement())
-  name      String      @db.VarChar(50)
-  photo     String?
-  eventId   Int
-  Event     Event       @relation(fields: [eventId], references: [id])
-  Booking   Booking[]
-  VenueType VenueType[]
+  id            Int             @id @default(autoincrement())
+  name          String          @db.VarChar(50)
+  photo1        String?         @db.LongText
+  photo2        String?         @db.LongText
+  photo3        String?         @db.LongText
+  eventId       Int
+  Event         Event           @relation(fields: [eventId], references: [id])
+  VenueType     VenueType[]
+  Booking       Booking[]
+  FloralService FloralService[]
+  TimePackage   TimePackage[]
 }
 
 model VenueType {
-  id          Int     @id @default(autoincrement())
-  name        String  @db.VarChar(50)
-  photo       String?
-  description String  @db.Text
-  price       String  @db.VarChar(255)
+  id          Int       @id @default(autoincrement())
+  name        String    @db.VarChar(50)
+  photo       String?   @db.LongText
+  description String    @db.Text
+  price       Float
   venue_id    Int
-  Venue       Venue   @relation(fields: [venue_id], references: [id])
+  Venue       Venue     @relation(fields: [venue_id], references: [id])
+  Booking     Booking[]
 }
 
 model FloralService {
   id          Int       @id @default(autoincrement())
   name        String    @db.VarChar(50)
-  photo       String
+  photo       String?   @db.LongText
   description String    @db.Text
-  price       Int
-  bookings    Booking[]
+  price       Float
+  venue_id    Int
+  Venue       Venue     @relation(fields: [venue_id], references: [id])
+  Booking     Booking[]
 }
 
 model TimePackage {
-  id       Int       @id @default(autoincrement())
-  photo    String
-  date     DateTime
-  time     DateTime
-  bookings Booking[]
+  id        Int       @id @default(autoincrement())
+  startTime DateTime
+  endTime   DateTime
+  venue_id  Int
+  Venue     Venue     @relation(fields: [venue_id], references: [id])
+  Booking   Booking[]
 }
 
 model Booking {
-  id                Int           @id @default(autoincrement())
-  venue             Venue         @relation(fields: [venue_id], references: [id])
-  venue_id          Int
-  floral_service    FloralService @relation(fields: [floral_service_id], references: [id])
+  id       Int   @id @default(autoincrement())
+  venue_id Int
+  venue    Venue @relation(fields: [venue_id], references: [id])
+
+  venueTypeId Int
+  VenueType   VenueType @relation(fields: [venueTypeId], references: [id])
+
   floral_service_id Int
-  time_package      TimePackage   @relation(fields: [time_package_id], references: [id])
-  time_package_id   Int
-  user              User          @relation(fields: [user_id], references: [id])
-  user_id           Int
-  booking_date      DateTime
-  total_amount      Int
+  floralService     FloralService @relation(fields: [floral_service_id], references: [id]) // ADD THIS
+
+  timePackageId Int
+  TimePackage   TimePackage @relation(fields: [timePackageId], references: [id])
+
+  user_id Int
+  user    User @relation(fields: [user_id], references: [id])
+
+  booking_date DateTime
+  total_amount Int
 }
 
 model Contact {
@@ -90,31 +105,23 @@ model Contact {
   @@map("contact")
 }
 
-model Rating {
-  id      Int      @id @default(autoincrement())
-  user    User     @relation(fields: [user_id], references: [id])
-  user_id Int
-  rating  Int
-  reviews Review[] // Changed from Review? to Review[] for one-to-many
-}
-
 model Review {
-  id          Int      @id @default(autoincrement())
-  user        User     @relation(fields: [user_id], references: [id])
-  user_id     Int
-  rating      Rating   @relation(fields: [rating_id], references: [id])
-  rating_id   Int // No @unique needed now
+  id      Int  @id @default(autoincrement())
+  user    User @relation(fields: [user_id], references: [id])
+  user_id Int
+
+  rating      Int
   review_date DateTime
   description String   @db.Text
-  photo       String?  @db.Text
+}
+
+model Description {
+  id          Int     @id @default(autoincrement())
+  photo       String? @db.LongText
+  description String  @db.Text
 }
 
 enum Role {
   user
   admin
-}
-
-enum Status {
-  active
-  inactive
 }

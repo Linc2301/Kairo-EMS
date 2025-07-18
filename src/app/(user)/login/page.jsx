@@ -11,17 +11,22 @@ import {
   IconButton,
   InputAdornment,
 } from "@mui/material";
-import { Visibility, VisibilityOff } from "@mui/icons-material"; // 👈 Import icons
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { schema } from "./validationSchema";
+import * as yup from "yup";
 import Link from "next/link";
-import { signIn } from "next-auth/react";
+import { signIn, getSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+
+//  Validation schema
+const schema = yup.object().shape({
+  email: yup.string().email("Invalid email").required("Email is required"),
+  password: yup.string().min(6, "Min 6 characters").required("Password is required"),
+});
 
 export default function LoginPage() {
   const router = useRouter();
-
   const {
     handleSubmit,
     reset,
@@ -37,7 +42,7 @@ export default function LoginPage() {
     severity: "success",
   });
 
-  const [showPassword, setShowPassword] = useState(false); // 👈 For password toggle
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSnackbarClose = () => {
     setSnackbar((prev) => ({ ...prev, open: false }));
@@ -56,13 +61,21 @@ export default function LoginPage() {
       });
 
       if (res.ok) {
+        const session = await getSession();
+
+        if (session?.user?.isAdmin === "admin") {
+          router.push("/admin/");
+        } else {
+          router.push("/");
+        }
+
         setSnackbar({
           open: true,
           message: "Login successful!",
           severity: "success",
         });
+
         reset();
-        router.push("/");
       } else {
         setSnackbar({
           open: true,
@@ -92,12 +105,10 @@ export default function LoginPage() {
         {/* Left side - Image */}
         <Box
           sx={{
-            flex: { xs: "none", md: 1 },
+            flex: 1,
             backgroundImage: 'url("/login.jpg")',
             backgroundSize: "cover",
             backgroundPosition: "center",
-            height: { xs: "30vh", md: "100%" },
-            width: "100%",
             display: { xs: "none", md: "block" },
           }}
         />
@@ -105,9 +116,8 @@ export default function LoginPage() {
         {/* Right side - Form */}
         <Box
           sx={{
-            flex: { xs: "none", md: 1 },
+            flex: 1,
             bgcolor: "white",
-            height: { xs: "auto", md: "100%" },
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -116,7 +126,7 @@ export default function LoginPage() {
         >
           <Box
             component="form"
-            sx={{ m: { xs: 2, md: 10 }, width: "100%", maxWidth: 500 }}
+            sx={{ width: "100%", maxWidth: 500 }}
             onSubmit={handleSubmit(onSubmit)}
           >
             <Typography
@@ -140,62 +150,39 @@ export default function LoginPage() {
               Let's login to your account
             </Typography>
 
+            {/* Email Field */}
             <Typography sx={{ color: "black", mb: 0.5 }}>Email</Typography>
             <TextField
               placeholder="Enter your email"
-              hiddenLabel
               fullWidth
               type="email"
               size="small"
-              sx={{
-                mb: 0.5,
-                "& .MuiInputBase-input::placeholder": {
-                  opacity: 0.3,
-                  transition: "opacity 0.2s",
-                },
-                "& .MuiInputBase-input:focus::placeholder": {
-                  opacity: 0,
-                },
-              }}
               {...register("email")}
               error={!!errors.email}
               helperText={errors.email?.message || " "}
+              sx={{ mb: 1 }}
             />
 
+            {/* Password Field */}
             <Typography sx={{ color: "black", mb: 0.5 }}>Password</Typography>
             <TextField
               placeholder="Enter your password"
-              hiddenLabel
               fullWidth
               size="small"
               type={showPassword ? "text" : "password"}
-              sx={{
-                mb: 0.5,
-                "& .MuiInputBase-input::placeholder": {
-                  opacity: 0.3,
-                  transition: "opacity 0.2s",
-                },
-                "& .MuiInputBase-input:focus::placeholder": {
-                  opacity: 0,
-                },
-              }}
               {...register("password")}
               error={!!errors.password}
               helperText={errors.password?.message || " "}
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
-                    <IconButton
-                      onClick={togglePasswordVisibility}
-                      edge="end"
-                      size="small"
-                      sx={{ color: "rgba(0,0,0,0.5)" }}
-                    >
+                    <IconButton onClick={togglePasswordVisibility} edge="end" size="small">
                       {showPassword ? <VisibilityOff /> : <Visibility />}
                     </IconButton>
                   </InputAdornment>
                 ),
               }}
+              sx={{ mb: 2 }}
             />
 
             <Button
@@ -211,9 +198,9 @@ export default function LoginPage() {
               Login
             </Button>
 
-            <Typography variant="body2" sx={{ color: "black" }} align="center">
-              Don't you have an account?{" "}
-              <Link passHref href="/register">
+            <Typography variant="body2" align="center">
+              Don&apos;t have an account?{" "}
+              <Link href="/register" passHref>
                 <Box
                   component="span"
                   sx={{
@@ -235,10 +222,11 @@ export default function LoginPage() {
         </Box>
       </Box>
 
+      {/* Snackbar */}
       <Snackbar
         sx={{ mb: 6 }}
         open={snackbar.open}
-        autoHideDuration={2000}
+        autoHideDuration={3000}
         onClose={handleSnackbarClose}
         anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
       >

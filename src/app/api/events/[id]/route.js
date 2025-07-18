@@ -2,44 +2,19 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/src/lib/prisma";
 import * as yup from "yup";
 
+
 const schema = yup.object().shape({
     name: yup.string().required("Name is required"),
     description: yup.string().required("Description is required"),
     photo: yup.string()
-        .url("Photo must be a valid URL")
-        .required("Photo is required")
-
+        .test("is-valid-photo", "Photo must be a valid URL or base64 image", value =>
+            /^https?:\/\/.+/.test(value) || /^data:image\/[a-z]+;base64,/.test(value)
+        )
+        .required("Photo is required"),
 });
 
-//Delete event API
-// export async function DELETE(req, { params }) {
-//     try {
-//         const id = parseInt(params.id); // only if your ID is a number
-//         if (!id) {
-//             return NextResponse.json({ message: "ID is required" }, { status: 400 });
-//         }
 
-//         const deleted = await prisma.contact.delete({
-//             where: { id }, //need to mark this
-//         });
-
-//         return NextResponse.json({
-//             message: "event successfully deleted",
-//             event: deleted,
-//         });
-//     } catch (error) {
-//         console.error("Delete API Error:", error);
-//         return NextResponse.json(
-//             {
-//                 message: "Failed to delete Event",
-//                 error: error.message,
-//             },
-//             { status: 500 }
-//         );
-//     }
-// }
-
-//DELETE API
+// DELETE API
 export async function DELETE(req, { params }) {
     const eventId = parseInt(params.id);
     try {
@@ -53,58 +28,55 @@ export async function DELETE(req, { params }) {
     } catch (error) {
         return NextResponse.json({
             message: "Event not found or event deletion failed!"
-        }, { status: 404 })
+        }, { status: 404 });
     }
-
 }
 
-
-//Update event API
+// PUT API (Update event)
 export async function PUT(req, { params }) {
     try {
         const eventId = parseInt(params.id);
         const body = await req.json();
-        const validatedData = await schema.validate(body, { abortEarly: false, stripUnknown: true }); //use stripUnknown that might notice the change data in the validation fields
+        const validatedData = await schema.validate(body, {
+            abortEarly: false,
+            stripUnknown: true,
+        });
+
         await prisma.event.update({
             where: { id: eventId },
             data: validatedData,
-        })
+        });
+
         return NextResponse.json({
             message: "Event is successfully updated.",
             eventId,
         });
     } catch (error) {
         if (error.name === "ValidationError") {
-            return NextResponse.json(
-                {
-                    message: "Validation Failed",
-                    errors: error.inner.map((e) => ({       //we used map for the output that we want 
-                        path: e.path,
-                        message: e.message,
-                    })),
-                }, { status: 400 }
-            );
+            return NextResponse.json({
+                message: "Validation Failed",
+                errors: error.inner.map((e) => ({
+                    path: e.path,
+                    message: e.message,
+                })),
+            }, { status: 400 });
         }
+
         return NextResponse.json({
             message: "Unexpected error",
             error: error.message,
-        }, {
-            status: 500
-        });
+        }, { status: 500 });
     }
-
 }
 
-
-//Get event Detail API
+// GET API (Fetch single event)
 export async function GET(req, { params }) {
-    const eventId = parseInt(params.id); //get URL params fields,
-    //Find student in database
+    const eventId = parseInt(params.id);
     const event = await prisma.event.findUnique({
         where: {
             id: eventId,
-        }
-    })
-    return NextResponse.json(event)
+        },
+    });
 
+    return NextResponse.json(event);
 }
