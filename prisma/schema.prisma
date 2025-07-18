@@ -13,6 +13,7 @@ model User {
   email    String?   @unique @db.VarChar(255)
   phone    String    @db.VarChar(50)
   password String    @db.VarChar(255)
+  photo    String?   @db.LongText
   isAdmin  String    @default("user") @db.VarChar(50)
   Booking  Booking[]
   Review   Review[]
@@ -112,6 +113,12 @@ model Review {
   rating      Int
   review_date DateTime
   description String   @db.Text
+}
+
+model Description {
+  id          Int     @id @default(autoincrement())
+  photo       String? @db.LongText
+  description String  @db.Text
 }
 
 enum Role {

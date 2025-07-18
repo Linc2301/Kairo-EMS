@@ -18,6 +18,7 @@ import {
 
 import {
     Dashboard,
+    Description,
     Event,
     Phone,
     Group,
@@ -103,6 +104,30 @@ export default function AdminLayout({ children }) {
                                 <Dashboard />
                             </ListItemIcon>
                             <ListItemText primary="Dashboard" />
+                        </ListItemButton>
+                    </ListItem>
+
+                    {/* Description */}
+                    <ListItem disablePadding>
+                        <ListItemButton
+                            component={Link}
+                            href="/admin/description"
+                            selected={isSelected('/admin/description')}
+                            sx={{
+                                '&.Mui-selected': {
+                                    color: '#ef6c00',
+                                    borderRight: '4px solid #ef6c00',
+                                },
+                                '&:hover': {
+                                    backgroundColor: '#f5f5f5',
+                                },
+                                pl: 3,
+                            }}
+                        >
+                            <ListItemIcon sx={{ color: isSelected('/admin/description') ? '#ef6c00' : 'inherit' }}>
+                                <Description />
+                            </ListItemIcon>
+                            <ListItemText primary="Description" />
                         </ListItemButton>
                     </ListItem>
 
