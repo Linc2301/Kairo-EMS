@@ -77,11 +77,21 @@ export default function AdminLayout({ children }) {
                     [`& .MuiDrawer-paper`]: {
                         width: drawerWidth,
                         boxSizing: 'border-box',
-                        pt: 8,
+
                     },
                 }}
             >
-                <Toolbar />
+
+
+                {/* Logo section */}
+                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', py: 2 }}>
+                    <img
+                        src="/logo-kairo.png" // adjust this if stored under a different name
+                        alt="Kairo Logo"
+                        style={{ maxWidth: '120px', height: 'auto' }}
+                    />
+                </Box>
+
                 <List>
                     {/* Dashboard */}
                     <ListItem disablePadding>
