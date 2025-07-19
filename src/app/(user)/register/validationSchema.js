@@ -13,8 +13,6 @@ export const schema = yup.object().shape({
     .required("Phone number is required")
     .matches(/^09\d{7,9}$/, "Invalid phone number"),
 
-
-
   password: yup
     .string()
     .required("Password is required")
