@@ -19,7 +19,7 @@ const reviews = [
     date: "3.5.2024",
     feedback:
       "I like the way they plan events and I like their services. It makes me feel like I’m planning by myself.",
-    image: "/events/event1.jpg",
+  
   },
   {
     name: "Ye Htut Naung",
@@ -28,7 +28,7 @@ const reviews = [
     date: "5.5.2024",
     feedback:
       "I like the way they plan events and I like their services. It makes me feel like I’m planning by myself.",
-    image: "/events/event2.jpg",
+    
   },
   {
     name: "Su Yadana Tun",
@@ -37,7 +37,7 @@ const reviews = [
     date: "2.5.2024",
     feedback:
       "I like the way they plan events and I like their services. It makes me feel like I’m planning by myself.",
-    image: "/events/event3.jpg",
+   
   },
   {
     name: "Ash Kidd",
@@ -46,7 +46,7 @@ const reviews = [
     date: "2.5.2024",
     feedback:
       "I like the way they plan events and I like their services. It makes me feel like I’m planning by myself.",
-    image: "/events/event4.jpg",
+   
   },
   {
     name: "Kaung Htet Lin",
@@ -55,7 +55,7 @@ const reviews = [
     date: "7.6.2024",
     feedback:
       "I like the way they plan events and I like their services. It makes me feel like I’m planning by myself.",
-    image: "/events/event5.jpg",
+   
   },
   {
     name: "Thiha Oo",
@@ -64,33 +64,14 @@ const reviews = [
     date: "6.5.2024",
     feedback:
       "I like the way they plan events and I like their services. It makes me feel like I’m planning by myself.",
-    image: "/events/event6.jpg",
+    
   },
 ];
 
 export default function Reviews() {
   return (
     <>
-      {/* Navbar */}
-      {/* <AppBar position="static" sx={{ backgroundColor: '#D64516' }}>
-        <Toolbar sx={{ justifyContent: 'space-between' }}>
-          <Typography variant="h5" fontWeight="bold">
-            <span style={{ color: 'white' }}>K</span>
-            <span style={{ color: 'black' }}>airo</span>
-          </Typography>
-          <Box display="flex" gap={3}>
-            {['Home', 'Events', 'About Us', 'Contact Us', 'Log in', 'Review'].map((text) => (
-              <Button key={text} sx={{ color: 'white', textTransform: 'none' }}>
-                {text}
-              </Button>
-            ))}
-            <Button variant="contained" sx={{ bgcolor: 'black', borderRadius: 3 }}>
-              Register now
-            </Button>
-          </Box>
-        </Toolbar>
-      </AppBar> */}
-
+     
       {/* Review Section */}
       <Box sx={{ bgcolor: "black", color: "white", py: 6 }}>
         <Container>
