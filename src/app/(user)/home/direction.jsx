@@ -28,7 +28,7 @@ export default function Direction() {
 
                 {/* Overlay content */}
                 <Container sx={{ zIndex: 1 }}>
-                    <Typography variant="h2" component="h1" color="white" fontWeight={700} gutterBottom>
+                    <Typography variant="h2" component="h1" color="black" fontWeight={700} gutterBottom>
                         Where
                         <br />
                         Extraordinary
@@ -40,7 +40,7 @@ export default function Direction() {
                         <Button
                             variant="contained"
                             size="large"
-                            sx={{ mt: 4, backgroundColor: 'white', color: '#000', fontWeight: 600 }}
+                            sx={{ mt: 4, backgroundColor: 'white', color: '#E24C00', fontWeight: 600 }}
                         >
                             Find your Event →
                         </Button>
