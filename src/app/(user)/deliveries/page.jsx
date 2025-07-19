@@ -1,7 +1,16 @@
+
 // "use client";
 
 // import * as React from "react";
-// import { Box, Tabs, Tab, Typography, Button, Divider } from "@mui/material";
+// import {
+//   Box,
+//   Tabs,
+//   Tab,
+//   Typography,
+//   Button,
+//   Divider,
+//   CircularProgress,
+// } from "@mui/material";
 
 // function CustomTabPanel(props) {
 //   const { children, value, index, ...other } = props;
@@ -22,72 +31,161 @@
 
 // export default function BookingTabs() {
 //   const [value, setValue] = React.useState(0);
+//   const [loading, setLoading] = React.useState({
+//     venues: false,
+//     florals: false,
+//     timePackages: false,
+//     confirm: false,
+//   });
+//   const [error, setError] = React.useState(null);
+
+//   const [venues, setVenues] = React.useState([]);
+//   const [florals, setFlorals] = React.useState([]);
+//   const [timePackages, setTimePackages] = React.useState([]);
 
 //   const [bookingData, setBookingData] = React.useState({
-//     venue: {
-//       title: "Wedding Venue (Crystal)",
-//       price: 3000000,
-//     },
-//     floral: {
-//       name: "Premium Floral",
-//       price: 200000,
-//     },
-//     date: new Date(2025, 6, 14, 18, 0),
+//     venue: null,
+//     floral: null,
+//     timePackage: null,
 //   });
 
+//   // Fetch venues
+//   React.useEffect(() => {
+//     setLoading((l) => ({ ...l, venues: true }));
+//     fetch("/api/venueType")
+//       .then((res) => res.json())
+//       .then((data) => {
+//         setVenues(data);
+//       })
+//       .catch(() => setError("Failed to load venues"))
+//       .finally(() => setLoading((l) => ({ ...l, venues: false })));
+//   }, []);
+
+//   // Fetch floral services
+//   React.useEffect(() => {
+//     setLoading((l) => ({ ...l, florals: true }));
+//     fetch("/api/floralServices")
+//       .then((res) => res.json())
+//       .then((data) => {
+//         setFlorals(data);
+//       })
+//       .catch(() => setError("Failed to load floral services"))
+//       .finally(() => setLoading((l) => ({ ...l, florals: false })));
+//   }, []);
+
+//   // Fetch time packages
+//   React.useEffect(() => {
+//     setLoading((l) => ({ ...l, timePackages: true }));
+//     fetch("/api/timePackages")
+//       .then((res) => res.json())
+//       .then((data) => {
+//         setTimePackages(data);
+//       })
+//       .catch(() => setError("Failed to load time packages"))
+//       .finally(() => setLoading((l) => ({ ...l, timePackages: false })));
+//   }, []);
+
 //   const handleTabChange = (event, newValue) => {
+//     // Disable tabs beyond current or incomplete steps
+//     if (
+//       newValue === 1 &&
+//       !bookingData.venue
+//     )
+//       return;
+//     if (
+//       newValue === 2 &&
+//       (!bookingData.venue || !bookingData.floral)
+//     )
+//       return;
+//     if (
+//       newValue === 3 &&
+//       (!bookingData.venue || !bookingData.floral || !bookingData.timePackage)
+//     )
+//       return;
+
 //     setValue(newValue);
 //   };
 
-//   const venues = [
-//     {
-//       title: "Light Ballroom",
-//       people: "30 - 50",
-//       price: 2000000,
-//       image: "/card1.jpg",
-//     },
-//     {
-//       title: "Crystal Ballroom",
-//       people: "50 - 70",
-//       price: 3000000,
-//       image: "/card1.jpg",
-//     },
-//     {
-//       title: "Harmony Ballroom",
-//       people: "70 - 100",
-//       price: 4000000,
-//       image: "/card1.jpg",
-//     },
-//     {
-//       title: "Grand Ballroom",
-//       people: "100 - 150",
-//       price: 5000000,
-//       image: "/card1.jpg",
-//     },
-//   ];
+//   // When user selects venue, auto-move to next tab
+//   const selectVenue = (venue) => {
+//     setBookingData((prev) => ({
+//       ...prev,
+//       venue,
+//       // reset dependent selections
+//       floral: null,
+//       timePackage: null,
+//     }));
+//     setValue(1);
+//   };
 
-//   const florals = [
-//     { name: "Simple Floral", price: 100000, image: "/card1.jpg" },
-//     { name: "Premium Floral", price: 200000, image: "/card1.jpg" },
-//   ];
+//   // When user selects floral, auto-move to next tab
+//   const selectFloral = (floral) => {
+//     setBookingData((prev) => ({
+//       ...prev,
+//       floral,
+//       timePackage: null,
+//     }));
+//     setValue(2);
+//   };
 
-//   const dateSlots = [
-//     {
-//       label: "July 20, 2025 - 10:00 AM",
-//       value: new Date(2025, 6, 20, 10, 0),
-//       image: "/card1.jpg",
-//     },
-//     {
-//       label: "July 21, 2025 - 2:00 PM",
-//       value: new Date(2025, 6, 21, 14, 0),
-//       image: "/card1.jpg",
-//     },
-//     {
-//       label: "July 22, 2025 - 5:00 PM",
-//       value: new Date(2025, 6, 22, 17, 0),
-//       image: "/card1.jpg",
-//     },
-//   ];
+//   // When user selects time package, auto-move to next tab
+//   const selectTimePackage = (timePackage) => {
+//     setBookingData((prev) => ({
+//       ...prev,
+//       timePackage,
+//     }));
+//     setValue(3);
+//   };
+
+//   // Confirm booking: send POST request to backend
+//   const handleConfirm = async () => {
+//     setError(null);
+
+//     if (!bookingData.venue || !bookingData.floral || !bookingData.timePackage) {
+//       alert("Please complete all selections before confirming.");
+//       return;
+//     }
+
+//     // Prepare payload - adjust user_id as needed
+//     const payload = {
+//       venue_id: bookingData.venue.venue_id || bookingData.venue.id,
+//       venueTypeId: bookingData.venue.id, // assuming this is venueTypeId
+//       floral_service_id: bookingData.floral.id,
+//       timePackageId: bookingData.timePackage.id,
+//       user_id: 1, // TODO: replace with actual logged in user ID
+//       booking_date: new Date().toISOString(), // you may want to customize this
+//       total_amount:
+//         (bookingData.venue.price || 0) + (bookingData.floral.price || 0),
+//     };
+
+//     setLoading((l) => ({ ...l, confirm: true }));
+
+//     try {
+//       const res = await fetch("/api/booking-info", {
+//         method: "POST",
+//         headers: { "Content-Type": "application/json" },
+//         body: JSON.stringify(payload),
+//       });
+
+//       if (!res.ok) {
+//         const errBody = await res.json();
+//         setError(errBody.error || errBody.message || "Booking failed");
+//         alert("Booking failed: " + (errBody.error || errBody.message));
+//         return;
+//       }
+
+//       const data = await res.json();
+//       alert("Booking confirmed! ID: " + data.id);
+//       // Reset selections and go back to first tab
+//       setBookingData({ venue: null, floral: null, timePackage: null });
+//       setValue(0);
+//     } catch (err) {
+//       setError(err.message);
+//       alert("Booking error: " + err.message);
+//     } finally {
+//       setLoading((l) => ({ ...l, confirm: false }));
+//     }
+//   };
 
 //   return (
 //     <Box sx={{ bgcolor: "black", minHeight: "100vh", py: 4 }}>
@@ -147,6 +245,7 @@
 //                 mx: 1,
 //               }}
 //               {...a11yProps(1)}
+//               disabled={!bookingData.venue}
 //             />
 //             <Tab
 //               label="Date & Time"
@@ -155,6 +254,7 @@
 //                 mx: 1,
 //               }}
 //               {...a11yProps(2)}
+//               disabled={!bookingData.floral}
 //             />
 //             <Tab
 //               label="Receipt"
@@ -163,178 +263,198 @@
 //                 ml: 1,
 //               }}
 //               {...a11yProps(3)}
+//               disabled={!bookingData.timePackage}
 //             />
 //           </Tabs>
 //         </Box>
 
+//         {/* Venue selection */}
 //         <CustomTabPanel value={value} index={0}>
-//           <Box
-//             sx={{
-//               display: "flex",
-//               flexWrap: "wrap",
-//               gap: 3,
-//               justifyContent: "center",
-//             }}
-//           >
-//             {venues.map((venue, i) => (
-//               <Box
-//                 key={i}
-//                 sx={{
-//                   width: 270,
-//                   bgcolor: "white",
-//                   color: "black",
-//                   borderRadius: 3,
-//                   boxShadow: 3,
-//                   overflow: "hidden",
-//                 }}
-//               >
-//                 <img
-//                   src={venue.image}
-//                   alt={venue.title}
-//                   style={{ width: "100%", height: 160, objectFit: "cover" }}
-//                 />
-//                 <Box sx={{ p: 2 }}>
-//                   <Typography fontWeight="bold" color="orange">
-//                     {venue.title}
-//                   </Typography>
-//                   <Typography variant="body2" mt={0.5}>
-//                     {venue.people} people can attend
-//                   </Typography>
-//                   <Typography variant="body2" mt={0.5}>
-//                     Price - {venue.price.toLocaleString()} MMK
-//                   </Typography>
-//                   <Button
-//                     variant="outlined"
-//                     sx={{
-//                       mt: 2,
-//                       borderColor: "orange",
-//                       color: "orange",
-//                       width: "100%",
-//                       borderRadius: "20px",
-//                       py: 1,
-//                       textTransform: "none",
-//                       fontSize: "0.8rem",
-//                       fontWeight: 500,
-//                       "&:hover": {
-//                         borderColor: "darkorange",
-//                         backgroundColor: "rgba(255, 165, 0, 0.08)",
-//                       },
-//                     }}
-//                     onClick={() =>
-//                       setBookingData((prev) => ({ ...prev, venue }))
-//                     }
-//                   >
-//                     Select
-//                   </Button>
+//           {loading.venues ? (
+//             <Box display="flex" justifyContent="center" py={5}>
+//               <CircularProgress />
+//             </Box>
+//           ) : error ? (
+//             <Typography color="error">{error}</Typography>
+//           ) : (
+//             <Box
+//               sx={{
+//                 display: "flex",
+//                 flexWrap: "wrap",
+//                 gap: 3,
+//                 justifyContent: "center",
+//               }}
+//             >
+//               {venues.map((venue) => (
+//                 <Box
+//                   key={venue.id}
+//                   sx={{
+//                     width: 270,
+//                     bgcolor: "white",
+//                     color: "black",
+//                     borderRadius: 3,
+//                     boxShadow: 3,
+//                     overflow: "hidden",
+//                   }}
+//                 >
+//                   <img
+//                     src={venue.photo}
+//                     alt={venue.name}
+//                     style={{ width: "100%", height: 160, objectFit: "cover" }}
+//                   />
+//                   <Box sx={{ p: 2 }}>
+//                     <Typography fontWeight="bold" color="orange">
+//                       {venue.name}
+//                     </Typography>
+//                     <Typography variant="body2" mt={0.5}>
+//                       {venue.description}
+//                     </Typography>
+//                     <Typography variant="body2" mt={0.5}>
+//                       Price - {venue.price.toLocaleString()} MMK
+//                     </Typography>
+//                     <Button
+//                       variant="outlined"
+//                       sx={{
+//                         mt: 2,
+//                         borderColor: "orange",
+//                         color: "orange",
+//                         width: "100%",
+//                         borderRadius: "20px",
+//                         py: 1,
+//                         textTransform: "none",
+//                         fontSize: "0.8rem",
+//                         fontWeight: 500,
+//                         "&:hover": {
+//                           borderColor: "darkorange",
+//                           backgroundColor: "rgba(255, 165, 0, 0.08)",
+//                         },
+//                       }}
+//                       onClick={() => selectVenue(venue)}
+//                     >
+//                       Select
+//                     </Button>
+//                   </Box>
 //                 </Box>
-//               </Box>
-//             ))}
-//           </Box>
+//               ))}
+//             </Box>
+//           )}
 //         </CustomTabPanel>
 
+//         {/* Floral service selection */}
 //         <CustomTabPanel value={value} index={1}>
-//           <Box sx={{ display: "flex", gap: 3, justifyContent: "center" }}>
-//             {florals.map((floral, i) => (
-//               <Box
-//                 key={i}
-//                 sx={{
-//                   width: 270,
-//                   bgcolor: "white",
-//                   color: "black",
-//                   borderRadius: 3,
-//                   boxShadow: 3,
-//                   overflow: "hidden",
-//                 }}
-//               >
-//                 <img
-//                   src={floral.image}
-//                   alt={floral.title}
-//                   style={{ width: "100%", height: 160, objectFit: "cover" }}
-//                 />
-//                 <Box sx={{ p: 2 }}>
-//                   <Typography variant="h6">{floral.name}</Typography>
-//                   <Typography>
-//                     Price: {floral.price.toLocaleString()} MMK
-//                   </Typography>
-//                   <Button
-//                     variant="outlined"
-//                     sx={{
-//                       mt: 2,
-//                       borderColor: "orange",
-//                       color: "orange",
-//                       width: "100%",
-//                       borderRadius: "20px",
-//                       py: 1,
-//                       textTransform: "none",
-//                       fontSize: "0.8rem",
-//                       fontWeight: 500,
-//                       "&:hover": {
-//                         borderColor: "darkorange",
-//                         backgroundColor: "rgba(255, 165, 0, 0.08)",
-//                       },
-//                     }}
-//                     onClick={() =>
-//                       setBookingData((prev) => ({ ...prev, venue }))
-//                     }
-//                   >
-//                     Select
-//                   </Button>
+//           {loading.florals ? (
+//             <Box display="flex" justifyContent="center" py={5}>
+//               <CircularProgress />
+//             </Box>
+//           ) : error ? (
+//             <Typography color="error">{error}</Typography>
+//           ) : (
+//             <Box sx={{ display: "flex", gap: 3, justifyContent: "center" }}>
+//               {florals.map((floral) => (
+//                 <Box
+//                   key={floral.id}
+//                   sx={{
+//                     width: 270,
+//                     bgcolor: "white",
+//                     color: "black",
+//                     borderRadius: 3,
+//                     boxShadow: 3,
+//                     overflow: "hidden",
+//                   }}
+//                 >
+//                   <img
+//                     src={floral.photo}
+//                     alt={floral.name}
+//                     style={{ width: "100%", height: 160, objectFit: "cover" }}
+//                   />
+//                   <Box sx={{ p: 2 }}>
+//                     <Typography variant="h6">{floral.name}</Typography>
+//                     <Typography>
+//                       Price: {floral.price.toLocaleString()} MMK
+//                     </Typography>
+//                     <Button
+//                       variant="outlined"
+//                       sx={{
+//                         mt: 2,
+//                         borderColor: "orange",
+//                         color: "orange",
+//                         width: "100%",
+//                         borderRadius: "20px",
+//                         py: 1,
+//                         textTransform: "none",
+//                         fontSize: "0.8rem",
+//                         fontWeight: 500,
+//                         "&:hover": {
+//                           borderColor: "darkorange",
+//                           backgroundColor: "rgba(255, 165, 0, 0.08)",
+//                         },
+//                       }}
+//                       onClick={() => selectFloral(floral)}
+//                     >
+//                       Select
+//                     </Button>
+//                   </Box>
 //                 </Box>
-//               </Box>
-//             ))}
-//           </Box>
+//               ))}
+//             </Box>
+//           )}
 //         </CustomTabPanel>
 
+//         {/* Time package selection */}
 //         <CustomTabPanel value={value} index={2}>
-//           <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
-//             {dateSlots.map((slot, i) => (
-//               <Box
-//                 key={i}
-//                 sx={{
-//                   width: 270,
-//                   bgcolor: "white",
-//                   color: "black",
-//                   borderRadius: 3,
-//                   boxShadow: 3,
-//                   overflow: "hidden",
-//                 }}
-//               >
-//                 <img
-//                   src={slot.image}
-//                   alt={slot.title}
-//                   style={{ width: "100%", height: 160, objectFit: "cover" }}
-//                 />
-//                 <Box sx={{ p: 2 }}>
-//                   <Typography>{slot.label}</Typography>
-//                   <Button
-//                     variant="outlined"
-//                     sx={{
-//                       mt: 2,
-//                       borderColor: "orange",
-//                       color: "orange",
-//                       width: "100%",
-//                       borderRadius: "20px",
-//                       py: 1,
-//                       textTransform: "none",
-//                       fontSize: "0.8rem",
-//                       fontWeight: 500,
-//                       "&:hover": {
-//                         borderColor: "darkorange",
-//                         backgroundColor: "rgba(255, 165, 0, 0.08)",
-//                       },
-//                     }}
-//                     onClick={() =>
-//                       setBookingData((prev) => ({ ...prev, venue }))
-//                     }
-//                   >
-//                     Select
-//                   </Button>
+//           {loading.timePackages ? (
+//             <Box display="flex" justifyContent="center" py={5}>
+//               <CircularProgress />
+//             </Box>
+//           ) : error ? (
+//             <Typography color="error">{error}</Typography>
+//           ) : (
+//             <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
+//               {timePackages.map((tp) => (
+//                 <Box
+//                   key={tp.id}
+//                   sx={{
+//                     width: 270,
+//                     bgcolor: "white",
+//                     color: "black",
+//                     borderRadius: 3,
+//                     boxShadow: 3,
+//                     overflow: "hidden",
+//                   }}
+//                 >
+//                   <Box sx={{ p: 2 }}>
+//                     <Typography>
+//                       {tp.venueName}: {tp.startTime} - {tp.endTime}
+//                     </Typography>
+//                     <Button
+//                       variant="outlined"
+//                       sx={{
+//                         mt: 2,
+//                         borderColor: "orange",
+//                         color: "orange",
+//                         width: "100%",
+//                         borderRadius: "20px",
+//                         py: 1,
+//                         textTransform: "none",
+//                         fontSize: "0.8rem",
+//                         fontWeight: 500,
+//                         "&:hover": {
+//                           borderColor: "darkorange",
+//                           backgroundColor: "rgba(255, 165, 0, 0.08)",
+//                         },
+//                       }}
+//                       onClick={() => selectTimePackage(tp)}
+//                     >
+//                       Select
+//                     </Button>
+//                   </Box>
 //                 </Box>
-//               </Box>
-//             ))}
-//           </Box>
+//               ))}
+//             </Box>
+//           )}
 //         </CustomTabPanel>
 
+//         {/* Receipt */}
 //         <CustomTabPanel value={value} index={3}>
 //           <Box
 //             sx={{
@@ -364,7 +484,10 @@
 //                 Venue
 //               </Typography>
 //               <Typography sx={{ fontSize: "0.9rem", color: "#555" }}>
-//                 {bookingData.venue?.title || "Not selected"}
+//                 {bookingData.venue?.name || "Not selected"}
+//               </Typography>
+//               <Typography sx={{ fontSize: "0.9rem", color: "#555" }}>
+//                 Price: {bookingData.venue?.price?.toLocaleString() || 0} MMK
 //               </Typography>
 //             </Box>
 
@@ -377,6 +500,9 @@
 //               <Typography sx={{ fontSize: "0.9rem", color: "#555" }}>
 //                 {bookingData.floral?.name || "Not selected"}
 //               </Typography>
+//               <Typography sx={{ fontSize: "0.9rem", color: "#555" }}>
+//                 Price: {bookingData.floral?.price?.toLocaleString() || 0} MMK
+//               </Typography>
 //             </Box>
 
 //             <Divider sx={{ my: 2 }} />
@@ -386,17 +512,8 @@
 //                 Date & Time
 //               </Typography>
 //               <Typography sx={{ fontSize: "0.9rem", color: "#555" }}>
-//                 {bookingData.date
-//                   ? bookingData.date
-//                       .toLocaleString("en-US", {
-//                         month: "short",
-//                         day: "numeric",
-//                         year: "numeric",
-//                         hour: "numeric",
-//                         minute: "2-digit",
-//                         hour12: true,
-//                       })
-//                       .replace(",", "")
+//                 {bookingData.timePackage
+//                   ? `${bookingData.timePackage.venueName}: ${bookingData.timePackage.startTime} - ${bookingData.timePackage.endTime}`
 //                   : "Not selected"}
 //               </Typography>
 //             </Box>
@@ -416,12 +533,19 @@
 //                 Total Price
 //               </Typography>
 //               <Typography variant="h6" fontWeight="bold">
-//                 {[bookingData.venue?.price || 0, bookingData.floral?.price || 0]
-//                   .reduce((a, b) => a + b, 0)
-//                   .toLocaleString()}{" "}
+//                 {(
+//                   (bookingData.venue?.price || 0) +
+//                   (bookingData.floral?.price || 0)
+//                 ).toLocaleString()}{" "}
 //                 MMK
 //               </Typography>
 //             </Box>
+
+//             {error && (
+//               <Typography color="error" sx={{ mb: 2 }}>
+//                 {error}
+//               </Typography>
+//             )}
 
 //             <Box
 //               sx={{
@@ -444,6 +568,7 @@
 //                   },
 //                 }}
 //                 onClick={() => setValue(0)}
+//                 disabled={loading.confirm}
 //               >
 //                 Cancel
 //               </Button>
@@ -458,15 +583,20 @@
 //                     backgroundColor: "darkorange",
 //                   },
 //                 }}
-//                 onClick={() => {
-//                   alert("Booking confirmed!");
-//                 }}
+//                 onClick={handleConfirm}
+//                 disabled={loading.confirm}
 //               >
-//                 Confirm
+//                 {loading.confirm ? (
+//                   <CircularProgress size={24} color="inherit" />
+//                 ) : (
+//                   "Confirm"
+//                 )}
 //               </Button>
 //             </Box>
 //           </Box>
 //         </CustomTabPanel>
+
+//         {/* Navigation Buttons */}
 //         <Box display="flex" justifyContent="space-between" p={2}>
 //           <Button
 //             disabled={value === 0}
@@ -476,9 +606,14 @@
 //             Back
 //           </Button>
 //           <Button
-//             disabled={value === 3}
+//             disabled={
+//               value === 3 ||
+//               (value === 0 && !bookingData.venue) ||
+//               (value === 1 && !bookingData.floral) ||
+//               (value === 2 && !bookingData.timePackage)
+//             }
 //             onClick={() => setValue((v) => v + 1)}
-//             sx={{ color: "orange" }}
+//             color="inherit"
 //           >
 //             Next
 //           </Button>
@@ -491,7 +626,7 @@
 
 "use client";
 
-import React, { useState, useEffect } from "react";
+import * as React from "react";
 import {
   Box,
   Tabs,
@@ -504,6 +639,7 @@ import {
 
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
+
   return (
     <div role="tabpanel" hidden={value !== index} {...other}>
       {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
@@ -519,60 +655,166 @@ function a11yProps(index) {
 }
 
 export default function BookingTabs() {
-  const [value, setValue] = useState(0);
-  const [venues, setVenues] = useState([]);
-  const [florals, setFlorals] = useState([]);
-  const [dateSlots, setDateSlots] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [value, setValue] = React.useState(0);
+  const [loading, setLoading] = React.useState({
+    venues: false,
+    florals: false,
+    timePackages: false,
+    confirm: false,
+  });
+  const [error, setError] = React.useState(null);
 
-  const [bookingData, setBookingData] = useState({
+  const [venues, setVenues] = React.useState([]);
+  const [florals, setFlorals] = React.useState([]);
+  const [timePackages, setTimePackages] = React.useState([]);
+
+  const [bookingData, setBookingData] = React.useState({
     venue: null,
     floral: null,
-    date: null,
+    timePackage: null,
   });
 
-  const handleTabChange = (_, newValue) => setValue(newValue);
-
-  // Fetch all data
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const [venuesRes, floralsRes, timeRes] = await Promise.all([
-          fetch("/api/venueType"), // You may need to implement this endpoint to return all venue types
-          fetch("/api/floralServices"),
-          fetch("/api/timePackages"), // You may need to implement this too
-        ]);
-
-        const venuesData = await venuesRes.json();
-        const floralsData = await floralsRes.json();
-        const timeData = await timeRes.json();
-
-        setVenues(venuesData || []);
-        setFlorals(floralsData || []);
-        setDateSlots(timeData || []);
-      } catch (error) {
-        console.error("API fetch error:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchData();
+  // Fetch venues
+  React.useEffect(() => {
+    setLoading((l) => ({ ...l, venues: true }));
+    fetch("/api/venueType")
+      .then((res) => res.json())
+      .then((data) => {
+        setVenues(data);
+      })
+      .catch(() => setError("Failed to load venues"))
+      .finally(() => setLoading((l) => ({ ...l, venues: false })));
   }, []);
 
-  if (loading) {
-    return (
-      <Box sx={{ minHeight: "100vh", bgcolor: "black", color: "white", display: "flex", justifyContent: "center", alignItems: "center" }}>
-        <CircularProgress sx={{ color: "orange" }} />
-      </Box>
-    );
-  }
+  // Fetch floral services
+  React.useEffect(() => {
+    setLoading((l) => ({ ...l, florals: true }));
+    fetch("/api/floralServices")
+      .then((res) => res.json())
+      .then((data) => {
+        setFlorals(data);
+      })
+      .catch(() => setError("Failed to load floral services"))
+      .finally(() => setLoading((l) => ({ ...l, florals: false })));
+  }, []);
+
+  // Fetch time packages
+  React.useEffect(() => {
+    setLoading((l) => ({ ...l, timePackages: true }));
+    fetch("/api/timePackages")
+      .then((res) => res.json())
+      .then((data) => {
+        setTimePackages(data);
+      })
+      .catch(() => setError("Failed to load time packages"))
+      .finally(() => setLoading((l) => ({ ...l, timePackages: false })));
+  }, []);
+
+  // Prevent user from clicking on tabs other than current
+  const handleTabChange = (event, newValue) => {
+    if (newValue !== value) {
+      event.preventDefault();
+      return;
+    }
+  };
+
+  // When user selects venue, auto-move to next tab
+  const selectVenue = (venue) => {
+    setBookingData((prev) => ({
+      ...prev,
+      venue,
+      floral: null,
+      timePackage: null,
+    }));
+    setValue(1);
+  };
+
+  // When user selects floral, auto-move to next tab
+  const selectFloral = (floral) => {
+    setBookingData((prev) => ({
+      ...prev,
+      floral,
+      timePackage: null,
+    }));
+    setValue(2);
+  };
+
+  // When user selects time package, auto-move to next tab
+  const selectTimePackage = (timePackage) => {
+    setBookingData((prev) => ({
+      ...prev,
+      timePackage,
+    }));
+    setValue(3);
+  };
+
+  // Confirm booking: send POST request to backend
+  const handleConfirm = async () => {
+    setError(null);
+
+    if (!bookingData.venue || !bookingData.floral || !bookingData.timePackage) {
+      alert("Please complete all selections before confirming.");
+      return;
+    }
+
+    const payload = {
+      venue_id: bookingData.venue.venue_id || bookingData.venue.id,
+      venueTypeId: bookingData.venue.id,
+      floral_service_id: bookingData.floral.id,
+      timePackageId: bookingData.timePackage.id,
+      user_id: 1, // Replace with actual user ID
+      booking_date: new Date().toISOString(),
+      total_amount:
+        (bookingData.venue.price || 0) + (bookingData.floral.price || 0),
+    };
+
+    setLoading((l) => ({ ...l, confirm: true }));
+
+    try {
+      const res = await fetch("/api/booking-info", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const errBody = await res.json();
+        setError(errBody.error || errBody.message || "Booking failed");
+        alert("Booking failed: " + (errBody.error || errBody.message));
+        return;
+      }
+
+      const data = await res.json();
+      alert("Booking confirmed! ID: " + data.id);
+      setBookingData({ venue: null, floral: null, timePackage: null });
+      setValue(0);
+    } catch (err) {
+      setError(err.message);
+      alert("Booking error: " + err.message);
+    } finally {
+      setLoading((l) => ({ ...l, confirm: false }));
+    }
+  };
 
   return (
     <Box sx={{ bgcolor: "black", minHeight: "100vh", py: 4 }}>
-      <Box sx={{ width: "90%", maxWidth: 1200, margin: "auto", color: "white" }}>
-        {/* Tabs */}
-        <Box sx={{ bgcolor: "white", px: 2, borderBottom: 1, borderColor: "divider" }}>
+      <Box
+        sx={{
+          width: "90%",
+          maxWidth: "1200px",
+          margin: "auto",
+          bgcolor: "black",
+          color: "white",
+        }}
+      >
+        <Box
+          sx={{
+            bgcolor: "white",
+            px: 2,
+            borderBottom: 1,
+            borderColor: "divider",
+          }}
+        >
           <Tabs
             value={value}
             onChange={handleTabChange}
@@ -580,12 +822,27 @@ export default function BookingTabs() {
             indicatorColor="primary"
             variant="fullWidth"
             sx={{
-              "& .MuiTabs-indicator": { backgroundColor: "orange", height: 3 },
+              minHeight: 48,
+              "& .MuiTabs-indicator": {
+                backgroundColor: "orange",
+                height: 3,
+              },
               "& .MuiTab-root": {
                 minHeight: 48,
                 fontSize: "1rem",
                 textTransform: "none",
-                "&.Mui-selected": { color: "orange", fontWeight: "bold" },
+                padding: "12px 16px",
+                color: "black", // Make all tabs black
+                fontWeight: "normal",
+                cursor: "default",
+                "&.Mui-selected": {
+                  color: "orange",
+                  fontWeight: "bold",
+                  cursor: "pointer",
+                },
+                "&:hover": {
+                  color: "darkorange",
+                },
               },
             }}
           >
@@ -596,135 +853,345 @@ export default function BookingTabs() {
           </Tabs>
         </Box>
 
-        {/* Venue Tab */}
+        {/* Venue selection */}
         <CustomTabPanel value={value} index={0}>
-          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 3, justifyContent: "center" }}>
-            {venues.map((venue) => (
-              <Box key={venue.id} sx={cardStyle}>
-                <img src={venue.photo} alt={venue.name} style={imgStyle} />
-                <Box sx={{ p: 2 }}>
-                  <Typography fontWeight="bold" color="orange">{venue.name}</Typography>
-                  <Typography variant="body2">{venue.description}</Typography>
-                  <Typography variant="body2">Price - {venue.price.toLocaleString()} MMK</Typography>
-                  <Button variant="outlined" sx={btnStyle} onClick={() => {
-                    setBookingData(prev => ({ ...prev, venue }));
-                    setValue(1);
-                  }}>Select</Button>
+          {loading.venues ? (
+            <Box display="flex" justifyContent="center" py={5}>
+              <CircularProgress />
+            </Box>
+          ) : error ? (
+            <Typography color="error">{error}</Typography>
+          ) : (
+            <Box
+              sx={{
+                display: "flex",
+                flexWrap: "wrap",
+                gap: 3,
+                justifyContent: "center",
+              }}
+            >
+              {venues.map((venue) => (
+                <Box
+                  key={venue.id}
+                  sx={{
+                    width: 270,
+                    bgcolor: "white",
+                    color: "black",
+                    borderRadius: 3,
+                    boxShadow: 3,
+                    overflow: "hidden",
+                  }}
+                >
+                  <img
+                    src={venue.photo || undefined}
+                    alt={venue.name}
+                    style={{ width: "100%", height: 160, objectFit: "cover" }}
+                  />
+                  <Box sx={{ p: 2 }}>
+                    <Typography fontWeight="bold" color="orange">
+                      {venue.name}
+                    </Typography>
+                    <Typography variant="body2" mt={0.5}>
+                      {venue.description}
+                    </Typography>
+                    <Typography variant="body2" mt={0.5}>
+                      Price - {venue.price.toLocaleString()} MMK
+                    </Typography>
+                    <Button
+                      variant="outlined"
+                      sx={{
+                        mt: 2,
+                        borderColor: "orange",
+                        color: "orange",
+                        width: "100%",
+                        borderRadius: "20px",
+                        py: 1,
+                        textTransform: "none",
+                        fontSize: "0.8rem",
+                        fontWeight: 500,
+                        "&:hover": {
+                          borderColor: "darkorange",
+                          backgroundColor: "rgba(255, 165, 0, 0.08)",
+                        },
+                      }}
+                      onClick={() => selectVenue(venue)}
+                    >
+                      Select
+                    </Button>
+                  </Box>
                 </Box>
-              </Box>
-            ))}
-          </Box>
+              ))}
+            </Box>
+          )}
         </CustomTabPanel>
 
-        {/* Floral Tab */}
+        {/* Floral service selection */}
         <CustomTabPanel value={value} index={1}>
-          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 3, justifyContent: "center" }}>
-            {florals.map((floral) => (
-              <Box key={floral.id} sx={cardStyle}>
-                <img src={floral.photo} alt={floral.name} style={imgStyle} />
-                <Box sx={{ p: 2 }}>
-                  <Typography fontWeight="bold" color="orange">{floral.name}</Typography>
-                  <Typography variant="body2">{floral.description}</Typography>
-                  <Typography variant="body2">Price - {floral.price.toLocaleString()} MMK</Typography>
-                  <Button variant="outlined" sx={btnStyle} onClick={() => {
-                    setBookingData(prev => ({ ...prev, floral }));
-                    setValue(2);
-                  }}>Select</Button>
+          {loading.florals ? (
+            <Box display="flex" justifyContent="center" py={5}>
+              <CircularProgress />
+            </Box>
+          ) : error ? (
+            <Typography color="error">{error}</Typography>
+          ) : (
+            <Box sx={{ display: "flex", gap: 3, justifyContent: "center" }}>
+              {florals.map((floral) => (
+                <Box
+                  key={floral.id}
+                  sx={{
+                    width: 270,
+                    bgcolor: "white",
+                    color: "black",
+                    borderRadius: 3,
+                    boxShadow: 3,
+                    overflow: "hidden",
+                  }}
+                >
+                  <img
+                    src={floral.photo || undefined}
+                    alt={floral.name}
+                    style={{ width: "100%", height: 160, objectFit: "cover" }}
+                  />
+                  <Box sx={{ p: 2 }}>
+                    <Typography variant="h6">{floral.name}</Typography>
+                    <Typography>
+                      Price: {floral.price.toLocaleString()} MMK
+                    </Typography>
+                    <Button
+                      variant="outlined"
+                      sx={{
+                        mt: 2,
+                        borderColor: "orange",
+                        color: "orange",
+                        width: "100%",
+                        borderRadius: "20px",
+                        py: 1,
+                        textTransform: "none",
+                        fontSize: "0.8rem",
+                        fontWeight: 500,
+                        "&:hover": {
+                          borderColor: "darkorange",
+                          backgroundColor: "rgba(255, 165, 0, 0.08)",
+                        },
+                      }}
+                      onClick={() => selectFloral(floral)}
+                    >
+                      Select
+                    </Button>
+                  </Box>
                 </Box>
-              </Box>
-            ))}
-          </Box>
+              ))}
+            </Box>
+          )}
         </CustomTabPanel>
 
-        {/* Date Tab */}
+        {/* Time package selection */}
         <CustomTabPanel value={value} index={2}>
-          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2, justifyContent: "center" }}>
-            {dateSlots.map((slot) => (
-              <Box key={slot.id} sx={cardStyle}>
-                <Box sx={{ height: 160, bgcolor: "#eee", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <Typography variant="h6" color="black">
-                    {slot.startTime} - {slot.endTime}
-                  </Typography>
+          {loading.timePackages ? (
+            <Box display="flex" justifyContent="center" py={5}>
+              <CircularProgress />
+            </Box>
+          ) : error ? (
+            <Typography color="error">{error}</Typography>
+          ) : (
+            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
+              {timePackages.map((tp) => (
+                <Box
+                  key={tp.id}
+                  sx={{
+                    width: 270,
+                    bgcolor: "white",
+                    color: "black",
+                    borderRadius: 3,
+                    boxShadow: 3,
+                    overflow: "hidden",
+                  }}
+                >
+                  <Box sx={{ p: 2 }}>
+                    <Typography>
+                      {tp.venueName}: {tp.startTime} - {tp.endTime}
+                    </Typography>
+                    <Button
+                      variant="outlined"
+                      sx={{
+                        mt: 2,
+                        borderColor: "orange",
+                        color: "orange",
+                        width: "100%",
+                        borderRadius: "20px",
+                        py: 1,
+                        textTransform: "none",
+                        fontSize: "0.8rem",
+                        fontWeight: 500,
+                        "&:hover": {
+                          borderColor: "darkorange",
+                          backgroundColor: "rgba(255, 165, 0, 0.08)",
+                        },
+                      }}
+                      onClick={() => selectTimePackage(tp)}
+                    >
+                      Select
+                    </Button>
+                  </Box>
                 </Box>
-                <Box sx={{ p: 2 }}>
-                  <Typography>{slot.venueName}</Typography>
-                  <Button variant="outlined" sx={btnStyle} onClick={() => {
-                    setBookingData(prev => ({ ...prev, date: slot }));
-                    setValue(3);
-                  }}>Select</Button>
-                </Box>
-              </Box>
-            ))}
-          </Box>
+              ))}
+            </Box>
+          )}
         </CustomTabPanel>
 
-        {/* Receipt Tab */}
+        {/* Receipt */}
         <CustomTabPanel value={value} index={3}>
-          <Box sx={{ bgcolor: "white", color: "black", p: 4, borderRadius: 2, maxWidth: 500, mx: "auto", boxShadow: 3 }}>
-            <Typography variant="h5" fontWeight="bold" mb={4} textAlign="center">Receipt</Typography>
-            <ReceiptRow label="Venue" value={bookingData.venue?.name} />
-            <ReceiptRow label="Floral Service" value={bookingData.floral?.name} />
-            <ReceiptRow label="Time" value={bookingData.date ? `${bookingData.date.startTime} - ${bookingData.date.endTime}` : "Not selected"} />
-            <Divider sx={{ my: 2 }} />
-            <Box sx={{ display: "flex", justifyContent: "space-between", mt: 3 }}>
-              <Typography variant="h6" fontWeight="bold">Total Price</Typography>
-              <Typography variant="h6" fontWeight="bold">
-                {[
-                  bookingData.venue?.price || 0,
-                  bookingData.floral?.price || 0,
-                ].reduce((a, b) => a + b, 0).toLocaleString()} MMK
+          <Box
+            sx={{
+              bgcolor: "white",
+              color: "black",
+              p: 4,
+              borderRadius: 2,
+              maxWidth: 500,
+              mx: "auto",
+              boxShadow: 3,
+            }}
+          >
+            <Typography
+              variant="h5"
+              fontWeight="bold"
+              mb={4}
+              sx={{
+                fontSize: "1.5rem",
+                textAlign: "center",
+              }}
+            >
+              Receipt
+            </Typography>
+
+            <Box mb={3}>
+              <Typography variant="subtitle1" fontWeight="bold" sx={{ mb: 1 }}>
+                Venue
+              </Typography>
+              <Typography sx={{ fontSize: "0.9rem", color: "#555" }}>
+                {bookingData.venue?.name || "Not selected"}
+              </Typography>
+              <Typography sx={{ fontSize: "0.9rem", color: "#555" }}>
+                Price: {bookingData.venue?.price?.toLocaleString() || 0} MMK
               </Typography>
             </Box>
-            <Box sx={{ display: "flex", justifyContent: "space-between", gap: 2, mt: 4 }}>
-              <Button variant="outlined" onClick={() => setValue(0)} sx={btnStyle}>Cancel</Button>
-              <Button variant="contained" sx={{ backgroundColor: "orange", color: "white", py: 1.5 }} onClick={() => alert("Booking confirmed!")}>Confirm</Button>
+
+            <Divider sx={{ my: 2 }} />
+
+            <Box mb={3}>
+              <Typography variant="subtitle1" fontWeight="bold" sx={{ mb: 1 }}>
+                Floral Service
+              </Typography>
+              <Typography sx={{ fontSize: "0.9rem", color: "#555" }}>
+                {bookingData.floral?.name || "Not selected"}
+              </Typography>
+              <Typography sx={{ fontSize: "0.9rem", color: "#555" }}>
+                Price: {bookingData.floral?.price?.toLocaleString() || 0} MMK
+              </Typography>
+            </Box>
+
+            <Divider sx={{ my: 2 }} />
+
+            <Box mb={3}>
+              <Typography variant="subtitle1" fontWeight="bold" sx={{ mb: 1 }}>
+                Date & Time
+              </Typography>
+              <Typography sx={{ fontSize: "0.9rem", color: "#555" }}>
+                {bookingData.timePackage
+                  ? `${bookingData.timePackage.venueName}: ${bookingData.timePackage.startTime} - ${bookingData.timePackage.endTime}`
+                  : "Not selected"}
+              </Typography>
+            </Box>
+
+            <Divider sx={{ my: 2 }} />
+
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                mt: 3,
+                mb: 4,
+              }}
+            >
+              <Typography variant="h6" fontWeight="bold">
+                Total Price
+              </Typography>
+              <Typography variant="h6" fontWeight="bold">
+                {(
+                  (bookingData.venue?.price || 0) +
+                  (bookingData.floral?.price || 0)
+                ).toLocaleString()}{" "}
+                MMK
+              </Typography>
+            </Box>
+
+            {error && (
+              <Typography color="error" sx={{ mb: 2 }}>
+                {error}
+              </Typography>
+            )}
+
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                gap: 2,
+                mt: 4,
+              }}
+            >
+              <Button
+                variant="outlined"
+                sx={{
+                  flex: 1,
+                  borderColor: "orange",
+                  color: "orange",
+                  py: 1.5,
+                  "&:hover": {
+                    borderColor: "darkorange",
+                    backgroundColor: "rgba(255, 165, 0, 0.04)",
+                  },
+                }}
+                onClick={() => setValue(0)}
+                disabled={loading.confirm}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="contained"
+                sx={{
+                  flex: 1,
+                  backgroundColor: "orange",
+                  color: "white",
+                  py: 1.5,
+                  "&:hover": {
+                    backgroundColor: "darkorange",
+                  },
+                }}
+                onClick={handleConfirm}
+                disabled={loading.confirm}
+              >
+                {loading.confirm ? (
+                  <CircularProgress size={24} color="inherit" />
+                ) : (
+                  "Confirm"
+                )}
+              </Button>
             </Box>
           </Box>
         </CustomTabPanel>
 
-        {/* Back / Next Buttons */}
-        <Box display="flex" justifyContent="space-between" p={2}>
-          <Button disabled={value === 0} onClick={() => setValue((v) => v - 1)} color="inherit">Back</Button>
-          <Button disabled={value === 3} onClick={() => setValue((v) => v + 1)} sx={{ color: "orange" }}>Next</Button>
+        {/* Only Back button */}
+        <Box display="flex" justifyContent="flex-start" p={2}>
+          <Button
+            disabled={value === 0}
+            onClick={() => setValue((v) => v - 1)}
+            color="inherit"
+          >
+            Back
+          </Button>
         </Box>
       </Box>
     </Box>
   );
 }
-
-// Helper components & styles
-const ReceiptRow = ({ label, value }) => (
-  <Box mb={3}>
-    <Typography variant="subtitle1" fontWeight="bold" sx={{ mb: 1 }}>{label}</Typography>
-    <Typography sx={{ fontSize: "0.9rem", color: "#555" }}>{value || "Not selected"}</Typography>
-    <Divider sx={{ my: 2 }} />
-  </Box>
-);
-
-const cardStyle = {
-  width: 270,
-  bgcolor: "white",
-  color: "black",
-  borderRadius: 3,
-  boxShadow: 3,
-  overflow: "hidden",
-};
-
-const imgStyle = { width: "100%", height: 160, objectFit: "cover" };
-
-const btnStyle = {
-  mt: 2,
-  borderColor: "orange",
-  color: "orange",
-  width: "100%",
-  borderRadius: "20px",
-  py: 1,
-  textTransform: "none",
-  fontSize: "0.8rem",
-  fontWeight: 500,
-  "&:hover": {
-    borderColor: "darkorange",
-    backgroundColor: "rgba(255, 165, 0, 0.08)",
-  },
-};
-
