@@ -6,27 +6,27 @@ import { Box, Typography } from "@mui/material";
 
 export default function EventPage() {
   const pyramidRows = [
-    [{ type: "text", name: "Engagement", id: 1, highlighted: true }],
+    [{ type: "text", name: "Engagement", id: 2, highlighted: true }],
 
     [
-      { type: "image", src: "/assets/w6.png" },
-      { type: "text", name: "Bridal Shower", id: 2 },
-      { type: "text", name: "Wedding", id: 3 },
-      { type: "image", src: "/images/img2.png" },
+      { type: "image", src: "/Event Main Page/cheers.jpg" },
+      { type: "text", name: "Bridal Shower", id: 4 },
+      { type: "text", name: "Wedding", id: 1 },
+      { type: "image", src: "/Event Main Page/balloons.jpg" },
     ],
 
     [
-      { type: "text", name: "Birthday", id: 4, highlighted: true },
+      { type: "text", name: "Birthday", id: 3, highlighted: true },
       { type: "text", name: "Baby Shower", id: 5, highlighted: true },
       { type: "text", name: "Private Party", id: 6, highlighted: true },
     ],
 
     [
-      { type: "image", src: "/images/img3.png" },
+      { type: "image", src: "/Event Main Page/celebrate.jpg" },
       { type: "text", name: "Corporate Events", id: 7 },
       { type: "text", name: "Business Meeting", id: 8 },
       { type: "text", name: "Art Gallery", id: 9 },
-      { type: "image", src: "/images/img4.png" },
+      { type: "image", src: "/Event Main Page/gallery.jpg" },
     ],
   ];
 
