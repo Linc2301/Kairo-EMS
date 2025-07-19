@@ -1,70 +1,84 @@
 import { NextResponse } from "next/server";
-import * as yup from "yup";
 import { prisma } from "@/src/lib/prisma";
 import bcrypt from "bcrypt";
 
-const schema = yup.object().shape({
-  name: yup.string().required("Name is required"),
-  email: yup.string().email("Invalid email").required("Email is required"),
-  phone: yup.string().required("Phone is required"),
-  password: yup
-    .string()
-    .min(6, "Password must be at least 6 characters")
-    .required("Password is required"),
-  confirm_pass: yup
-    .string()
-    .oneOf([yup.ref("password")], "Passwords do not match")
-    .required("Please confirm your password"),
-});
-
-export async function GET() {
-  const users = await prisma.user.findMany();
-  return NextResponse.json(users);
-}
-
-//Register User API
+// Register User (POST)
 export async function POST(req) {
   try {
-      
-      const body = await req.json();
-      const validatedData = await schema.validate(body, { abortEarly: false });
-    delete validatedData.confirm_pass;
-    const hashedPassword = await bcrypt.hash(validatedData.password, 10);
-    const user = await prisma.user.create({
-      data: {
-        name: validatedData.name,
-        email: validatedData.email,
-        phone: validatedData.phone,
-        password: hashedPassword,
-      },
-    });
-    return NextResponse.json({
-      message: "User is successfully created.",
-      user: user,
-    });
-  } catch (error) {
-    // return NextResponse.json({ message: "Internal Server Error" }, { status: 500 }); //we need to mark that error message have the (status) attrubute
-    if (error.name === "ValidationError") {
+    const body = await req.json();
+    const { name, email, phone, password, confirm_pass } = body;
+
+    // Basic validation
+    if (!name || !email || !phone || !password || !confirm_pass) {
       return NextResponse.json(
-        {
-          message: "Validation Failed",
-          errors: error.inner.map((e) => ({
-            //we used map for the output that we want
-            path: e.path,
-            message: e.message,
-          })),
-        },
+        { message: "All fields are required" },
         { status: 400 }
       );
     }
-    return NextResponse.json(
-      {
-        message: "Unexpected error",
-        error: error.message || error,
+
+    if (password !== confirm_pass) {
+      return NextResponse.json(
+        { message: "Passwords do not match" },
+        { status: 400 }
+      );
+    }
+
+    if (password.length < 6) {
+      return NextResponse.json(
+        { message: "Password must be at least 6 characters" },
+        { status: 400 }
+      );
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const user = await prisma.user.create({
+      data: {
+        name,
+        email,
+        phone,
+        password: hashedPassword,
       },
-      {
-        status: 500,
-      }
+    });
+
+    return NextResponse.json(
+      { message: "User successfully registered", user },
+      { status: 201 }
+    );
+  } catch (error) {
+    if (error.code === "P2002" && error.meta?.target?.includes("email")) {
+      return NextResponse.json(
+        { message: "Email already in use" },
+        { status: 400 }
+      );
+    }
+
+    return NextResponse.json(
+      { message: "Internal server error", error: error.message },
+      { status: 500 }
+    );
+  }
+}
+
+// Get All Users (GET)
+export async function GET() {
+  try {
+    const users = await prisma.user.findMany({
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phone: true,
+        photo: true,
+        isAdmin: true,
+      },
+    });
+
+    return NextResponse.json(users);
+  } catch (error) {
+    return NextResponse.json(
+      { message: "Failed to fetch users", error: error.message },
+      { status: 500 }
     );
   }
 }
