@@ -65,6 +65,7 @@ export async function GET(req, { params }) {
 
 // PUT /api/user/[id] — Update user profile
 export async function PUT(req, { params }) {
+    
     try {
         const { id } = params;
         const { fields, files } = await parseFormData(req);
