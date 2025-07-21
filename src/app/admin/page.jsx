@@ -64,25 +64,56 @@
 // }
 
 
-import DashboardStats from '@/src/app/admin/components/DashboardStats';
-import RevenueChart from '@/src/app/admin/components/RevenueChart';
-import BookingCalendar from '@/src/app/admin/components/BookingCalendar';
-import BookingList from '@/src/app/admin/components/BookingList';
-import { Container, Grid } from '@mui/material';
+// import DashboardStats from '@/src/app/admin/components/DashboardStats';
+// import RevenueChart from '@/src/app/admin/components/RevenueChart';
+// import BookingCalendar from '@/src/app/admin/components/BookingCalendar';
+// import BookingList from '@/src/app/admin/components/BookingList';
+// import { Container, Grid } from '@mui/material';
+// import TaskChart from './components/TaskChart';
+// import { Box } from 'lucide-react';
 
-export default function Dashboard() {
+// export default function Dashboard() {
+//   return (
+//     // <Container maxWidth="lg" sx={{ mt: 4 }}>
+//     //   <DashboardStats />
+//     //   <Grid container spacing={2} sx={{ mt: 2 }}>
+//     //     <Grid item xs={12} md={8}>
+//     //       <RevenueChart />
+//     //     </Grid>
+//     //     <Grid item xs={12} md={4}>
+//     //       <BookingCalendar />
+//     //       <BookingList />
+//     //       <TaskChart/>
+//     //     </Grid>
+//     //   </Grid>
+//     // </Container>
+
+
+//   );
+// }
+
+import { Box, Container } from '@mui/material';
+import BookingCalendar from './components/BookingCalendar';
+import BookingList from './components/BookingList';
+import DashboardStats from './components/DashboardStats';
+
+export default function AdminDashboardPage() {
   return (
-    <Container maxWidth="lg" sx={{ mt: 4 }}>
-      <DashboardStats />
-      <Grid container spacing={2} sx={{ mt: 2 }}>
-        <Grid item xs={12} md={8}>
-          <RevenueChart />
-        </Grid>
-        <Grid item xs={12} md={4}>
+    <Container sx={{ mt: 4 }}>
+      <DashboardStats/>
+      
+      <Box display="flex" gap={2} flexWrap="wrap">
+        {/* Left side - Calendar */}
+        <Box flex={1} minWidth="300px">
           <BookingCalendar />
+        </Box>
+
+        {/* Right side - Booking List */}
+        <Box flex={1} minWidth="300px">
           <BookingList />
-        </Grid>
-      </Grid>
+       
+        </Box>
+      </Box>
     </Container>
   );
 }

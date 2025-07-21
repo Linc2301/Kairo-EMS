@@ -21,7 +21,6 @@ import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { useRouter } from "next/navigation";
 
-
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
 
@@ -48,7 +47,7 @@ export default function BookingTabs() {
     confirm: false,
   });
 
-   const router = useRouter();
+  const router = useRouter();
   const [error, setError] = React.useState(null);
 
   const [venues, setVenues] = React.useState([]);
@@ -56,11 +55,6 @@ export default function BookingTabs() {
   const [timePackages, setTimePackages] = React.useState([]);
   const [selectedDate, setSelectedDate] = useState(null);
   const [dateError, setDateError] = useState("");
-
-
-  
-
-  
 
   const [bookingData, setBookingData] = React.useState({
     venue: null,
@@ -70,7 +64,6 @@ export default function BookingTabs() {
 
   const [successMessage, setSuccessMessage] = useState("");
   const [successDialogOpen, setSuccessDialogOpen] = useState(false);
-
 
   // Fetch venues
   React.useEffect(() => {
@@ -155,12 +148,12 @@ export default function BookingTabs() {
       return;
     }
 
-  if (!selectedDate) {
-  setDateError("⚠️ Please select a booking date before confirming.");
-  return;
-} else {
-  setDateError(""); // Clear error when valid
-}
+    if (!selectedDate) {
+      setDateError("⚠️ Please select a booking date before confirming.");
+      return;
+    } else {
+      setDateError(""); // Clear error when valid
+    }
 
     if (!selectedDate) {
       alert("Please select a booking date before confirming.");
@@ -199,7 +192,7 @@ export default function BookingTabs() {
 
       const data = await res.json();
       setSuccessMessage("Booking confirmed!");
-setSuccessDialogOpen(true); // Show the dialog
+      setSuccessDialogOpen(true); // Show the dialog
 
       setBookingData({ venue: null, floral: null, timePackage: null });
       setValue(0);
@@ -528,18 +521,17 @@ setSuccessDialogOpen(true); // Show the dialog
                     textField: {
                       fullWidth: true,
                       size: "small",
-                      sx: {mb: 1},
+                      sx: { mb: 1 },
                     },
                   }}
                 />
               </LocalizationProvider>
 
               {dateError && (
-  <Typography color="error" sx={{mb: 1}}>
-    {dateError}
-  </Typography>
-)}
-
+                <Typography color="error" sx={{ mb: 1 }}>
+                  {dateError}
+                </Typography>
+              )}
 
               <Typography sx={{ fontSize: "0.9rem", color: "#555" }}>
                 {bookingData.timePackage
@@ -622,40 +614,36 @@ setSuccessDialogOpen(true); // Show the dialog
                   "Confirm"
                 )}
               </Button>
-
-             
             </Box>
           </Box>
         </CustomTabPanel>
-         <Dialog
-  open={successDialogOpen}
-  onClose={() => setSuccessDialogOpen(false)}
->
-  <DialogTitle sx={{ color: "green", fontWeight: "bold" }}>
-    Booking Success
-  </DialogTitle>
-  <DialogContent>
-    <Typography>{successMessage}</Typography>
-  </DialogContent>
-  <DialogActions>
-   <Button
-  onClick={() => {
-    setSuccessDialogOpen(false);
-    router.push("/events"); // change path
-  }}
-  autoFocus
-  sx={{
-    color: "white",
-    backgroundColor: "orange",
-    "&:hover": { backgroundColor: "darkorange" },
-  }}
->
-  OK
-</Button>
-
-  </DialogActions>
-</Dialog>
-
+        <Dialog
+          open={successDialogOpen}
+          onClose={() => setSuccessDialogOpen(false)}
+        >
+          <DialogTitle sx={{ color: "green", fontWeight: "bold" }}>
+            Booking Success
+          </DialogTitle>
+          <DialogContent>
+            <Typography>{successMessage}</Typography>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              onClick={() => {
+                setSuccessDialogOpen(false);
+                router.push("/events"); // change path
+              }}
+              autoFocus
+              sx={{
+                color: "white",
+                backgroundColor: "orange",
+                "&:hover": { backgroundColor: "darkorange" },
+              }}
+            >
+              OK
+            </Button>
+          </DialogActions>
+        </Dialog>
 
         {/* Only Back button */}
         <Box display="flex" justifyContent="flex-start" p={2}>
