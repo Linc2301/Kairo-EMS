@@ -41,6 +41,8 @@ model Venue {
   Booking       Booking[]
   FloralService FloralService[]
   TimePackage   TimePackage[]
+
+  Review Review[]
 }
 
 model VenueType {
@@ -113,6 +115,9 @@ model Review {
   rating      Int
   review_date DateTime
   description String   @db.Text
+
+  venue_id Int
+  Venue    Venue @relation(fields: [venue_id], references: [id])
 }
 
 model Description {

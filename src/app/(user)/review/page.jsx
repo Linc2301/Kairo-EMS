@@ -1,112 +1,124 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import axios from "axios";
 import {
-  AppBar,
-  Toolbar,
-  Button,
-  Typography,
-  Container,
-  Grid,
   Box,
+  Container,
+  Typography,
+  Card,
+  CardContent,
+  Avatar,
+  Stack,
+  Rating,
 } from "@mui/material";
-import CustomerReviewCard from "@/src/components/CustomerReviewCard";
 
-const reviews = [
-  {
-    name: "Wai Lynn Oo",
-    avatar: "/avatars/avatar1.png",
-    venue: "Crystal Ballroom (Corporate Event)",
-    date: "3.5.2024",
-    feedback:
-      "I like the way they plan events and I like their services. It makes me feel like I’m planning by myself.",
-  
-  },
-  {
-    name: "Ye Htut Naung",
-    avatar: "/avatars/avatar2.png",
-    venue: "Crystal Ballroom (Corporate Event)",
-    date: "5.5.2024",
-    feedback:
-      "I like the way they plan events and I like their services. It makes me feel like I’m planning by myself.",
-    
-  },
-  {
-    name: "Su Yadana Tun",
-    avatar: "/avatars/avatar3.png",
-    venue: "Crystal Ballroom (Corporate Event)",
-    date: "2.5.2024",
-    feedback:
-      "I like the way they plan events and I like their services. It makes me feel like I’m planning by myself.",
-   
-  },
-  {
-    name: "Ash Kidd",
-    avatar: "/avatars/avatar4.png",
-    venue: "Crystal Ballroom (Corporate Event)",
-    date: "2.5.2024",
-    feedback:
-      "I like the way they plan events and I like their services. It makes me feel like I’m planning by myself.",
-   
-  },
-  {
-    name: "Kaung Htet Lin",
-    avatar: "/avatars/avatar5.png",
-    venue: "Crystal Ballroom (Corporate Event)",
-    date: "7.6.2024",
-    feedback:
-      "I like the way they plan events and I like their services. It makes me feel like I’m planning by myself.",
-   
-  },
-  {
-    name: "Thiha Oo",
-    avatar: "/avatars/avatar6.png",
-    venue: "Crystal Ballroom (Corporate Event)",
-    date: "6.5.2024",
-    feedback:
-      "I like the way they plan events and I like their services. It makes me feel like I’m planning by myself.",
-    
-  },
-];
+export default function ReviewsPage() {
+  const [reviews, setReviews] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-export default function Reviews() {
+  // Fetch reviews from API
+  const getReviewList = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get("/api/review");
+      setReviews(response.data);
+      setLoading(false);
+    } catch (err) {
+      setError("Failed to load reviews");
+      setLoading(false);
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    getReviewList();
+  }, []);
+
+  if (loading)
+    return (
+      <Container sx={{ py: 6 }}>
+        <Typography align="center">Loading reviews...</Typography>
+      </Container>
+    );
+
+  if (error)
+    return (
+      <Container sx={{ py: 6 }}>
+        <Typography color="error" align="center">
+          {error}
+        </Typography>
+      </Container>
+    );
+
   return (
-    <>
-     
-      {/* Review Section */}
-      <Box sx={{ bgcolor: "black", color: "white", py: 6 }}>
-        <Container>
-          <Typography variant="h4" align="center" fontWeight="bold" mb={1}>
-            Our Happy <span style={{ color: "#7F5AF0" }}>Customers</span>
-          </Typography>
-          <Typography variant="body1" align="center" mb={5}>
-            See how our customers are talking about us
-          </Typography>
+    <Box sx={{ bgcolor: "black", color: "white", py: 6 }}>
+      <Container>
+        <Typography
+          variant="h4"
+          align="center"
+          fontWeight="bold"
+          mb={3}
+          sx={{ color: "#7F5AF0" }}
+        >
+          Our Happy Customers
+        </Typography>
 
-          <Box
-            sx={{
-              display: "flex",
-              flexWrap: "wrap",
-              gap: 2,
-            }}
-          >
-            {reviews.map((review, index) => (
-              <Box
-                key={index}
-                sx={{
-                  width: {
-                    xs: "100%",
-                    sm: "calc(50% - 16px)",
-                    md: "calc(33.33% - 16px)",
-                  },
-                  display: "flex",
-                }}
-              >
-                <CustomerReviewCard review={review} />
-              </Box>
-            ))}
-          </Box>
-        </Container>
-      </Box>
-    </>
+        <Stack
+          direction="row"
+          flexWrap="wrap"
+          gap={2}
+          justifyContent="center"
+        >
+          {reviews.length === 0 && (
+            <Typography>No reviews available.</Typography>
+          )}
+
+          {reviews.map((review) => (
+            <Card
+              key={review.id}
+              sx={{
+                width: { xs: "100%", sm: 350 },
+                bgcolor: "#1E1E1E",
+                color: "white",
+                borderRadius: 2,
+              }}
+            >
+              <CardContent>
+                <Stack direction="row" spacing={2} alignItems="center" mb={1}>
+                  <Avatar
+                    alt={review.user?.name || "User"}
+                    src={review.user?.photo || ""}
+                  />
+                  <Box>
+                    <Typography fontWeight="bold">
+                      {review.user?.name || "Anonymous"}
+                    </Typography>
+                    <Typography variant="body2" color="gray">
+                      {review.Venue?.name || "Unknown Venue"}
+                    </Typography>
+                    <Typography variant="caption" color="gray">
+                      {new Date(review.review_date).toLocaleDateString()}
+                    </Typography>
+                  </Box>
+                </Stack>
+
+                <Rating
+                  value={review.rating || 0}
+                  readOnly
+                  size="small"
+                  sx={{ mb: 1 }}
+                />
+
+                <Typography variant="body2" sx={{ whiteSpace: "pre-line" }}>
+                  {review.description}
+                </Typography>
+              </CardContent>
+            </Card>
+          ))}
+        </Stack>
+      </Container>
+    </Box>
   );
 }

@@ -1,16 +1,34 @@
-// app/api/review/route.js
-import { NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
+import { NextResponse } from "next/server";
+import { prisma } from "@/src/lib/prisma";
 
 export async function GET() {
   try {
     const reviews = await prisma.review.findMany({
-      include: { user: true },
-      orderBy: { review_date: 'desc' },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            photo: true,
+          },
+        },
+        Venue: {   // Make sure this matches your Prisma schema relation name
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+      orderBy: {
+        review_date: "desc",
+      },
     });
+
     return NextResponse.json(reviews);
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to fetch reviews' }, { status: 500 });
+    console.error("GET /api/review error:", error);
+    return NextResponse.json({ error: "Failed to fetch reviews" }, { status: 500 });
   }
 }
 
@@ -18,17 +36,24 @@ export async function POST(req) {
   try {
     const data = await req.json();
 
+    const { user_id, venue_id, rating, review_date, description } = data;
+    if (!user_id || !venue_id || typeof rating !== "number" || !review_date || !description) {
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    }
+
     const newReview = await prisma.review.create({
       data: {
-        user_id: data.user_id,
-        rating: data.rating,
-        review_date: new Date(data.review_date),
-        description: data.description,
+        user_id,
+        venue_id,
+        rating,
+        review_date: new Date(review_date),
+        description,
       },
     });
 
     return NextResponse.json(newReview, { status: 201 });
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to create review' }, { status: 500 });
+    console.error("POST /api/review error:", error);
+    return NextResponse.json({ error: "Failed to create review" }, { status: 500 });
   }
 }

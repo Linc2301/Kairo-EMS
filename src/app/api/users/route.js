@@ -69,6 +69,7 @@ export async function GET() {
         name: true,
         email: true,
         phone: true,
+        password: true,
         photo: true,
         isAdmin: true,
       },
