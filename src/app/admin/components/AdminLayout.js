@@ -233,7 +233,7 @@ export default function AdminLayout({ children }) {
                                         },
                                     }}
                                 >
-                                    <ListItemText primary="Floral Service" />
+                                    <ListItemText primary="Service" />
                                 </ListItemButton>
                             </ListItem>
 
@@ -363,13 +363,11 @@ export default function AdminLayout({ children }) {
             <Box
                 component="main"
                 sx={{
-                    height: 1100,
                     flexGrow: 1,
                     bgcolor: '#fff',
                     mt: 8,
                     p: 4,
-                    borderRadius: 2,
-                    boxShadow: 2,
+
                     mx: 1,
                 }}
             >

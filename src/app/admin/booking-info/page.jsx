@@ -81,7 +81,7 @@ export default function BookingList() {
                                 <TableCell align="center">{booking.VenueType?.name || "N/A"}</TableCell>
                                 <TableCell align="center">{booking.floralService?.name || "N/A"}</TableCell>
                                 <TableCell align="center">{new Date(booking.booking_date).toLocaleDateString()}</TableCell>
-                                <TableCell align="center">${booking.total_amount}</TableCell>
+                                <TableCell align="center">{booking.total_amount}MMK</TableCell>
                                 <TableCell align="center">
                                     <Link passHref href={`/admin/booking-info/${booking.id}/edit`}>
                                         <IconButton sx={{ color: "blue" }}>

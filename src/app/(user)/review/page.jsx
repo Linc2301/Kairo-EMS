@@ -11,7 +11,9 @@ import {
   Avatar,
   Stack,
   Rating,
+  Button,
 } from "@mui/material";
+import Link from "next/link";
 
 export default function ReviewsPage() {
   const [reviews, setReviews] = useState([]);
@@ -59,11 +61,32 @@ export default function ReviewsPage() {
           variant="h4"
           align="center"
           fontWeight="bold"
-          mb={3}
+          mb={2}
           sx={{ color: "#7F5AF0" }}
         >
           Our Happy Customers
         </Typography>
+
+
+      <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2} ml={45}>
+        <Typography
+          variant="h6"
+          align="center"
+          fontWeight="bold"
+          mb={3}
+          sx={{ color: "orange" }}
+        >
+          See how our customers are talking about us   
+        </Typography>
+                <Link passHref href="/review/create">
+                    <Button sx={{ mb: 2 }} variant="contained">
+                        Give Review
+                    </Button>
+                </Link>
+            </Stack>
+
+
+        
 
         <Stack
           direction="row"

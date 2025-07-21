@@ -43,12 +43,24 @@ export async function PUT(req, { params }) {
 // DELETE venue
 export async function DELETE(req, { params }) {
     try {
-        await prisma.venue.delete({
-            where: { id: parseInt(params.id) },
-        });
+        const id = parseInt(params.id);
 
-        return NextResponse.json({ message: 'Venue deleted successfully' });
+        if (isNaN(id)) {
+            return NextResponse.json({ error: "Invalid ID" }, { status: 400 });
+        }
+
+        // Manual deletion (remove if you use cascade)
+        await prisma.review.deleteMany({ where: { venue_id: id } });
+        await prisma.booking.deleteMany({ where: { venue_id: id } });
+        await prisma.venueType.deleteMany({ where: { venue_id: id } });
+        await prisma.floralService.deleteMany({ where: { venue_id: id } });
+        await prisma.timePackage.deleteMany({ where: { venue_id: id } });
+
+        await prisma.venue.delete({ where: { id } });
+
+        return NextResponse.json({ message: "Venue deleted successfully" });
     } catch (error) {
-        return NextResponse.json({ error: 'Failed to delete venue' }, { status: 500 });
+        console.error("Failed to delete venue:", error);
+        return NextResponse.json({ error: "Failed to delete venue" }, { status: 500 });
     }
 }

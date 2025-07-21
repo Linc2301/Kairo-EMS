@@ -87,7 +87,7 @@ export default function EventDetailPage() {
               {event.name}
             </Typography>
             <Typography sx={{ fontSize: 30, mt: 4, fontWeight: "bold" }}>
-             {event.description}
+              {event.description}
             </Typography>
             <Typography sx={{ fontSize: 30, mt: 4, ml: 18, fontWeight: "bold" }}>
               Choose {event.name} Venues
@@ -95,7 +95,7 @@ export default function EventDetailPage() {
 
             <FormControl fullWidth sx={{ mt: 4, width: 300 }}>
               <InputLabel sx={{ ml: 20 }}>Select</InputLabel>
-              <Select
+              {/* <Select
                 value={selectedVenue}
                 label="Select"
                 onChange={handleSelectChange}
@@ -133,7 +133,50 @@ export default function EventDetailPage() {
                     {venue.name}
                   </MenuItem>
                 ))}
+              </Select> */}
+
+              <Select
+                value={selectedVenue}
+                label="Select"
+                onChange={handleSelectChange}
+                sx={{
+                  ml: 20,
+                  width: 400,
+                  backgroundColor: "#fff",
+                  borderRadius: 2,
+                  "& .MuiOutlinedInput-notchedOutline": {
+                    borderWidth: "3px",
+                    borderColor: "#1976d2",
+                  },
+                  "&:hover .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "#E24C00",
+                  },
+                  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "#E24C00",
+                  },
+                }}
+              >
+                {venues
+                  .filter((venue) => venue.eventId === event.id)
+                  .map((venue, idx) => (
+                    <MenuItem
+                      key={venue.id}
+                      value={venue.id}
+                      sx={{
+                        backgroundColor: idx % 2 === 0 ? "#fce4ec" : "#e8f5e9",
+                        color: "#333",
+                        fontWeight: "bold",
+                        "&:hover": {
+                          backgroundColor: "#E24C00",
+                          color: "#fff",
+                        },
+                      }}
+                    >
+                      {venue.name}
+                    </MenuItem>
+                  ))}
               </Select>
+
             </FormControl>
           </Box>
         </Grid>

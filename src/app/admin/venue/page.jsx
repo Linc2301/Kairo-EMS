@@ -32,19 +32,34 @@ export default function UserList() {
     }
   };
 
-  const handleDelete = async (id) => {
-    const confirmed = window.confirm("Are you sure you want to delete this venue?");
-    if (!confirmed) return;
+  // const handleDelete = async (id) => {
+  //   const confirmed = window.confirm("Are you sure you want to delete this venue?");
+  //   if (!confirmed) return;
 
-    try {
-      await axios.delete(`/api/venue/${id}`);
-      setEvents((prev) => prev.filter((event) => event.id !== id));
-      alert("Venue deleted successfully!");
-    } catch (error) {
-      console.error("Failed to delete:", error);
-      alert("Something went wrong while deleting.");
-    }
-  };
+  //   try {
+  //     await axios.delete(`/api/venue/${id}`);
+  //     setEvents((prev) => prev.filter((event) => event.id !== id));
+  //     alert("Venue deleted successfully!");
+  //   } catch (error) {
+  //     console.error("Failed to delete:", error);
+  //     alert("Something went wrong while deleting.");
+  //   }
+  // };
+
+const handleDelete = async (id) => {
+  const confirmed = window.confirm("Are you sure you want to delete this venue?");
+  if (!confirmed) return;
+
+  try {
+    await axios.delete(`/api/venue/${id}`);
+    setEvents((prev) => prev.filter((event) => event.id !== id)); //  OK if you're storing venues in `setEvents`
+    alert("Venue deleted successfully!");
+  } catch (error) {
+    console.error("Failed to delete:", error);
+    alert("Something went wrong while deleting.");
+  }
+};
+
 
   useEffect(() => {
     getEventList();
@@ -66,7 +81,7 @@ export default function UserList() {
           <TableHead>
             <TableRow>
               <TableCell align="center">No</TableCell>
-              <TableCell align="center">Name</TableCell>
+              <TableCell align="center">Venue</TableCell>
               <TableCell align="center">Photo1</TableCell>
               <TableCell align="center">Photo2</TableCell>
               <TableCell align="center">Photo3</TableCell>
