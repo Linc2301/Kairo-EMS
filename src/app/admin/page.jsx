@@ -92,13 +92,18 @@
 //   );
 // }
 
+
+import { useState } from 'react';
 import { Box, Container } from '@mui/material';
 import BookingCalendar from './components/BookingCalendar';
 import BookingList from './components/BookingList';
 import DashboardStats from './components/DashboardStats';
 import TimePackagePieChart from './components/TImeChart';
+import dayjs from 'dayjs';
 
 export default function AdminDashboardPage() {
+  const [selectedDate, setSelectedDate] = useState(dayjs());
+
   return (
     <Container sx={{ mt: 4 }}>
       <Box>
@@ -112,12 +117,12 @@ export default function AdminDashboardPage() {
       <Box display="flex" gap={2} flexWrap="wrap" sx={{mt: 5}}>
         {/* Left side - Calendar */}
         <Box flex={1} minWidth="300px">
-          <BookingCalendar />
+          <BookingCalendar selectedDate={selectedDate} onChange={setSelectedDate} />
         </Box>
     
         {/* Right side - Booking List */}
         <Box flex={1} minWidth="300px">
-          <BookingList />
+          <BookingList selectedDate={selectedDate} />
        
         </Box>
       </Box>
