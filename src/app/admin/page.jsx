@@ -96,24 +96,32 @@ import { Box, Container } from '@mui/material';
 import BookingCalendar from './components/BookingCalendar';
 import BookingList from './components/BookingList';
 import DashboardStats from './components/DashboardStats';
+import TimePackagePieChart from './components/TImeChart';
 
 export default function AdminDashboardPage() {
   return (
     <Container sx={{ mt: 4 }}>
-      <DashboardStats/>
+      <Box>
+             <DashboardStats/>
+      </Box>
+ 
+         <Box flex={1} minWidth="300px">
+          <TimePackagePieChart />
+        </Box>
       
-      <Box display="flex" gap={2} flexWrap="wrap">
+      <Box display="flex" gap={2} flexWrap="wrap" sx={{mt: 5}}>
         {/* Left side - Calendar */}
         <Box flex={1} minWidth="300px">
           <BookingCalendar />
         </Box>
-
+    
         {/* Right side - Booking List */}
         <Box flex={1} minWidth="300px">
           <BookingList />
        
         </Box>
       </Box>
+    
     </Container>
   );
 }

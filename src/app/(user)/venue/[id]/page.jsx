@@ -98,58 +98,63 @@
 
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react"; // ✅ import session
 import {
   Box,
   Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
   Grid,
   Typography,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
 } from "@mui/material";
 import Image from "next/image";
 
 export default function VenuePage() {
   const { id } = useParams();
   const router = useRouter();
-  const [venue, setVenue] = useState(null);
-  const [openDialog, setOpenDialog] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // Simulate auth check
 
+  const { data: session, status } = useSession(); // ✅ get session
+  const isLoggedIn = !!session;
+
+  const [venue, setVenue] = useState(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+  // Fetch venue details
   useEffect(() => {
     if (!id) return;
 
     fetch(`/api/venue/${id}`)
       .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch");
+        if (!res.ok) throw new Error("Failed to fetch venue");
         return res.json();
       })
       .then(setVenue)
       .catch(console.error);
   }, [id]);
 
-  useEffect(() => {
-    // Simulated check: replace this with your real auth logic (e.g. cookies, localStorage, or API check)
-    const token = localStorage.getItem("token"); // Adjust key name as needed
-    setIsLoggedIn(!!token);
-  }, []);
-
   const handleBookClick = () => {
+    if (status === "loading") return; // still checking session
     if (isLoggedIn) {
       router.push("/deliveries");
     } else {
-      setOpenDialog(true);
+      setDialogOpen(true);
     }
   };
 
-  const handleDialogConfirm = () => {
-    setOpenDialog(false);
+  const handleLogin = () => {
+    setDialogOpen(false);
     router.push("/login");
   };
 
+  const handleCloseDialog = () => {
+    setDialogOpen(false);
+  };
+
   if (!venue) return <Typography>Loading venue details...</Typography>;
+  if (status === "loading") return <Typography>Checking login status...</Typography>;
 
   return (
     <Box sx={{ bgcolor: "black", p: 5, minHeight: "100vh" }}>
@@ -194,8 +199,8 @@ export default function VenuePage() {
               {venue.name || "Unknown Venue"}
             </Typography>
             <Button
-              variant="contained"
               onClick={handleBookClick}
+              variant="contained"
               sx={{
                 backgroundColor: "#e65100",
                 ml: 6,
@@ -217,16 +222,16 @@ export default function VenuePage() {
       </Grid>
 
       {/* Login Required Dialog */}
-      <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
+      <Dialog open={dialogOpen} onClose={handleCloseDialog}>
         <DialogTitle>Login Required</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            You need to be logged in to book a venue. Please login to continue.
+            You need to login first to book this venue.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
-          <Button onClick={handleDialogConfirm} variant="contained" sx={{ bgcolor: "#E24C00"}}>
+          <Button onClick={handleCloseDialog}>Cancel</Button>
+          <Button onClick={handleLogin} variant="contained">
             Go to Login
           </Button>
         </DialogActions>
