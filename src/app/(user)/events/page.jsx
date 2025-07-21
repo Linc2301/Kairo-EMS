@@ -3,6 +3,8 @@
 "use client";
 import Link from "next/link";
 import { Box, Typography } from "@mui/material";
+import { useRouter } from "next/navigation";
+
 
 export default function EventPage() {
   const pyramidRows = [
@@ -29,6 +31,7 @@ export default function EventPage() {
       { type: "image", src: "/Event Main Page/gallery.jpg" },
     ],
   ];
+   const router = useRouter();
 
   return (
     <Box sx={{ backgroundColor: "#000", py: 8, px: 2, textAlign: "center" }}>
