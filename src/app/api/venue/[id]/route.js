@@ -15,6 +15,46 @@ export async function GET(req, { params }) {
     return NextResponse.json(venue);
 }
 
+
+// export async function GET(req, { params }) {
+//     const { id } = params;
+//     const venueId = parseInt(id);
+
+//     if (!venueId || isNaN(venueId)) {
+//         return NextResponse.json({ message: "Venue ID is required" }, { status: 400 });
+//     }
+
+//     try {
+//         const venue = await prisma.venue.findUnique({
+//             where: { id: venueId },
+//         });
+
+//         if (!venue) {
+//             return NextResponse.json({ message: "Venue not found" }, { status: 404 });
+//         }
+
+//         const venueTypes = await prisma.venueType.findMany({
+//             where: { venue_id: venueId },
+//         });
+
+//         const floralServices = await prisma.floralService.findMany({
+//             where: { venue_id: venueId },
+//         });
+
+//         const timePackages = await prisma.timePackage.findMany({
+//             where: { venue_id: venueId },
+//         });
+
+//         return NextResponse.json({
+//             venueTypes,
+//             floralServices,
+//             timePackages,
+//         });
+//     } catch (error) {
+//         console.error("Error fetching related venue data:", error);
+//         return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
+//     }
+// }
 export async function PUT(req, { params }) {
     const { id } = params;
     const body = await req.json();

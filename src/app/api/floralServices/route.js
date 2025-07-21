@@ -27,9 +27,19 @@ export async function POST(req) {
     }
 }
 
-export async function GET() {
+
+export async function GET(req) {
+    const { searchParams } = new URL(req.url);
+    const venueId = searchParams.get("venueId");
+
     try {
         const services = await prisma.floralService.findMany({
+            where: venueId
+                ? {
+                    venue_id: parseInt(venueId),
+                }
+                : {},
+
             select: {
                 id: true,
                 name: true,

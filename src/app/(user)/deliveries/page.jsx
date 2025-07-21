@@ -659,3 +659,256 @@ export default function BookingTabs() {
     </Box>
   );
 }
+
+
+// "use client";
+
+// import * as React from "react";
+// import {
+//   Box,
+//   Tabs,
+//   Tab,
+//   Typography,
+//   Button,
+//   Divider,
+//   CircularProgress,
+//   Dialog,
+//   DialogTitle,
+//   DialogContent,
+//   DialogActions,
+// } from "@mui/material";
+// import {
+//   DatePicker,
+//   LocalizationProvider,
+// } from "@mui/x-date-pickers";
+// import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+// import { useRouter } from "next/navigation";
+
+// function CustomTabPanel({ children, value, index, ...other }) {
+//   return (
+//     <div role="tabpanel" hidden={value !== index} {...other}>
+//       {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
+//     </div>
+//   );
+// }
+
+// function a11yProps(index) {
+//   return {
+//     id: `tab-${index}`,
+//     "aria-controls": `tabpanel-${index}`,
+//   };
+// }
+
+// export default function BookingTabs() {
+//   const [value, setValue] = React.useState(0);
+//   const [loading, setLoading] = React.useState({ venues: false, florals: false, timePackages: false, confirm: false });
+//   const [error, setError] = React.useState(null);
+//   const [venues, setVenues] = React.useState([]);
+//   const [florals, setFlorals] = React.useState([]);
+//   const [timePackages, setTimePackages] = React.useState([]);
+//   const [selectedDate, setSelectedDate] = React.useState(null);
+//   const [dateError, setDateError] = React.useState("");
+//   const [bookingData, setBookingData] = React.useState({ venue: null, floral: null, timePackage: null });
+//   const [successDialogOpen, setSuccessDialogOpen] = React.useState(false);
+//   const [successMessage, setSuccessMessage] = React.useState("");
+//   const router = useRouter();
+
+//   React.useEffect(() => {
+//     const fetchData = async () => {
+//       try {
+//         setLoading((l) => ({ ...l, venues: true }));
+//         const res = await fetch("/api/venueType");
+//         const data = await res.json();
+//         setVenues(data);
+//       } catch {
+//         setError("Failed to load venues");
+//       } finally {
+//         setLoading((l) => ({ ...l, venues: false }));
+//       }
+//     };
+//     fetchData();
+//   }, []);
+
+//   React.useEffect(() => {
+//     const fetchFlorals = async () => {
+//       try {
+//         setLoading((l) => ({ ...l, florals: true }));
+//         const res = await fetch("/api/floralServices");
+//         const data = await res.json();
+//         setFlorals(data);
+//       } catch {
+//         setError("Failed to load floral services");
+//       } finally {
+//         setLoading((l) => ({ ...l, florals: false }));
+//       }
+//     };
+//     fetchFlorals();
+//   }, []);
+
+//   React.useEffect(() => {
+//     const fetchTimePackages = async () => {
+//       try {
+//         setLoading((l) => ({ ...l, timePackages: true }));
+//         const res = await fetch("/api/timePackages");
+//         const data = await res.json();
+//         setTimePackages(data);
+//       } catch {
+//         setError("Failed to load time packages");
+//       } finally {
+//         setLoading((l) => ({ ...l, timePackages: false }));
+//       }
+//     };
+//     fetchTimePackages();
+//   }, []);
+
+//   const handleTabChange = (event, newValue) => {
+//     if (newValue !== value) event.preventDefault();
+//   };
+
+//   const handleSelect = (field, item, nextValue) => {
+//     setBookingData((prev) => ({ ...prev, [field]: item }));
+//     if (nextValue !== null) setValue(nextValue);
+//   };
+
+//   const handleConfirm = async () => {
+//     if (!bookingData.venue || !bookingData.floral || !bookingData.timePackage || !selectedDate) {
+//       setDateError("Please complete all selections and choose a date.");
+//       return;
+//     }
+//     setLoading((l) => ({ ...l, confirm: true }));
+//     const payload = {
+//       venue_id: bookingData.venue.venue_id || bookingData.venue.id,
+//       venueTypeId: bookingData.venue.id,
+//       floral_service_id: bookingData.floral.id,
+//       timePackageId: bookingData.timePackage.id,
+//       user_id: 1,
+//       booking_date: selectedDate.toISOString(),
+//       total_amount: (bookingData.venue.price || 0) + (bookingData.floral.price || 0),
+//     };
+
+//     try {
+//       const res = await fetch("/api/booking-info", {
+//         method: "POST",
+//         headers: { "Content-Type": "application/json" },
+//         body: JSON.stringify(payload),
+//       });
+//       if (!res.ok) throw new Error("Booking failed");
+//       setSuccessMessage("Booking confirmed!");
+//       setSuccessDialogOpen(true);
+//       setBookingData({ venue: null, floral: null, timePackage: null });
+//       setValue(0);
+//     } catch (err) {
+//       setError(err.message);
+//       alert("Booking failed: " + err.message);
+//     } finally {
+//       setLoading((l) => ({ ...l, confirm: false }));
+//     }
+//   };
+
+//   const renderCard = (item, onClick, labelField = "name", priceField = "price", descriptionField = "description") => (
+//     <Box
+//       key={item.id}
+//       sx={{ width: 270, bgcolor: "white", color: "black", borderRadius: 3, boxShadow: 3, overflow: "hidden" }}
+//     >
+//       <img src={item.photo || undefined} alt={item[labelField]} style={{ width: "100%", height: 160, objectFit: "cover" }} />
+//       <Box sx={{ p: 2 }}>
+//         <Typography fontWeight="bold" color="orange">{item[labelField]}</Typography>
+//         {item[descriptionField] && (
+//           <Typography variant="body2" mt={0.5}>{item[descriptionField]}</Typography>
+//         )}
+//         <Typography variant="body2" mt={0.5}>Price - {item[priceField]?.toLocaleString()} MMK</Typography>
+//         <Button
+//           variant="outlined"
+//           sx={{ mt: 2, borderColor: "orange", color: "orange", width: "100%", borderRadius: "20px", py: 1, textTransform: "none", fontSize: "0.8rem", fontWeight: 500, "&:hover": { borderColor: "darkorange", backgroundColor: "rgba(255,165,0,0.08)" } }}
+//           onClick={onClick}
+//         >
+//           Select
+//         </Button>
+//       </Box>
+//     </Box>
+//   );
+
+//   return (
+//     <Box sx={{ bgcolor: "black", minHeight: "100vh", py: 4 }}>
+//       <Box sx={{ width: "90%", maxWidth: 1200, mx: "auto", color: "white" }}>
+//         <Box sx={{ bgcolor: "white", px: 2, borderBottom: 1, borderColor: "divider" }}>
+//           <Tabs
+//             value={value}
+//             onChange={handleTabChange}
+//             variant="fullWidth"
+//             sx={{
+//               "& .MuiTabs-indicator": { backgroundColor: "orange", height: 3 },
+//               "& .MuiTab-root": {
+//                 fontSize: "1rem",
+//                 textTransform: "none",
+//                 color: "black",
+//                 "&.Mui-selected": { color: "orange", fontWeight: "bold" },
+//               },
+//             }}
+//           >
+//             <Tab label="Venue" {...a11yProps(0)} />
+//             <Tab label="Floral Service" {...a11yProps(1)} />
+//             <Tab label="Date & Time" {...a11yProps(2)} />
+//             <Tab label="Receipt" {...a11yProps(3)} />
+//           </Tabs>
+//         </Box>
+
+//         <CustomTabPanel value={value} index={0}>
+//           {loading.venues ? <CircularProgress /> : venues.map((v) => renderCard(v, () => handleSelect("venue", v, 1)))}
+//         </CustomTabPanel>
+
+//         <CustomTabPanel value={value} index={1}>
+//           {loading.florals ? <CircularProgress /> : florals.map((f) => renderCard(f, () => handleSelect("floral", f, 2)))}
+//         </CustomTabPanel>
+
+//         <CustomTabPanel value={value} index={2}>
+//           {loading.timePackages ? <CircularProgress /> : timePackages.map((tp) => renderCard(tp, () => handleSelect("timePackage", tp, 3), "venueName", "price", ""))}
+//         </CustomTabPanel>
+
+//         <CustomTabPanel value={value} index={3}>
+//           <Box sx={{ bgcolor: "white", color: "black", p: 4, borderRadius: 2, maxWidth: 500, mx: "auto" }}>
+//             <Typography variant="h5" textAlign="center" fontWeight="bold" mb={3}>Receipt</Typography>
+//             {["venue", "floral"].map((key) => (
+//               <Box key={key} mb={2}>
+//                 <Typography variant="subtitle1" fontWeight="bold">{key.charAt(0).toUpperCase() + key.slice(1)}</Typography>
+//                 <Typography>{bookingData[key]?.name || "Not selected"}</Typography>
+//                 <Typography>Price: {bookingData[key]?.price?.toLocaleString() || 0} MMK</Typography>
+//               </Box>
+//             ))}
+//             <Divider sx={{ my: 2 }} />
+//             <LocalizationProvider dateAdapter={AdapterDateFns}>
+//               <DatePicker
+//                 label="Select Booking Date"
+//                 value={selectedDate}
+//                 onChange={(date) => setSelectedDate(date)}
+//                 slotProps={{ textField: { fullWidth: true, size: "small" } }}
+//               />
+//             </LocalizationProvider>
+//             {dateError && <Typography color="error">{dateError}</Typography>}
+//             <Typography mt={2}>{bookingData.timePackage ? `${bookingData.timePackage.venueName}: ${bookingData.timePackage.startTime} - ${bookingData.timePackage.endTime}` : "Not selected"}</Typography>
+//             <Divider sx={{ my: 2 }} />
+//             <Typography fontWeight="bold">Total: {(bookingData.venue?.price || 0 + bookingData.floral?.price || 0).toLocaleString()} MMK</Typography>
+//             <Box mt={2} display="flex" gap={2}>
+//               <Button variant="outlined" onClick={() => setValue(0)} disabled={loading.confirm}>Cancel</Button>
+//               <Button variant="contained" sx={{ bgcolor: "orange", color: "white" }} onClick={handleConfirm} disabled={loading.confirm}>
+//                 {loading.confirm ? <CircularProgress size={24} color="inherit" /> : "Confirm"}
+//               </Button>
+//             </Box>
+//           </Box>
+//         </CustomTabPanel>
+
+//         <Dialog open={successDialogOpen} onClose={() => setSuccessDialogOpen(false)}>
+//           <DialogTitle sx={{ color: "green" }}>Booking Success</DialogTitle>
+//           <DialogContent><Typography>{successMessage}</Typography></DialogContent>
+//           <DialogActions>
+//             <Button onClick={() => { setSuccessDialogOpen(false); router.push("/events"); }} autoFocus sx={{ bgcolor: "orange", color: "white" }}>OK</Button>
+//           </DialogActions>
+//         </Dialog>
+
+//         <Box display="flex" justifyContent="flex-start" p={2}>
+//           <Button disabled={value === 0} onClick={() => setValue((v) => v - 1)}>Back</Button>
+//         </Box>
+//       </Box>
+//     </Box>
+//   );
+// }

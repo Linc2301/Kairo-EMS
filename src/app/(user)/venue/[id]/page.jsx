@@ -138,7 +138,7 @@ export default function VenuePage() {
   const handleBookClick = () => {
     if (status === "loading") return; // still checking session
     if (isLoggedIn) {
-      router.push("/deliveries");
+      router.push(`/deliveries/${id}`);
     } else {
       setDialogOpen(true);
     }
