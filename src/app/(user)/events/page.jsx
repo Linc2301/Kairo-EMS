@@ -31,11 +31,11 @@ export default function EventPage() {
   ];
 
   return (
-    <Box sx={{ backgroundColor: "#000", py: 6, px: 2, textAlign: "center" }}>
+    <Box sx={{ backgroundColor: "#000", py: 8, px: 2, textAlign: "center" }}>
       <Typography variant="h4" sx={{ color: "#ccc", fontWeight: "bold", mb: 2 }}>
         A space for every moment
       </Typography>
-      <Typography variant="h6" sx={{ color: "#aaa", mb: 8 }}>
+      <Typography variant="h6" sx={{ color: "#aaa", mb: 15 }}>
         Book a unique space for your activity
       </Typography>
 
@@ -76,7 +76,7 @@ export default function EventPage() {
                 component="img"
                 src={item.src}
                 alt=""
-                sx={{ width: 40, height: 40, objectFit: "contain" }}
+                sx={{ width: 85, height: 80, borderRadius: 7 }}
               />
             )
           )}

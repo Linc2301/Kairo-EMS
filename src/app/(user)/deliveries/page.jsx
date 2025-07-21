@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -12,11 +11,10 @@ import {
   CircularProgress,
 } from "@mui/material";
 
-import  { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-
 
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -50,13 +48,11 @@ export default function BookingTabs() {
   const [timePackages, setTimePackages] = React.useState([]);
   const [selectedDate, setSelectedDate] = useState(null);
 
-
   const [bookingData, setBookingData] = React.useState({
     venue: null,
     floral: null,
     timePackage: null,
   });
-  
 
   // Fetch venues
   React.useEffect(() => {
@@ -141,13 +137,24 @@ export default function BookingTabs() {
       return;
     }
 
+    if (!selectedDate) {
+      alert("Please select a booking date before confirming.");
+      return;
+    }
+    if (!selectedDate) {
+      alert("Please select a booking date before confirming.");
+      return;
+    }
+
     const payload = {
       venue_id: bookingData.venue.venue_id || bookingData.venue.id,
       venueTypeId: bookingData.venue.id,
       floral_service_id: bookingData.floral.id,
       timePackageId: bookingData.timePackage.id,
       user_id: 1, // Replace with actual user ID
-      booking_date: selectedDate ? selectedDate.toISOString() : new Date().toISOString(),
+      booking_date: selectedDate
+        ? selectedDate.toISOString()
+        : new Date().toISOString(),
 
       total_amount:
         (bookingData.venue.price || 0) + (bookingData.floral.price || 0),
@@ -482,27 +489,27 @@ export default function BookingTabs() {
                 Date & Time
               </Typography>
               <LocalizationProvider dateAdapter={AdapterDateFns}>
-  <DatePicker
-    label="Select Booking Date"
-    value={selectedDate}
-    onChange={(newDate) => setSelectedDate(newDate)}
-    shouldDisableDate={(date) => {
-      const today = new Date();
-      return (
-        date.getDate() === today.getDate() &&
-        date.getMonth() === today.getMonth() &&
-        date.getFullYear() === today.getFullYear()
-      );
-    }}
-    slotProps={{
-      textField: {
-        fullWidth: true,
-        size: "small",
-        sx: { mt: 2 },
-      },
-    }}
-  />
-</LocalizationProvider>
+                <DatePicker
+                  label="Select Booking Date"
+                  value={selectedDate}
+                  onChange={(newDate) => setSelectedDate(newDate)}
+                  shouldDisableDate={(date) => {
+                    const today = new Date();
+                    return (
+                      date.getDate() === today.getDate() &&
+                      date.getMonth() === today.getMonth() &&
+                      date.getFullYear() === today.getFullYear()
+                    );
+                  }}
+                  slotProps={{
+                    textField: {
+                      fullWidth: true,
+                      size: "small",
+                      sx: {mb: 1.5 },
+                    },
+                  }}
+                />
+              </LocalizationProvider>
 
               <Typography sx={{ fontSize: "0.9rem", color: "#555" }}>
                 {bookingData.timePackage
