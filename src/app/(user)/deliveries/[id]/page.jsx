@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -18,6 +19,7 @@ import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { useRouter, useParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
 
 function CustomTabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -36,6 +38,7 @@ function a11yProps(index) {
 }
 
 export default function DeliveryPage() {
+    const { data: session } = useSession();
     const { id: eventId } = useParams();
     const router = useRouter();
 
@@ -149,12 +152,19 @@ export default function DeliveryPage() {
             setDateError("");
         }
 
+        const userId = session?.user?.id;
+
+        if (!userId) {
+            alert("Please log in to confirm booking.");
+            return;
+        }
+
         const payload = {
             venue_id: bookingData.venue.venue_id || bookingData.venue.id,
             venueTypeId: bookingData.venue.id,
             floral_service_id: bookingData.floral.id,
             timePackageId: bookingData.timePackage.id,
-            user_id: 1,
+            user_id: userId,
             booking_date: selectedDate.toISOString(),
             total_amount:
                 (bookingData.venue.price || 0) + (bookingData.floral.price || 0),
@@ -189,8 +199,10 @@ export default function DeliveryPage() {
         }
     };
 
-    return (
+    // UI remains unchanged, so it's omitted here for brevity
 
+
+    return (
         <Box sx={{ bgcolor: "black", minHeight: "100vh", py: 4 }}>
             <Box
                 sx={{
@@ -643,6 +655,5 @@ export default function DeliveryPage() {
                 </Box>
             </Box>
         </Box>
-
     );
 }

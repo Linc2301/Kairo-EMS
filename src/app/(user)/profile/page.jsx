@@ -5,22 +5,25 @@
 //   Avatar,
 //   Box,
 //   Button,
+//   Card,
 //   Container,
 //   Grid,
+//   IconButton,
 //   TextField,
 //   Typography,
-//   Card,
-//   IconButton,
 // } from "@mui/material";
-// import { useState, useEffect } from "react";
+// import { useSession } from "next-auth/react";
+// import { useEffect, useState } from "react";
 // import EditIcon from "@mui/icons-material/Edit";
 // import SaveIcon from "@mui/icons-material/Save";
 // import CancelIcon from "@mui/icons-material/Close";
 // import UploadIcon from "@mui/icons-material/Upload";
 // import axios from "axios";
+// import { useRouter } from "next/navigation";
 
 // export default function ProfilePage() {
-//   const userId = 1; // replace with dynamic user id
+//   const { data: session, status } = useSession();
+//   const router = useRouter();
 
 //   const [editMode, setEditMode] = useState(false);
 //   const [profile, setProfile] = useState({
@@ -35,25 +38,33 @@
 //     email: "",
 //     phone: "",
 //     photoFile: null,
-//     password: "", // new password field
+//     password: "",
 //   });
 
-//   // Fetch user data on mount
+//   const userId = session?.user?.id;
+
+//   // Redirect unauthenticated users & load profile data
 //   useEffect(() => {
-//     axios
-//       .get(`/api/users/${userId}`)
-//       .then((res) => {
-//         setProfile(res.data);
-//         setFormData({
-//           name: res.data.name || "",
-//           email: res.data.email || "",
-//           phone: res.data.phone || "",
-//           photoFile: null,
-//           password: "",
-//         });
-//       })
-//       .catch((err) => console.error(err));
-//   }, [userId]);
+//     if (status === "unauthenticated") {
+//       router.push("/login");
+//     }
+
+//     if (status === "authenticated" && userId) {
+//       axios
+//         .get(`/api/users/${userId}`)
+//         .then((res) => {
+//           setProfile(res.data);
+//           setFormData({
+//             name: res.data.name || "",
+//             email: res.data.email || "",
+//             phone: res.data.phone || "",
+//             photoFile: null,
+//             password: "",
+//           });
+//         })
+//         .catch((err) => console.error("Failed to load profile", err));
+//     }
+//   }, [status, userId, router]);
 
 //   const handleChange = (field) => (e) => {
 //     setFormData({ ...formData, [field]: e.target.value });
@@ -69,7 +80,6 @@
 //     try {
 //       const data = new FormData();
 //       data.append("name", formData.name);
-//       data.append("email", formData.email);
 //       data.append("phone", formData.phone);
 //       if (formData.photoFile) {
 //         data.append("photo", formData.photoFile);
@@ -78,8 +88,12 @@
 //         data.append("password", formData.password);
 //       }
 
+//       // <-- IMPORTANT: withCredentials true to send cookies (JWT)
 //       const res = await axios.put(`/api/users/${userId}`, data, {
-//         headers: { "Content-Type": "multipart/form-data" },
+//         headers: {
+//           "Content-Type": "multipart/form-data",
+//         },
+//         withCredentials: true,
 //       });
 
 //       setProfile(res.data.user);
@@ -93,6 +107,7 @@
 //       });
 //     } catch (error) {
 //       console.error("Failed to update profile:", error);
+//       alert("Failed to update profile");
 //     }
 //   };
 
@@ -107,6 +122,10 @@
 //     setEditMode(false);
 //   };
 
+//   if (status === "loading") {
+//     return <Typography>Loading...</Typography>;
+//   }
+
 //   return (
 //     <Container maxWidth="md" sx={{ mt: 5, mb: 5, p: 8 }}>
 //       <Card sx={{ p: 5, borderRadius: 4 }}>
@@ -115,7 +134,6 @@
 //         </Typography>
 
 //         <Grid container spacing={4} alignItems="center" minHeight={300}>
-//           {/* Avatar Section */}
 //           <Grid item xs={12} md={4} textAlign="center">
 //             <Avatar
 //               alt="User"
@@ -141,7 +159,6 @@
 //             )}
 //           </Grid>
 
-//           {/* Info Section */}
 //           <Grid item xs={12} md={8}>
 //             {editMode ? (
 //               <>
@@ -156,9 +173,8 @@
 //                   fullWidth
 //                   label="Email"
 //                   value={formData.email}
-//                   onChange={handleChange("email")}
 //                   margin="normal"
-//                   disabled // email usually uneditable
+//                   disabled
 //                 />
 //                 <TextField
 //                   fullWidth
@@ -239,27 +255,21 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
 import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Close";
 import UploadIcon from "@mui/icons-material/Upload";
-import axios from "axios";
+import { useSession } from "next-auth/react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import axios from "axios";
 
 export default function ProfilePage() {
   const { data: session, status } = useSession();
   const router = useRouter();
 
   const [editMode, setEditMode] = useState(false);
-  const [profile, setProfile] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    photo: "",
-  });
-
+  const [profile, setProfile] = useState(null);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -268,30 +278,36 @@ export default function ProfilePage() {
     password: "",
   });
 
-  const userId = session?.user?.id;
-
-  // Redirect unauthenticated users & load profile data
+  // Redirect to login if not authenticated
   useEffect(() => {
-    if (status === "unauthenticated") {
+    if (status === "loading") return;
+    if (!session) {
       router.push("/login");
     }
+  }, [status, session, router]);
 
-    if (status === "authenticated" && userId) {
-      axios
-        .get(`/api/users/${userId}`)
-        .then((res) => {
-          setProfile(res.data);
-          setFormData({
-            name: res.data.name || "",
-            email: res.data.email || "",
-            phone: res.data.phone || "",
-            photoFile: null,
-            password: "",
-          });
-        })
-        .catch((err) => console.error("Failed to load profile", err));
-    }
-  }, [status, userId, router]);
+  // Load user profile from DB
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (!session?.user?.id) return;
+
+      try {
+        const res = await axios.get(`/api/users/${session.user.id}`);
+        setProfile(res.data);
+        setFormData({
+          name: res.data.name || "",
+          email: res.data.email || "",
+          phone: res.data.phone || "",
+          photoFile: null,
+          password: "",
+        });
+      } catch (err) {
+        console.error("Failed to load profile:", err);
+      }
+    };
+
+    fetchProfile();
+  }, [session?.user?.id]);
 
   const handleChange = (field) => (e) => {
     setFormData({ ...formData, [field]: e.target.value });
@@ -308,19 +324,19 @@ export default function ProfilePage() {
       const data = new FormData();
       data.append("name", formData.name);
       data.append("phone", formData.phone);
-      if (formData.photoFile) {
-        data.append("photo", formData.photoFile);
-      }
-      if (formData.password.trim() !== "") {
+
+      if (formData.password.trim()) {
         data.append("password", formData.password);
       }
 
-      // <-- IMPORTANT: withCredentials true to send cookies (JWT)
-      const res = await axios.put(`/api/users/${userId}`, data, {
+      if (formData.photoFile) {
+        data.append("photo", formData.photoFile);
+      }
+
+      const res = await axios.put(`/api/users/${session.user.id}`, data, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
-        withCredentials: true,
       });
 
       setProfile(res.data.user);
@@ -333,8 +349,8 @@ export default function ProfilePage() {
         password: "",
       });
     } catch (error) {
-      console.error("Failed to update profile:", error);
-      alert("Failed to update profile");
+      console.error("❌ Failed to update profile:", error);
+      alert(error?.response?.data?.message || "Something went wrong.");
     }
   };
 
@@ -349,8 +365,8 @@ export default function ProfilePage() {
     setEditMode(false);
   };
 
-  if (status === "loading") {
-    return <Typography>Loading...</Typography>;
+  if (status === "loading" || !profile) {
+    return <Typography textAlign="center">Loading...</Typography>;
   }
 
   return (
