@@ -1,4 +1,3 @@
-
 // "use client";
 
 // import { useParams } from "next/navigation";
@@ -154,74 +153,255 @@ export default function VenuePage() {
   };
 
   if (!venue) return <Typography>Loading venue details...</Typography>;
-  if (status === "loading") return <Typography>Checking login status...</Typography>;
+  if (status === "loading")
+    return <Typography>Checking login status...</Typography>;
 
   return (
-    <Box sx={{ bgcolor: "black", p: 5, minHeight: "100vh" }}>
-      <Grid container spacing={4} alignItems="center" sx={{ ml: 10 }}>
-        <Grid item xs={12} md={6}>
-          <Image
-            src={venue.photo1 || "/assets/fallback.jpg"}
-            alt={venue.name || "Main Venue"}
-            width={500}
-            height={500}
-            style={{ borderRadius: "20px" }}
-          />
-        </Grid>
+    // <Box sx={{ bgcolor: "black", p: 5, minHeight: "100vh" }}>
+    //   <Grid container spacing={4} alignItems="center" sx={{ ml: 10 }}>
+    //     <Grid container spacing={4} alignItems="center" sx={{ ml: 10 }}>
+    //       {/* Main Large Image */}
+    //       <Grid item xs={12} md={6}>
+    //         <Box
+    //           sx={{
+    //             width: 500,
+    //             height: 500,
+    //             borderRadius: "20px",
+    //             overflow: "hidden",
+    //             position: "relative",
+    //           }}
+    //         >
+    //           <Image
+    //             src={venue.photo1 || "/assets/fallback.jpg"}
+    //             alt={venue.name || "Main Venue"}
+    //             fill
+    //             style={{ objectFit: "cover" }}
+    //           />
+    //         </Box>
+    //       </Grid>
 
-        <Grid item xs={12} md={3}>
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+    //       {/* Right Side - Two Smaller Images */}
+    //       <Grid item xs={12} md={3}>
+    //         <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+    //           {[venue.photo2, venue.photo3].map((photo, index) => (
+    //             <Box
+    //               key={index}
+    //               sx={{
+    //                 width: 300,
+    //                 height: 300,
+    //                 borderRadius: "20px",
+    //                 overflow: "hidden",
+    //                 position: "relative",
+    //               }}
+    //             >
+    //               <Image
+    //                 src={photo || "/assets/fallback.jpg"}
+    //                 alt={`Venue Side Image ${index + 1}`}
+    //                 fill
+    //                 style={{ objectFit: "cover" }}
+    //               />
+    //             </Box>
+    //           ))}
+    //         </Box>
+    //       </Grid>
+
+    //       {/* Info + Book Button */}
+    //       <Grid item xs={12} md={3}>
+    //         <Box sx={{ ml: 5 }}>
+    //           <Typography
+    //             variant="h4"
+    //             fontWeight="bold"
+    //             color="#d1d5db"
+    //             sx={{ mb: 3 }}
+    //           >
+    //             {venue.name || "Unknown Venue"}
+    //           </Typography>
+    //           <Button
+    //             onClick={handleBookClick}
+    //             variant="contained"
+    //             sx={{
+    //               backgroundColor: "#e65100",
+    //               ml: 6,
+    //               color: "white",
+    //               px: 5,
+    //               py: 1.5,
+    //               fontSize: "18px",
+    //               borderRadius: "16px",
+    //               textTransform: "none",
+    //               "&:hover": {
+    //                 backgroundColor: "#bf360c",
+    //               },
+    //             }}
+    //           >
+    //             Book
+    //           </Button>
+    //         </Box>
+    //       </Grid>
+    //     </Grid>
+
+    //     <Grid item xs={12} md={3}>
+    //       <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+    //         <Box
+    //           sx={{
+    //             width: 300,
+    //             height: 300,
+    //             borderRadius: "20px",
+    //             overflow: "hidden",
+    //             position: "relative",
+    //           }}
+    //         >
+    //           <Image
+    //             src={venue.photo2 || "/assets/fallback.jpg"}
+    //             alt="Top Right"
+    //             fill
+    //             style={{
+    //               objectFit: "cover",
+    //             }}
+    //           />
+    //         </Box>
+
+    //         <Box
+    //           sx={{
+    //             width: 300,
+    //             height: 300,
+    //             borderRadius: "20px",
+    //             overflow: "hidden",
+    //             position: "relative",
+    //           }}
+    //         >
+    //           <Image
+    //             src={venue.photo2 || "/assets/fallback.jpg"}
+    //             alt="Top Right"
+    //             fill
+    //             style={{
+    //               objectFit: "cover",
+    //             }}
+    //           />
+    //         </Box>
+    //       </Box>
+    //     </Grid>
+
+    //     <Grid item xs={12} md={3}>
+    //       <Box sx={{ ml: 5 }}>
+    //         <Typography
+    //           variant="h4"
+    //           fontWeight="bold"
+    //           color="#d1d5db"
+    //           sx={{ mb: 3 }}
+    //         >
+    //           {venue.name || "Unknown Venue"}
+    //         </Typography>
+    //         <Button
+    //           onClick={handleBookClick}
+    //           variant="contained"
+    //           sx={{
+    //             backgroundColor: "#e65100",
+    //             ml: 6,
+    //             color: "white",
+    //             px: 5,
+    //             py: 1.5,
+    //             fontSize: "18px",
+    //             borderRadius: "16px",
+    //             textTransform: "none",
+    //             "&:hover": {
+    //               backgroundColor: "#bf360c",
+    //             },
+    //           }}
+    //         >
+    //           Book
+    //         </Button>
+    //       </Box>
+    //     </Grid>
+    //   </Grid>
+
+      
+    // </Box>
+
+<Box sx={{ bgcolor: "black", p: 5, minHeight: "100vh" }}>
+  <Grid container spacing={4} alignItems="center" sx={{ ml: 10 }}>
+    {/* Main Image */}
+    <Grid item xs={12} md={6}>
+      <Box
+        sx={{
+          width: 500,
+          height: 500,
+          borderRadius: "20px",
+          overflow: "hidden",
+          position: "relative",
+        }}
+      >
+        <Image
+          src={venue.photo1 || "/assets/fallback.jpg"}
+          alt={venue.name || "Main Venue"}
+          fill
+          style={{ objectFit: "cover" }}
+        />
+      </Box>
+    </Grid>
+
+    {/* Two Side Images */}
+    <Grid item xs={12} md={3}>
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+        {[venue.photo2, venue.photo3].map((photo, index) => (
+          <Box
+            key={index}
+            sx={{
+              width: 300,
+              height: 300,
+              borderRadius: "20px",
+              overflow: "hidden",
+              position: "relative",
+            }}
+          >
             <Image
-              src={venue.photo2 || "/assets/fallback.jpg"}
-              alt="Top Right"
-              width={300}
-              height={300}
-              style={{ borderRadius: "20px" }}
-            />
-            <Image
-              src={venue.photo3 || "/assets/fallback.jpg"}
-              alt="Bottom Right"
-              width={300}
-              height={300}
-              style={{ borderRadius: "20px" }}
+              src={photo || "/assets/fallback.jpg"}
+              alt={`Venue Side Image ${index + 1}`}
+              fill
+              style={{ objectFit: "cover" }}
             />
           </Box>
-        </Grid>
+        ))}
+      </Box>
+    </Grid>
 
-        <Grid item xs={12} md={3}>
-          <Box sx={{ ml: 5 }}>
-            <Typography
-              variant="h4"
-              fontWeight="bold"
-              color="#d1d5db"
-              sx={{ mb: 3 }}
-            >
-              {venue.name || "Unknown Venue"}
-            </Typography>
-            <Button
-              onClick={handleBookClick}
-              variant="contained"
-              sx={{
-                backgroundColor: "#e65100",
-                ml: 6,
-                color: "white",
-                px: 5,
-                py: 1.5,
-                fontSize: "18px",
-                borderRadius: "16px",
-                textTransform: "none",
-                "&:hover": {
-                  backgroundColor: "#bf360c",
-                },
-              }}
-            >
-              Book
-            </Button>
-          </Box>
-        </Grid>
-      </Grid>
+    {/* Info & Button */}
+    <Grid item xs={12} md={3}>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "flex-start",
+          gap: 2,
+          ml: 2, // apply left margin here
+        }}
+      >
+        <Typography variant="h4" fontWeight="bold" color="#d1d5db">
+          {venue.name || "Unknown Venue"}
+        </Typography>
 
-      {/* Login Required Dialog */}
+        <Button
+          onClick={handleBookClick}
+          variant="contained"
+          sx={{
+            backgroundColor: "#e65100",
+            color: "white",
+            px: 5,
+            py: 1.5,
+            fontSize: "18px",
+            borderRadius: "16px",
+            textTransform: "none",
+            "&:hover": {
+              backgroundColor: "#bf360c",
+            },
+          }}
+        >
+          Book
+        </Button>
+      </Box>
+    </Grid>
+  </Grid>
+
+  {/* Login Required Dialog */}
       <Dialog open={dialogOpen} onClose={handleCloseDialog}>
         <DialogTitle>Login Required</DialogTitle>
         <DialogContent>
@@ -236,6 +416,8 @@ export default function VenuePage() {
           </Button>
         </DialogActions>
       </Dialog>
-    </Box>
+</Box>
+
+
   );
 }

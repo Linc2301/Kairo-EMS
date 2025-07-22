@@ -70,7 +70,7 @@ export default function EventDetailPage() {
       <Grid container spacing={4} alignItems="center" sx={{ mt: 3 }}>
         {/* Event Image */}
         <Grid item xs={12} md={6}>
-          <Box sx={{ position: "relative", width: 350, height: 500, ml: 15 }}>
+          <Box sx={{ position: "relative", width: 350, height: 500, ml: 12 }}>
             <Image
               src={event.photo}
               alt={event.name}
@@ -83,10 +83,10 @@ export default function EventDetailPage() {
         {/* Event Info and Venue Select */}
         <Grid item xs={12} md={6}>
           <Box position="relative" mb={20} ml={25} mt={10}>
-            <Typography sx={{ fontSize: 40, fontWeight: "bold", ml: 25 }}>
+            <Typography sx={{ fontSize: 45, fontWeight: "bold", ml: 25 }}>
               {event.name}
             </Typography>
-            <Typography sx={{ fontSize: 30, mt: 4, fontWeight: "bold" }}>
+            <Typography sx={{ fontSize: 30, mt: 4, fontWeight: "bold" , ml: 15}}>
               {event.description}
             </Typography>
             <Typography sx={{ fontSize: 30, mt: 4, ml: 18, fontWeight: "bold" }}>
