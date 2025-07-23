@@ -113,6 +113,7 @@ export const authOptions = {
           name: user.name,
           email: user.email,
           isAdmin: user.isAdmin,
+          photo: user.photo || null, // ✅ Add this
         };
       },
     }),
@@ -133,6 +134,7 @@ export const authOptions = {
       if (user) {
         token.id = user.id;
         token.isAdmin = user.isAdmin;
+        token.photo = user.photo || null;
       }
       return token;
     },
@@ -141,6 +143,7 @@ export const authOptions = {
       if (token && session.user) {
         session.user.id = token.id;
         session.user.isAdmin = token.isAdmin;
+        session.user.photo = token.image || null;
       }
       return session;
     },

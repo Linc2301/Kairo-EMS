@@ -240,7 +240,8 @@ export async function PUT(req, { params }) {
             data: updateData,
         });
 
-        return NextResponse.json({ user: updatedUser });
+        return NextResponse.json({ user: { ...updatedUser, image: updatedUser.photo } });
+
     } catch (err) {
         console.error("PUT Error:", err);
         return NextResponse.json({ message: "Server error" }, { status: 500 });

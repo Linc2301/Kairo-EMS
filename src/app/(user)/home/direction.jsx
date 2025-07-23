@@ -19,7 +19,7 @@ export default function Direction() {
             >
                 {/* Background Image */}
                 <Image
-                    src="/assets/wed-indoor.jpg"
+                    src="/direction.jpg"
                     alt="Event Setup"
                     layout="fill"
                     objectFit="cover"
