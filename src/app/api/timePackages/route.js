@@ -1,27 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/src/lib/prisma";
 
-// export async function GET() {
-//     try {
-//         const timePackages = await prisma.timePackage.findMany({
-//             include: { Venue: { select: { name: true } } },
-//             orderBy: { id: "asc" },
-//         });
-
-//         const formatted = timePackages.map(tp => ({
-//             id: tp.id,
-//             startTime: tp.startTime.toISOString().slice(11, 16), // HH:mm
-//             endTime: tp.endTime.toISOString().slice(11, 16),
-//             venue_id: tp.venue_id,
-//             venueName: tp.Venue?.name || "N/A",
-//         }));
-
-//         return NextResponse.json(formatted);
-//     } catch (error) {
-//         console.error("Error fetching time packages:", error);
-//         return NextResponse.json({ message: "Failed to fetch time packages" }, { status: 500 });
-//     }
-// }
 
 export async function GET(req) {
     const { searchParams } = new URL(req.url);
