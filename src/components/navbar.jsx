@@ -212,7 +212,11 @@ export default function Navbar() {
     return (
         <AppBar position="sticky" sx={{ backgroundColor: deepOrange[500] }}>
             <Toolbar sx={{ justifyContent: 'space-between' }}>
-                <Typography variant="h5">Kairo</Typography>
+                <img
+                    src="/logo-kairo.png" // adjust this if stored under a different name
+                    alt="Kairo Logo"
+                    style={{ maxWidth: '70px', height: 'auto' }}
+                />
 
                 <Box>
                     {navItems.map(({ label, path }) => (

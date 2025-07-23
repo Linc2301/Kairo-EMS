@@ -32,6 +32,7 @@ export default function UserList() {
         }
     };
     console.log("events", events);
+
     const handleDelete = async (id) => {
         const confirmed = window.confirm("Are you sure you want to delete this event?");
         if (!confirmed) return;
@@ -46,6 +47,7 @@ export default function UserList() {
         }
     };
 
+
     useEffect(() => {
         getEventList();
     }, []);
@@ -53,7 +55,7 @@ export default function UserList() {
     return (
         <Box sx={{ p: 3 }}>
             <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
-                    <Typography variant="h4">Description</Typography>
+                <Typography variant="h4">Description</Typography>
                 <Link passHref href="/admin/description/create">
                     <Button sx={{ mb: 2 }} variant="contained">
                         ADD Description

@@ -2,36 +2,46 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/src/lib/prisma";
 import * as yup from "yup";
 
-
 const schema = yup.object().shape({
     description: yup.string().required("Description is required"),
-    photo: yup.string()
-        .test("is-valid-photo", "Photo must be a valid URL or base64 image", value =>
-            /^https?:\/\/.+/.test(value) || /^data:image\/[a-z]+;base64,/.test(value)
+    photo: yup
+        .string()
+        .test(
+            "is-valid-photo",
+            "Photo must be a valid URL or base64 image",
+            (value) =>
+                /^https?:\/\/.+/.test(value) || /^data:image\/[a-z]+;base64,/.test(value)
         )
         .required("Photo is required"),
 });
 
-
 // DELETE API
 export async function DELETE(req, { params }) {
-    const eventId = parseInt(params.id);
+    const id = parseInt(params.id);
+
+    if (isNaN(id)) {
+        return NextResponse.json({ message: "Invalid ID" }, { status: 400 });
+    }
+
     try {
-        await prisma.event.delete({
-            where: { id: eventId },
+        await prisma.description.delete({
+            where: { id },
         });
+
         return NextResponse.json({
-            message: "Event is successfully deleted.",
-            eventId,
+            message: "Description deleted successfully.",
+            id,
         });
     } catch (error) {
-        return NextResponse.json({
-            message: "Event not found or event deletion failed!"
-        }, { status: 404 });
+        console.error("Delete error:", error);
+        return NextResponse.json(
+            { message: "Delete failed or record not found.", error: error.message },
+            { status: 404 }
+        );
     }
 }
 
-// PUT API (Update event)
+// UPDATE API 
 export async function PUT(req, { params }) {
     try {
         const eventId = parseInt(params.id);
@@ -52,23 +62,29 @@ export async function PUT(req, { params }) {
         });
     } catch (error) {
         if (error.name === "ValidationError") {
-            return NextResponse.json({
-                message: "Validation Failed",
-                errors: error.inner.map((e) => ({
-                    path: e.path,
-                    message: e.message,
-                })),
-            }, { status: 400 });
+            return NextResponse.json(
+                {
+                    message: "Validation Failed",
+                    errors: error.inner.map((e) => ({
+                        path: e.path,
+                        message: e.message,
+                    })),
+                },
+                { status: 400 }
+            );
         }
 
-        return NextResponse.json({
-            message: "Unexpected error",
-            error: error.message,
-        }, { status: 500 });
+        return NextResponse.json(
+            {
+                message: "Unexpected error",
+                error: error.message,
+            },
+            { status: 500 }
+        );
     }
 }
 
-// GET API (Fetch single event)
+// GET API (Fetch single description)
 export async function GET(req, { params }) {
     const eventId = parseInt(params.id);
     const event = await prisma.description.findUnique({

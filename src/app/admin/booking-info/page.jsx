@@ -16,7 +16,6 @@ import {
 } from "@mui/material";
 import Link from "next/link";
 import DeleteIcon from "@mui/icons-material/Delete";
-import EditIcon from "@mui/icons-material/Edit";
 import axios from "axios";
 import { useEffect, useState } from "react";
 
@@ -83,11 +82,7 @@ export default function BookingList() {
                                 <TableCell align="center">{new Date(booking.booking_date).toLocaleDateString()}</TableCell>
                                 <TableCell align="center">{booking.total_amount}MMK</TableCell>
                                 <TableCell align="center">
-                                    <Link passHref href={`/admin/booking-info/${booking.id}/edit`}>
-                                        <IconButton sx={{ color: "blue" }}>
-                                            <EditIcon />
-                                        </IconButton>
-                                    </Link>
+
                                     <IconButton sx={{ color: "red" }} onClick={() => handleDelete(booking.id)}>
                                         <DeleteIcon />
                                     </IconButton>
