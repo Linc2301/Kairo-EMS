@@ -255,14 +255,15 @@ export async function PUT(req, { params }) {
 // ✅ GET user by ID
 export async function GET(req, context) {
     try {
-        const id = parseInt(context.params.id);
+        const params = await context.params; // <-- await this!
+        const id = parseInt(params.id);
+
         if (isNaN(id)) {
             return NextResponse.json({ message: "Invalid ID" }, { status: 400 });
         }
 
         const user = await prisma.user.findUnique({
             where: { id },
-            select: { id: true, name: true, email: true, phone: true, photo: true },
         });
 
         if (!user) {
@@ -271,11 +272,13 @@ export async function GET(req, context) {
 
         return NextResponse.json(user);
     } catch (error) {
-        console.error("GET Error:", error);
-        return NextResponse.json({ message: "Failed to fetch user" }, { status: 500 });
+        console.error("❌ GET /api/users/[id] error:", error);
+        return NextResponse.json(
+            { message: "Failed to fetch user" },
+            { status: 500 }
+        );
     }
 }
-
 // ✅ UPDATE user by ID (with optional photo and password)
 // export async function PUT(req, context) {
 //     try {

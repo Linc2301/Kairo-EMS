@@ -4,11 +4,10 @@ import formidable from "formidable";
 import fs from "fs/promises";
 import path from "path";
 
-// Disable Next.js body parser to handle multipart/form-data
 export const config = {
     api: {
         bodyParser: false,
-        sizeLimit: "10mb", // Increase if needed for larger images
+        sizeLimit: "10mb",
     },
 };
 
@@ -34,9 +33,6 @@ async function parseForm(req) {
     });
 }
 
-
-// Improved form parsing with error handling
-// POST create new event
 export async function POST(req) {
     try {
         const formData = await req.formData();
@@ -73,14 +69,14 @@ export async function POST(req) {
     }
 }
 
-// GET single event with photo
+
 export async function GET() {
     const events = await prisma.event.findMany({
         select: {
             id: true,
             name: true,
             description: true,
-            photo: true, // or false if you're omitting image on list
+            photo: true,
         },
     });
 

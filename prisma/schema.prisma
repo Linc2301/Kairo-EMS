@@ -8,25 +8,29 @@ datasource db {
 }
 
 model User {
-  id       Int       @id @default(autoincrement())
-  name     String    @db.VarChar(255)
-  email    String?   @unique @db.VarChar(255)
-  phone    String    @db.VarChar(50)
-  password String    @db.VarChar(255)
-  photo    String?   @db.LongText
-  isAdmin  String    @default("user") @db.VarChar(50)
-  Booking  Booking[]
-  Review   Review[]
+  id           Int            @id @default(autoincrement())
+  name         String         @db.VarChar(255)
+  email        String?        @unique @db.VarChar(255)
+  phone        String         @db.VarChar(50)
+  password     String         @db.VarChar(255)
+  photo        String?        @db.LongText
+  isAdmin      String         @default("user") @db.VarChar(50)
+  Booking      Booking[]
+  Review       Review[]
+  Notification Notification[]
 
   @@map("user")
 }
 
 model Event {
-  id          Int     @id @default(autoincrement())
-  name        String  @db.VarChar(50)
-  description String  @db.Text
-  photo       String? @db.LongText
-  Venue       Venue[]
+  id            Int             @id @default(autoincrement())
+  name          String          @db.VarChar(50)
+  description   String          @db.Text
+  photo         String?         @db.LongText
+  Venue         Venue[]
+  FloralService FloralService[]
+  TimePackage   TimePackage[]
+  Notification  Notification[]
 }
 
 model Venue {
@@ -65,6 +69,8 @@ model FloralService {
   venue_id    Int
   Venue       Venue     @relation(fields: [venue_id], references: [id])
   Booking     Booking[]
+  Event       Event?    @relation(fields: [eventId], references: [id])
+  eventId     Int?
 }
 
 model TimePackage {
@@ -74,6 +80,8 @@ model TimePackage {
   venue_id  Int
   Venue     Venue     @relation(fields: [venue_id], references: [id])
   Booking   Booking[]
+  Event     Event?    @relation(fields: [eventId], references: [id])
+  eventId   Int?
 }
 
 model Booking {
@@ -126,7 +134,21 @@ model Description {
   description String  @db.Text
 }
 
+model Notification {
+  id        Int      @id @default(autoincrement())
+  message   String   @db.Text
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  eventId   Int?
+  event     Event?   @relation(fields: [eventId], references: [id]) 
+}
+
+
 enum Role {
   user
   admin
 }
+
+
