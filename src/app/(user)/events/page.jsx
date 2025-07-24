@@ -49,7 +49,7 @@ export default function EventPage() {
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            gap: 4,
+            gap: 8,
             mb: 4,
             flexWrap: "wrap",
           }}
@@ -79,7 +79,7 @@ export default function EventPage() {
                 component="img"
                 src={item.src}
                 alt=""
-                sx={{ width: 85, height: 80, borderRadius: 7 }}
+                sx={{ width: 90, height: 90, borderRadius: 7 }}
               />
             )
           )}
