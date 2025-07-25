@@ -58,10 +58,10 @@ export default function UserList() {
     return (
         <Box sx={{ p: 3 }}>
             <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
-                    <Typography variant="h4">Floral Services</Typography>
+                <Typography variant="h4"> Services</Typography>
                 <Link href="/admin/floralServices/create" passHref>
                     <Button sx={{ mb: 2 }} variant="contained">
-                        Add New Floral Service
+                        Add New Service
                     </Button>
                 </Link>
             </Stack>
@@ -78,7 +78,7 @@ export default function UserList() {
                                 <TableCell align="center">Photo</TableCell>
                                 <TableCell align="center">Description</TableCell>
                                 <TableCell align="center">Price</TableCell>
-                                <TableCell align="center">Venue</TableCell>
+                                <TableCell align="center">Event</TableCell>
                                 <TableCell align="center">Actions</TableCell>
                             </TableRow>
                         </TableHead>

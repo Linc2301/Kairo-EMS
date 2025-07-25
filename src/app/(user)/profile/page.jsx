@@ -672,23 +672,23 @@ export default function ProfileSettingsPage() {
   }, [session?.user?.id]);
 
   // Poll for notifications
-  useEffect(() => {
-    const fetchNotifications = async () => {
-      if (!session?.user?.id) return;
+  // useEffect(() => {
+  //   const fetchNotifications = async () => {
+  //     if (!session?.user?.id) return;
 
-      try {
-        const res = await axios.get(`/api/notifications/${session.user.id}`);
-        console.log("Notifications fetched:", res.data); // <- Add this
-        setNotifications(res.data);
-      } catch (err) {
-        console.error("Failed to fetch notifications:", err);
-      }
-    };
+  //     try {
+  //       const res = await axios.get(`/api/notifications/${session.user.id}`);
+  //       console.log("Notifications fetched:", res.data); // <- Add this
+  //       setNotifications(res.data);
+  //     } catch (err) {
+  //       console.error("Failed to fetch notifications:", err);
+  //     }
+  //   };
 
-    fetchNotifications();
-    const interval = setInterval(fetchNotifications, 1000);
-    return () => clearInterval(interval);
-  }, [session?.user?.id]);
+  //   fetchNotifications();
+  //   const interval = setInterval(fetchNotifications, 1000);
+  //   return () => clearInterval(interval);
+  // }, [session?.user?.id]);
 
 
 
@@ -897,13 +897,13 @@ export default function ProfileSettingsPage() {
             </Card>
           )}
 
-          {/* === Notifications Section === */}
+          {/* === Notifications Section ===
           {notifications.map((notif, idx) => (
             <div key={idx}>
               <p>{notif.message}</p>
               <small>{new Date(notif.createdAt).toLocaleString()}</small>
             </div>
-          ))}
+          ))} */}
 
 
           {/* === Photo (Optional Stub) === */}

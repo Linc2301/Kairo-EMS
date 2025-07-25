@@ -8,16 +8,15 @@ datasource db {
 }
 
 model User {
-  id           Int            @id @default(autoincrement())
-  name         String         @db.VarChar(255)
-  email        String?        @unique @db.VarChar(255)
-  phone        String         @db.VarChar(50)
-  password     String         @db.VarChar(255)
-  photo        String?        @db.LongText
-  isAdmin      String         @default("user") @db.VarChar(50)
-  Booking      Booking[]
-  Review       Review[]
-  Notification Notification[]
+  id       Int       @id @default(autoincrement())
+  name     String    @db.VarChar(255)
+  email    String?   @unique @db.VarChar(255)
+  phone    String    @db.VarChar(50)
+  password String    @db.VarChar(255)
+  photo    String?   @db.LongText
+  isAdmin  String    @default("user") @db.VarChar(50)
+  Booking  Booking[]
+  Review   Review[]
 
   @@map("user")
 }
@@ -30,21 +29,19 @@ model Event {
   Venue         Venue[]
   FloralService FloralService[]
   TimePackage   TimePackage[]
-  Notification  Notification[]
 }
 
 model Venue {
-  id            Int             @id @default(autoincrement())
-  name          String          @db.VarChar(50)
-  photo1        String?         @db.LongText
-  photo2        String?         @db.LongText
-  photo3        String?         @db.LongText
-  eventId       Int
-  Event         Event           @relation(fields: [eventId], references: [id])
-  VenueType     VenueType[]
-  Booking       Booking[]
-  FloralService FloralService[]
-  TimePackage   TimePackage[]
+  id          Int           @id @default(autoincrement())
+  name        String        @db.VarChar(50)
+  photo1      String?       @db.LongText
+  photo2      String?       @db.LongText
+  photo3      String?       @db.LongText
+  eventId     Int
+  Event       Event         @relation(fields: [eventId], references: [id])
+  VenueType   VenueType[]
+  Booking     Booking[]
+  TimePackage TimePackage[]
 
   Review Review[]
 }
@@ -66,11 +63,11 @@ model FloralService {
   photo       String?   @db.LongText
   description String    @db.Text
   price       Float
-  venue_id    Int
-  Venue       Venue     @relation(fields: [venue_id], references: [id])
   Booking     Booking[]
   Event       Event?    @relation(fields: [eventId], references: [id])
   eventId     Int?
+
+  @@index([eventId])
 }
 
 model TimePackage {
@@ -134,21 +131,18 @@ model Description {
   description String  @db.Text
 }
 
-model Notification {
-  id        Int      @id @default(autoincrement())
-  message   String   @db.Text
-  userId    Int
-  user      User     @relation(fields: [userId], references: [id])
-  isRead    Boolean  @default(false)
-  createdAt DateTime @default(now())
-  eventId   Int?
-  event     Event?   @relation(fields: [eventId], references: [id]) 
-}
-
+// model Notification {
+//   id        Int      @id @default(autoincrement())
+//   message   String   @db.Text
+//   userId    Int
+//   user      User     @relation(fields: [userId], references: [id])
+//   isRead    Boolean  @default(false)
+//   createdAt DateTime @default(now())
+//   eventId   Int?
+//   event     Event?   @relation(fields: [eventId], references: [id]) 
+// }
 
 enum Role {
   user
   admin
 }
-
-

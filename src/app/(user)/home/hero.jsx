@@ -83,11 +83,11 @@ export default function WhyKairo() {
         <Typography sx={{ fontSize: 120, fontWeight: "bold", lineHeight: 1,mt:6 }}>
           Why
         </Typography>
-        <Typography sx={{ fontSize: 120, fontWeight: "bold", lineHeight: 1, mb: 6,ml:30 }}>
+        <Typography sx={{ fontSize: 120, fontWeight: "bold", lineHeight: 1, mb: 6,ml:30,mt:2 }}>
           Kairo?
         </Typography>
 
-        <Typography sx={{ fontSize: 40 }}>
+        <Typography sx={{ fontSize: 40, mt:4 }}>
           New and never-ending <br /> possibilities
         </Typography>
 
