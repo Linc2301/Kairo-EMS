@@ -365,7 +365,7 @@ export default function AdminLayout({ children }) {
                 sx={{
                     flexGrow: 1,
                     bgcolor: '#fff',
-                    mt: 8,
+                    mt: 2,
                     p: 4,
 
                     mx: 1,

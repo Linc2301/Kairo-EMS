@@ -13,6 +13,7 @@ import {
   TableHead,
   TableRow,
   Typography,
+  Pagination,
 } from "@mui/material";
 import Link from "next/link";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -22,6 +23,8 @@ import { useEffect, useState } from "react";
 
 export default function UserList() {
   const [events, setEvents] = useState([]);
+  const [page, setPage] = useState(1);
+  const rowsPerPage = 5;
 
   const getEventList = async () => {
     try {
@@ -46,29 +49,39 @@ export default function UserList() {
   //   }
   // };
 
-const handleDelete = async (id) => {
-  const confirmed = window.confirm("Are you sure you want to delete this venue?");
-  if (!confirmed) return;
+  const handleDelete = async (id) => {
+    const confirmed = window.confirm("Are you sure you want to delete this venue?");
+    if (!confirmed) return;
 
-  try {
-    await axios.delete(`/api/venue/${id}`);
-    setEvents((prev) => prev.filter((event) => event.id !== id)); //  OK if you're storing venues in `setEvents`
-    alert("Venue deleted successfully!");
-  } catch (error) {
-    console.error("Failed to delete:", error);
-    alert("Something went wrong while deleting.");
-  }
-};
+    try {
+      await axios.delete(`/api/venue/${id}`);
+      setEvents((prev) => prev.filter((event) => event.id !== id)); //  OK if you're storing venues in `setEvents`
+      alert("Venue deleted successfully!");
+    } catch (error) {
+      console.error("Failed to delete:", error);
+      alert("Something went wrong while deleting.");
+    }
+  };
+
+  const handlePageChange = (event, value) => {
+    setPage(value);
+  };
+
 
 
   useEffect(() => {
     getEventList();
   }, []);
 
+  // Calculate which events to show on the current page
+  const paginatedEvents = events.slice((page - 1) * rowsPerPage, page * rowsPerPage);
+  const totalPages = Math.ceil(events.length / rowsPerPage);
+
+
   return (
     <Box sx={{ p: 3 }}>
       <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
-                    <Typography variant="h4">Venues</Typography>
+        <Typography variant="h4">Venues</Typography>
         <Link passHref href="/admin/venue/create">
           <Button sx={{ mb: 2 }} variant="contained">
             ADD Venue
@@ -91,9 +104,9 @@ const handleDelete = async (id) => {
           </TableHead>
 
           <TableBody>
-            {events.map((venue, index) => (
+            {paginatedEvents.map((venue, index) => (
               <TableRow key={venue.id}>
-                <TableCell align="center">{index + 1}</TableCell>
+                <TableCell align="center">{(page - 1) * rowsPerPage + index + 1}</TableCell>
                 <TableCell align="center">{venue.name}</TableCell>
 
                 <TableCell align="center">
@@ -167,6 +180,34 @@ const handleDelete = async (id) => {
           </TableBody>
         </Table>
       </TableContainer>
+
+      {/* Pagination Control */}
+      {events.length > rowsPerPage && (
+        <Box
+          sx={{
+            position: 'fixed',
+            bottom: 0,
+            left: 0,
+            width: '100%',
+            bgcolor: 'white', // Optional: match page background
+            py: 2,
+            display: 'flex',
+            justifyContent: 'center',
+            boxShadow: '0 -2px 8px rgba(0,0,0,0.1)', // optional: subtle shadow
+          }}
+        >
+          <Pagination
+            sx={{ ml: 16 }}
+            count={totalPages}
+            page={page}
+            onChange={handlePageChange}
+            color="primary"
+            shape="rounded"
+            showFirstButton
+            showLastButton
+          />
+        </Box>
+      )}
     </Box>
   );
 }

@@ -3,7 +3,7 @@ import { Open_Sans, Raleway } from "next/font/google";
 import "./globals.css";
 import Footer from "@/src/components/footer"
 import Header from "@/src/components/navbar"
-import { CssBaseline } from "@mui/material";
+import { Box, CssBaseline } from "@mui/material";
 import { SessionProvider } from "next-auth/react";
 
 const openSans = Open_Sans({
@@ -26,7 +26,16 @@ export default function RootLayout({ children }) {
         <CssBaseline />
         <SessionProvider>
           <Header />
-          {children}
+          <Box
+            component="main"
+            sx={{
+              flexGrow: 1,
+              bgcolor: '#fff',
+              height: '100%',
+            }}
+          >
+            {children}
+          </Box>
           <Footer />
         </SessionProvider>
       </body>

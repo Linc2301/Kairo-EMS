@@ -22,13 +22,13 @@ model User {
 }
 
 model Event {
-  id            Int             @id @default(autoincrement())
-  name          String          @db.VarChar(50)
-  description   String          @db.Text
-  photo         String?         @db.LongText
-  Venue         Venue[]
-  FloralService FloralService[]
-  TimePackage   TimePackage[]
+  id          Int     @id @default(autoincrement())
+  name        String  @db.VarChar(50)
+  description String  @db.Text
+  photo       String? @db.LongText
+  Venue       Venue[]
+
+  TimePackage TimePackage[]
 }
 
 model Venue {
@@ -43,7 +43,8 @@ model Venue {
   Booking     Booking[]
   TimePackage TimePackage[]
 
-  Review Review[]
+  Review        Review[]
+  FloralService FloralService[]
 }
 
 model VenueType {
@@ -63,11 +64,9 @@ model FloralService {
   photo       String?   @db.LongText
   description String    @db.Text
   price       Float
+  venue_id    Int
+  Venue       Venue     @relation(fields: [venue_id], references: [id])
   Booking     Booking[]
-  Event       Event?    @relation(fields: [eventId], references: [id])
-  eventId     Int?
-
-  @@index([eventId])
 }
 
 model TimePackage {

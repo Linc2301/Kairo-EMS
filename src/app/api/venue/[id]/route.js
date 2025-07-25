@@ -2,8 +2,23 @@ import { prisma } from "@/src/lib/prisma";
 import { NextResponse } from "next/server";
 
 
-export async function GET(req, context) {
-    const { id } = context.params;
+// export async function GET(req, context) {
+//     const { id } = context.params;
+
+//     const venue = await prisma.venue.findUnique({
+//         where: { id: parseInt(id) },
+//     });
+
+//     if (!venue) {
+//         return NextResponse.json({ message: "Venue not found" }, { status: 404 });
+//     }
+
+//     return NextResponse.json(venue);
+// }
+
+
+export async function GET(req, { params }) {
+    const { id } = params;
 
     const venue = await prisma.venue.findUnique({
         where: { id: parseInt(id) },

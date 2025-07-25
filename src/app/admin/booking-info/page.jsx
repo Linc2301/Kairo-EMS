@@ -53,9 +53,7 @@ export default function BookingList() {
         <Box sx={{ p: 3 }}>
             <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
                 <Typography variant="h4">Bookings</Typography>
-                <Link passHref href="/admin/booking-info/create">
-                    <Button variant="contained">Add Booking</Button>
-                </Link>
+                
             </Stack>
             <TableContainer component={Paper}>
                 <Table>

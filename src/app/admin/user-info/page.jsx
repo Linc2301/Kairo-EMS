@@ -1,6 +1,6 @@
 "use client"
 
-import { Box, Button, IconButton, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
+import { Box, Button, IconButton, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 import Link from 'next/link';
 import DeleteIcon from '@mui/icons-material/Delete';
 import axios from 'axios';
@@ -45,8 +45,11 @@ export default function UserList() {
 
     return (
         <Box sx={{ p: 3 }}>
-
+            <Typography variant="h4" gutterBottom>
+                Users
+            </Typography>
             <TableContainer component={Paper}>
+
                 <Table>
                     <TableHead>
                         <TableRow>

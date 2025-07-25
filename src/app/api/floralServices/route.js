@@ -4,9 +4,9 @@ import { NextResponse } from "next/server";
 export async function POST(req) {
     try {
         const body = await req.json();
-        const { name, description, photo, price, eventId } = body;
+        const { name, description, photo, price, venue_id } = body;
 
-        if (!name || !description || !photo || !price || !eventId) {
+        if (!name || !description || !photo || !price || !venue_id) {
             return NextResponse.json({ message: "Missing required fields" }, { status: 400 });
         }
 
@@ -16,7 +16,7 @@ export async function POST(req) {
                 description,
                 photo,
                 price: parseFloat(price),
-                eventId: parseInt(eventId),
+                venue_id: parseInt(venue_id),
             },
         });
 
@@ -30,13 +30,13 @@ export async function POST(req) {
 
 export async function GET(req) {
     const { searchParams } = new URL(req.url);
-    const eventId = searchParams.get("eventId");
+    const venueId = searchParams.get("venue_id");
 
     try {
         const services = await prisma.floralService.findMany({
-            where: eventId
+            where: venueId
                 ? {
-                    eventId: parseInt(eventId),
+                    venue_id: parseInt(venueId),
                 }
                 : {},
 
@@ -46,8 +46,8 @@ export async function GET(req) {
                 description: true,
                 photo: true,
                 price: true,
-                eventId: true,
-                Event: {
+                venue_id: true,
+                Venue: {
                     select: { name: true },
                 },
             },
@@ -55,7 +55,7 @@ export async function GET(req) {
 
         const formatted = services.map((service) => ({
             ...service,
-            venueName: service.Event?.name || null,
+            venueName: service.Venue?.name || null,
         }));
 
         return NextResponse.json(formatted);

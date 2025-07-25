@@ -70,7 +70,7 @@ export default function DeliveryPage() {
             try {
                 const [venueRes, floralRes, timeRes] = await Promise.all([
                     fetch(`/api/venueType?venueId=${eventId}`),
-                    fetch(`/api/floralServices?eventId=${eventId}`),
+                    fetch(`/api/floralServices?venue_id=${eventId}`),
                     fetch(`/api/timePackages?venueId=${eventId}`),
                 ]);
 
@@ -307,8 +307,17 @@ export default function DeliveryPage() {
                                             variant="outlined"
                                             sx={{
                                                 mt: 2,
-                                                borderColor: "orange",
-                                                color: "orange",
+                                                borderColor: bookingData.venue?.id === venue.id
+                                                    ? "orange"
+                                                    : "orange",
+                                                backgroundColor:
+                                                    bookingData.venue?.id === venue.id
+                                                        ? "orange"
+                                                        : "transparent",
+                                                color:
+                                                    bookingData.venue?.id === venue.id
+                                                        ? "white"
+                                                        : "orange",
                                                 width: "100%",
                                                 borderRadius: "20px",
                                                 py: 1,
@@ -317,12 +326,16 @@ export default function DeliveryPage() {
                                                 fontWeight: 500,
                                                 "&:hover": {
                                                     borderColor: "darkorange",
-                                                    backgroundColor: "rgba(255, 165, 0, 0.08)",
+                                                    backgroundColor: bookingData.venue?.id === venue.id
+                                                        ? "darkorange"
+                                                        : "rgba(255, 165, 0, 0.08)",
                                                 },
                                             }}
                                             onClick={() => selectVenue(venue)}
                                         >
-                                            Select
+                                            {bookingData.venue?.id === venue.id
+                                                ? "Selected"
+                                                : "Select"}
                                         </Button>
                                     </Box>
                                 </Box>
@@ -340,7 +353,7 @@ export default function DeliveryPage() {
                     ) : error ? (
                         <Typography color="error">{error}</Typography>
                     ) : (
-                        <Box sx={{ display: "flex", gap: 3, justifyContent: "center" }}>
+                        <Box sx={{ display: "flex", gap: 3, flexWrap: "wrap", justifyContent: "center" }}>
                             {floralServices.map((floral) => (
                                 <Box
                                     key={floral.id}
@@ -367,8 +380,17 @@ export default function DeliveryPage() {
                                             variant="outlined"
                                             sx={{
                                                 mt: 2,
-                                                borderColor: "orange",
-                                                color: "orange",
+                                                borderColor: bookingData.floral?.id === floral.id
+                                                    ? "orange"
+                                                    : "orange",
+                                                backgroundColor:
+                                                    bookingData.floral?.id === floral.id
+                                                        ? "orange"
+                                                        : "transparent",
+                                                color:
+                                                    bookingData.floral?.id === floral.id
+                                                        ? "white"
+                                                        : "orange",
                                                 width: "100%",
                                                 borderRadius: "20px",
                                                 py: 1,
@@ -377,12 +399,16 @@ export default function DeliveryPage() {
                                                 fontWeight: 500,
                                                 "&:hover": {
                                                     borderColor: "darkorange",
-                                                    backgroundColor: "rgba(255, 165, 0, 0.08)",
+                                                    backgroundColor: bookingData.floral?.id === floral.id
+                                                        ? "darkorange"
+                                                        : "rgba(255, 165, 0, 0.08)",
                                                 },
                                             }}
                                             onClick={() => selectFloral(floral)}
                                         >
-                                            Select
+                                            {bookingData.floral?.id === floral.id
+                                                ? "Selected"
+                                                : "Select"}
                                         </Button>
                                     </Box>
                                 </Box>

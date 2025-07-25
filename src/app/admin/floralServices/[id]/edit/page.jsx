@@ -35,7 +35,7 @@ export default function EditVenueTypePage() {
       try {
         const [venueRes, typeRes] = await Promise.all([
           axios.get("/api/venue"),
-          axios.get(`/api/venueType/${id}`),
+          axios.get(`/api/floralServices/${id}`),
         ]);
 
         setVenues(venueRes.data);
@@ -71,7 +71,7 @@ export default function EditVenueTypePage() {
 
   const validate = () => {
     const newErrors = {};
-    if (!formData.name.trim()) newErrors.name = "Event name is required";
+    if (!formData.name.trim()) newErrors.name = "Service name is required";
     if (!formData.description.trim()) newErrors.description = "Description is required";
     if (!formData.price.trim()) newErrors.price = "Price is required";
     if (!String(formData.venue_id).trim()) newErrors.venue_id = "Venue ID is required";
@@ -91,12 +91,12 @@ export default function EditVenueTypePage() {
 
     const submitRequest = async (finalPayload) => {
       try {
-        await axios.put(`/api/venueType/${id}`, finalPayload);
-        alert("Venue type updated!");
-        router.push("/admin/venueType");
+        await axios.put(`/api/floralServices/${id}`, finalPayload);
+        alert("Service  updated!");
+        router.push("/admin/floralServices");
       } catch (err) {
         console.error("Update failed:", err);
-        alert("Failed to update venue type");
+        alert("Failed to update Service");
       }
     };
 
@@ -117,7 +117,7 @@ export default function EditVenueTypePage() {
     <Box sx={{ maxWidth: 600, mx: "auto" }}>
       <Paper sx={{ p: 4, borderRadius: 3, boxShadow: 3 }}>
         <Typography variant="h5" gutterBottom>
-          Edit Venue Type
+          Edit Service
         </Typography>
         <form onSubmit={handleSubmit}>
           <Stack spacing={3}>
@@ -204,7 +204,7 @@ export default function EditVenueTypePage() {
                 Cancel
               </Button>
               <Button variant="contained" type="submit">
-                Update Venue Type
+                Update Service
               </Button>
             </Stack>
           </Stack>

@@ -242,7 +242,7 @@ export default function CreateVenueTypePage() {
     name: "",
     price: "",
     description: "",
-    eventId: "",
+    venue_id: "",
   });
 
   const [photoFile, setPhotoFile] = useState(null);
@@ -281,7 +281,7 @@ export default function CreateVenueTypePage() {
     if (!photoFile) newErrors.photo = "Service photo is required";
     if (!formData.description.trim()) newErrors.description = "Description is required";
     if (!formData.price.trim()) newErrors.price = "Price is required";
-    if (!String(formData.eventId).trim()) newErrors.eventId = "Event ID is required";
+    if (!String(formData.venue_id).trim()) newErrors.venue_id = "Venue ID is required";
     return newErrors;
   };
 
@@ -305,7 +305,7 @@ export default function CreateVenueTypePage() {
           name: formData.name,
           description: formData.description,
           price: formData.price,
-          eventId: formData.eventId,
+          venue_id: formData.venue_id,
           photo: base64Image,
         });
 
@@ -339,7 +339,7 @@ export default function CreateVenueTypePage() {
   useEffect(() => {
     const fetchVenues = async () => {
       try {
-        const res = await axios.get("/api/events");
+        const res = await axios.get("/api/venue");
         setVenues(res.data);
       } catch (error) {
         console.error("Failed to fetch venues:", error);
@@ -356,7 +356,7 @@ export default function CreateVenueTypePage() {
         <Typography variant="h4" gutterBottom sx={{ fontWeight: 600, mb: 3 }}>
           Create New Floral Service
         </Typography>
-        
+
         <form onSubmit={handleSubmit}>
           <Stack spacing={3}>
             <TextField
@@ -396,10 +396,9 @@ export default function CreateVenueTypePage() {
                     alt="Preview"
                     style={{
                       width: "100%",
-                      maxHeight: 300,
-                      objectFit: "contain",
+                      maxHeight: 250,
+                      objectFit: "cover",
                       borderRadius: 8,
-                      border: "1px solid #e0e0e0",
                     }}
                   />
                 </Box>
@@ -423,14 +422,12 @@ export default function CreateVenueTypePage() {
             <TextField
               name="price"
               label="Price"
-              type="number"
               value={formData.price}
               onChange={handleChange}
               error={!!errors.price}
               helperText={errors.price}
               InputProps={{
                 endAdornment: <InputAdornment position="end">MMK</InputAdornment>,
-                inputProps: { min: 0 }
               }}
               fullWidth
               variant="outlined"
@@ -439,12 +436,12 @@ export default function CreateVenueTypePage() {
 
             <TextField
               select
-              name="eventId"
-              label="Select Event"
-              value={formData.eventId}
+              name="venue_id"
+              label="Select Venue"
+              value={formData.venue_id}
               onChange={handleChange}
-              error={!!errors.eventId}
-              helperText={errors.eventId}
+              error={!!errors.venue_id}
+              helperText={errors.venue_id}
               fullWidth
               variant="outlined"
               size="small"
