@@ -28,42 +28,42 @@ export async function POST(req) {
 }
 
 
-// export async function GET(req) {
-//     const { searchParams } = new URL(req.url);
-//     const eventId = searchParams.get("eventId");
+export async function GET(req) {
+    const { searchParams } = new URL(req.url);
+    const eventId = searchParams.get("eventId");
 
-//     try {
-//         const services = await prisma.floralService.findMany({
-//             where: eventId
-//                 ? {
-//                     eventId: parseInt(eventId),
-//                 }
-//                 : {},
+    try {
+        const services = await prisma.floralService.findMany({
+            where: eventId
+                ? {
+                    eventId: parseInt(eventId),
+                }
+                : {},
 
-//             select: {
-//                 id: true,
-//                 name: true,
-//                 description: true,
-//                 photo: true,
-//                 price: true,
-//                 eventId: true,
-//                 Event: {
-//                     select: { name: true },
-//                 },
-//             },
-//         });
+            select: {
+                id: true,
+                name: true,
+                description: true,
+                photo: true,
+                price: true,
+                eventId: true,
+                Event: {
+                    select: { name: true },
+                },
+            },
+        });
 
-//         const formatted = services.map((service) => ({
-//             ...service,
-//             venueName: service.Event?.name || null,
-//         }));
+        const formatted = services.map((service) => ({
+            ...service,
+            venueName: service.Event?.name || null,
+        }));
 
-//         return NextResponse.json(formatted);
-//     } catch (error) {
-//         console.error("GET /floralServices error:", error);
-//         return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
-//     }
-// }
+        return NextResponse.json(formatted);
+    } catch (error) {
+        console.error("GET /floralServices error:", error);
+        return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
+    }
+}
 
 
 // export async function GET(req) {
@@ -126,24 +126,24 @@ export async function POST(req) {
 //     }
 // }
 
-export async function GET(req) {
-    const { searchParams } = new URL(req.url);
-    const eventId = searchParams.get("eventId");
+// export async function GET(req) {
+//     const { searchParams } = new URL(req.url);
+//     const eventId = searchParams.get("eventId");
 
-    if (!eventId || isNaN(eventId)) {
-        return NextResponse.json({ message: "Invalid eventId" }, { status: 400 });
-    }
+//     if (!eventId || isNaN(eventId)) {
+//         return NextResponse.json({ message: "Invalid eventId" }, { status: 400 });
+//     }
 
-    try {
-        const floralServices = await prisma.floralService.findMany({
-            where: {
-                eventId: parseInt(eventId),
-            },
-        });
+//     try {
+//         const floralServices = await prisma.floralService.findMany({
+//             where: {
+//                 eventId: parseInt(eventId),
+//             },
+//         });
 
-        return NextResponse.json(floralServices);
-    } catch (error) {
-        console.error("Error fetching floral services:", error);
-        return NextResponse.json({ message: "Failed to load floral services" }, { status: 500 });
-    }
-}
+//         return NextResponse.json(floralServices);
+//     } catch (error) {
+//         console.error("Error fetching floral services:", error);
+//         return NextResponse.json({ message: "Failed to load floral services" }, { status: 500 });
+//     }
+// }

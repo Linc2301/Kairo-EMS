@@ -70,7 +70,7 @@ export default function DeliveryPage() {
             try {
                 const [venueRes, floralRes, timeRes] = await Promise.all([
                     fetch(`/api/venueType?venueId=${eventId}`),
-                    fetch(`/api/floralServices?venueId=${eventId}`),
+                    fetch(`/api/floralServices?eventId=${eventId}`),
                     fetch(`/api/timePackages?venueId=${eventId}`),
                 ]);
 
@@ -527,103 +527,103 @@ export default function DeliveryPage() {
         </Box>
     )}
 </CustomTabPanel> */}
-<CustomTabPanel value={value} index={2} >
-    {loading.timePackages ? (
-        <Box display="flex" justifyContent="center" py={5}>
-            <CircularProgress />
-        </Box>
-    ) : error ? (
-        <Typography color="error">{error}</Typography>
-    ) : (
-        <Box sx={{ display: "flex", flexDirection: "column", gap: 4, bgcolor: 'white' }}>
-            <LocalizationProvider dateAdapter={AdapterDateFns}>
-                <DatePicker
-                    label="Select Booking Date"
-                    value={selectedDate}
-                    onChange={(newDate) => setSelectedDate(newDate)}
-                    shouldDisableDate={(date) => {
-                        const today = new Date();
-                        return (
-                            date.getDate() === today.getDate() &&
-                            date.getMonth() === today.getMonth() &&
-                            date.getFullYear() === today.getFullYear()
-                        );
-                    }}
-                    slotProps={{
-                        textField: {
-                            fullWidth: true,
-                            size: "small",
-                            sx: { maxWidth: 300 },
-                        },
-                    }}
-                />
-            </LocalizationProvider>
+                <CustomTabPanel value={value} index={2} >
+                    {loading.timePackages ? (
+                        <Box display="flex" justifyContent="center" py={5}>
+                            <CircularProgress />
+                        </Box>
+                    ) : error ? (
+                        <Typography color="error">{error}</Typography>
+                    ) : (
+                        <Box sx={{ display: "flex", flexDirection: "column", gap: 4, bgcolor: 'white' }}>
+                            <LocalizationProvider dateAdapter={AdapterDateFns}>
+                                <DatePicker
+                                    label="Select Booking Date"
+                                    value={selectedDate}
+                                    onChange={(newDate) => setSelectedDate(newDate)}
+                                    shouldDisableDate={(date) => {
+                                        const today = new Date();
+                                        return (
+                                            date.getDate() === today.getDate() &&
+                                            date.getMonth() === today.getMonth() &&
+                                            date.getFullYear() === today.getFullYear()
+                                        );
+                                    }}
+                                    slotProps={{
+                                        textField: {
+                                            fullWidth: true,
+                                            size: "small",
+                                            sx: { maxWidth: 300 },
+                                        },
+                                    }}
+                                />
+                            </LocalizationProvider>
 
-            {dateError && (
-                <Typography color="error" sx={{ mb: 1 }}>
-                    {dateError}
-                </Typography>
-            )}
+                            {dateError && (
+                                <Typography color="error" sx={{ mb: 1 }}>
+                                    {dateError}
+                                </Typography>
+                            )}
 
-            {/* Show time packages only if a date is selected */}
-            {selectedDate ? (
-                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
-                    {timePackages.map((tp) => {
-                        // Example: You can disable a time package if booked, based on your logic
-                        const isBooked = false; // TODO: Replace with real availability check
+                            {/* Show time packages only if a date is selected */}
+                            {selectedDate ? (
+                                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
+                                    {timePackages.map((tp) => {
+                                        // Example: You can disable a time package if booked, based on your logic
+                                        const isBooked = false; // TODO: Replace with real availability check
 
-                        return (
-                            <Box
-                                key={tp.id}
-                                sx={{
-                                    width: 270,
-                                    bgcolor: isBooked ? "#f0f0f0" : "white",
-                                    color: isBooked ? "#999" : "black",
-                                    borderRadius: 3,
-                                    boxShadow: 3,
-                                    overflow: "hidden",
-                                    opacity: isBooked ? 0.5 : 1,
-                                }}
-                            >
-                                <Box sx={{ p: 2 }}>
-                                    <Typography>
-                                        {tp.venueName}: {tp.startTime} - {tp.endTime}
-                                    </Typography>
-                                    <Button
-                                        variant="outlined"
-                                        sx={{
-                                            mt: 2,
-                                            borderColor: "orange",
-                                            color: "orange",
-                                            width: "100%",
-                                            borderRadius: "20px",
-                                            py: 1,
-                                            textTransform: "none",
-                                            fontSize: "0.8rem",
-                                            fontWeight: 500,
-                                            "&:hover": {
-                                                borderColor: "darkorange",
-                                                backgroundColor: "rgba(255, 165, 0, 0.08)",
-                                            },
-                                        }}
-                                        onClick={() => selectTimePackage(tp)}
-                                        disabled={isBooked}
-                                    >
-                                        {isBooked ? "Unavailable" : "Select"}
-                                    </Button>
+                                        return (
+                                            <Box
+                                                key={tp.id}
+                                                sx={{
+                                                    width: 270,
+                                                    bgcolor: isBooked ? "#f0f0f0" : "white",
+                                                    color: isBooked ? "#999" : "black",
+                                                    borderRadius: 3,
+                                                    boxShadow: 3,
+                                                    overflow: "hidden",
+                                                    opacity: isBooked ? 0.5 : 1,
+                                                }}
+                                            >
+                                                <Box sx={{ p: 2 }}>
+                                                    <Typography>
+                                                        {tp.venueName}: {tp.startTime} - {tp.endTime}
+                                                    </Typography>
+                                                    <Button
+                                                        variant="outlined"
+                                                        sx={{
+                                                            mt: 2,
+                                                            borderColor: "orange",
+                                                            color: "orange",
+                                                            width: "100%",
+                                                            borderRadius: "20px",
+                                                            py: 1,
+                                                            textTransform: "none",
+                                                            fontSize: "0.8rem",
+                                                            fontWeight: 500,
+                                                            "&:hover": {
+                                                                borderColor: "darkorange",
+                                                                backgroundColor: "rgba(255, 165, 0, 0.08)",
+                                                            },
+                                                        }}
+                                                        onClick={() => selectTimePackage(tp)}
+                                                        disabled={isBooked}
+                                                    >
+                                                        {isBooked ? "Unavailable" : "Select"}
+                                                    </Button>
+                                                </Box>
+                                            </Box>
+                                        );
+                                    })}
                                 </Box>
-                            </Box>
-                        );
-                    })}
-                </Box>
-            ) : (
-                <Typography sx={{ mt: 2, fontStyle: "italic", color: "#555" }}>
-                    Please select a date to see available time packages.
-                </Typography>
-            )}
-        </Box>
-    )}
-</CustomTabPanel>
+                            ) : (
+                                <Typography sx={{ mt: 2, fontStyle: "italic", color: "#555" }}>
+                                    Please select a date to see available time packages.
+                                </Typography>
+                            )}
+                        </Box>
+                    )}
+                </CustomTabPanel>
 
 
 
@@ -719,25 +719,25 @@ export default function DeliveryPage() {
                                     : "Not selected"}
                             </Typography>
                         </Box> */}
-<Box mb={3}>
-    <Typography variant="subtitle1" fontWeight="bold" sx={{ mb: 1 }}>
-        Date & Time
-    </Typography>
+                        <Box mb={3}>
+                            <Typography variant="subtitle1" fontWeight="bold" sx={{ mb: 1 }}>
+                                Date & Time
+                            </Typography>
 
-    <Typography sx={{ fontSize: "0.9rem", color: "#555" }}>
-        Date:{" "}
-        {selectedDate
-            ? new Date(selectedDate).toLocaleDateString()
-            : "Not selected"}
-    </Typography>
+                            <Typography sx={{ fontSize: "0.9rem", color: "#555" }}>
+                                Date:{" "}
+                                {selectedDate
+                                    ? new Date(selectedDate).toLocaleDateString()
+                                    : "Not selected"}
+                            </Typography>
 
-    <Typography sx={{ fontSize: "0.9rem", color: "#555" }}>
-        Time:{" "}
-        {bookingData.timePackage
-            ? `${bookingData.timePackage.venueName}: ${bookingData.timePackage.startTime} - ${bookingData.timePackage.endTime}`
-            : "Not selected"}
-    </Typography>
-</Box>
+                            <Typography sx={{ fontSize: "0.9rem", color: "#555" }}>
+                                Time:{" "}
+                                {bookingData.timePackage
+                                    ? `${bookingData.timePackage.venueName}: ${bookingData.timePackage.startTime} - ${bookingData.timePackage.endTime}`
+                                    : "Not selected"}
+                            </Typography>
+                        </Box>
 
                         <Divider sx={{ my: 2 }} />
 
