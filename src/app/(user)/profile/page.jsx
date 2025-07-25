@@ -1,4 +1,3 @@
-
 // 'use client';
 
 // import {
@@ -202,7 +201,6 @@
 //     </Container>
 //   );
 // }
-
 
 // 'use client';
 
@@ -604,6 +602,11 @@ import {
   IconButton,
   TextField,
   Typography,
+  ListItem,
+  Paper,
+  List,
+  ListItemText,
+  Divider,
 } from "@mui/material";
 
 import EditIcon from "@mui/icons-material/Edit";
@@ -616,12 +619,17 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 
-const menuItems = [
-  "Profile",
-  "Photo",
-  "Notifications",
-  "History",
-  "Close account",
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+
+const menuItems = ["Profile", "Notification", "History", "Log Out"];
+
+const mockHistory = [
+  { id: 1, action: "Booked 'Floral Package A'", date: "2025-07-01" },
+  { id: 2, action: "Updated profile information", date: "2025-07-15" },
+  { id: 3, action: "Cancelled 'Venue 3'", date: "2025-07-20" },
 ];
 
 export default function ProfileSettingsPage() {
@@ -633,6 +641,15 @@ export default function ProfileSettingsPage() {
   const [profile, setProfile] = useState(null);
   const [notifications, setNotifications] = useState([]);
 
+  const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
+
+  const handleLogout = () => {
+    // Clear auth info – depends on how you're storing it
+    localStorage.removeItem("token"); // Example if you're storing a token
+    sessionStorage.clear(); // optional
+    router.push("/login"); // Redirect to login page
+  };
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -640,6 +657,27 @@ export default function ProfileSettingsPage() {
     photoFile: null,
     password: "",
   });
+
+  const mockNotifications = [
+    {
+      id: 1,
+      title: "New Event Added",
+      message: "Check out the new event “Summer Gala” happening next week!",
+      time: "2 hours ago",
+    },
+    {
+      id: 2,
+      title: "Booking Confirmed",
+      message: "Your booking for Floral Design has been confirmed.",
+      time: "Yesterday",
+    },
+    {
+      id: 3,
+      title: "Profile Updated",
+      message: "You successfully updated your profile information.",
+      time: "2 days ago",
+    },
+  ];
 
   // Protect route
   useEffect(() => {
@@ -689,8 +727,6 @@ export default function ProfileSettingsPage() {
   //   const interval = setInterval(fetchNotifications, 1000);
   //   return () => clearInterval(interval);
   // }, [session?.user?.id]);
-
-
 
   const handleChange = (field) => (e) => {
     setFormData({ ...formData, [field]: e.target.value });
@@ -763,9 +799,12 @@ export default function ProfileSettingsPage() {
 
   return (
     <Container maxWidth="lg" sx={{ mt: 5, mb: 20 }}>
-      <Box sx={{ display: "flex" }}>
+      <Box sx={{ display: "flex", gap: 4 }}>
         {/* Sidebar Menu */}
-        <Box sx={{ width: 260, pr: 4 }}>
+        <Box sx={{ width: 260, pr: 4 ,p: 2,
+      border: "1px solid #ddd",
+      borderRadius: 2,
+      backgroundColor: "#f5f5f5",}}>
           {menuItems.map((item, index) => (
             <Typography
               key={index}
@@ -785,7 +824,12 @@ export default function ProfileSettingsPage() {
         </Box>
 
         {/* Main Content */}
-        <Box sx={{ flex: 1 }}>
+        <Box sx={{ flex: 1,
+           p: 2,
+      border: "1px solid #ddd",
+      borderRadius: 2,
+      backgroundColor: "#fff",
+         }}>
           {/* === Profile Section === */}
           {selectedSection === "Profile" && (
             <Card sx={{ p: 5, borderRadius: 4 }}>
@@ -905,18 +949,96 @@ export default function ProfileSettingsPage() {
             </div>
           ))} */}
 
-
           {/* === Photo (Optional Stub) === */}
-          {selectedSection === "Photo" && (
-            <Card sx={{ p: 5, borderRadius: 4 }}>
-              <Typography variant="h5" fontWeight="bold" mb={3}>
-                Profile Photo Settings
+          {selectedSection === "Notification" && (
+            <Paper elevation={3} sx={{ mt: 2 }}>
+              <List>
+                {mockNotifications.map((n, index) => (
+                  <Box key={n.id}>
+                    <ListItem alignItems="flex-start">
+                      <ListItemText
+                        primary={n.title}
+                        secondary={
+                          <>
+                            <Typography
+                              component="span"
+                              variant="body2"
+                              color="text.primary"
+                            >
+                              {n.message}
+                            </Typography>
+                            <Typography
+                              variant="caption"
+                              display="block"
+                              color="text.secondary"
+                            >
+                              {n.time}
+                            </Typography>
+                          </>
+                        }
+                      />
+                    </ListItem>
+                    {index < mockNotifications.length - 1 && <Divider />}
+                  </Box>
+                ))}
+              </List>
+            </Paper>
+          )}
+
+          {selectedSection === "History" && (
+            <Box>
+              <Typography variant="h6" gutterBottom>
+                Your Activity History
               </Typography>
-              <Button variant="contained" component="label">
-                Upload New Photo
-                <input type="file" hidden />
-              </Button>
-            </Card>
+
+              {mockHistory.length > 0 ? (
+                mockHistory.map((item) => (
+                  <Box
+                    key={item.id}
+                    sx={{
+                      p: 2,
+                      mb: 1,
+                      border: "1px solid #ccc",
+                      borderRadius: 2,
+                      backgroundColor: "#fafafa",
+                    }}
+                  >
+                    <Typography variant="body1">{item.action}</Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {item.date}
+                    </Typography>
+                  </Box>
+                ))
+              ) : (
+                <Typography color="text.secondary">No history yet.</Typography>
+              )}
+            </Box>
+          )}
+
+          {selectedSection === "Log Out" && (
+            <>
+              <Dialog open={true}>
+                <DialogTitle>Confirm Logout</DialogTitle>
+                <DialogContent>
+                  <Typography>Are you sure you want to log out?</Typography>
+                </DialogContent>
+                <DialogActions>
+                  <Button
+                    onClick={() => setSelectedSection("Profile")}
+                    color="inherit"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={handleLogout}
+                    color="error"
+                    variant="contained"
+                  >
+                    Confirm
+                  </Button>
+                </DialogActions>
+              </Dialog>
+            </>
           )}
         </Box>
       </Box>
