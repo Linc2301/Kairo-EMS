@@ -623,6 +623,7 @@ import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
+import Loading from "@/src/components/Loading";
 
 const menuItems = ["Profile", "Notification", "History", "Log Out"];
 
@@ -815,7 +816,7 @@ useEffect(() => {
   };
 
   if (!profile) {
-    return <Typography textAlign="center">Loading...</Typography>;
+    return <Loading open={true}/>;
   }
 
   return (

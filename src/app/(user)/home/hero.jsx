@@ -4,6 +4,7 @@ import { Box, IconButton, Stack, Typography } from "@mui/material";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import { useEffect, useState } from "react";
+import Loading from "@/src/components/Loading";
 
 export default function WhyKairo() {
   const [items, setItems] = useState([]);
@@ -34,7 +35,7 @@ export default function WhyKairo() {
   const currentItem = items.length > 0 ? items[currentIndex] : null;
 
   if (!currentItem) {
-    return <Typography sx={{ p: 4 }}>Loading...</Typography>;
+    return <Loading open={true}/>;
   }
 
   return (
