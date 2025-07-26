@@ -25,6 +25,8 @@ export default function RootLayout({ children }) {
         className={`${openSans.variable} ${raleway.variable} antialiased`}>
         <CssBaseline />
         <SessionProvider>
+          <div className="min-h-screen flex flex-col">
+
           <Header />
           <Box
             component="main"
@@ -37,6 +39,7 @@ export default function RootLayout({ children }) {
             {children}
           </Box>
           <Footer />
+          </div>
         </SessionProvider>
       </body>
     </html>

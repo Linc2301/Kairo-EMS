@@ -60,7 +60,7 @@ export default function EventCarousel() {
                 width: 350,
                 height: 350,
                 position: "relative",
-                borderRadius: "20",
+                // borderRadius: "30px",
                 overflow: "hidden",
                 mx: 1,
               }}
@@ -72,7 +72,7 @@ export default function EventCarousel() {
                   width: "100%",
                   height: "100%",
                   objectFit: "cover",
-                  borderRadius: "20px",
+                  borderRadius: "20",
                 }}
               />
               <Box
