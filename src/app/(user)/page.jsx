@@ -4,10 +4,11 @@ import Hero from "@/src/app/(user)/home/hero";
 import Direction from "@/src/app/(user)/home/direction";
 
 export default function Home() {
+
   return (
     <>
       <Description />
-      <Hero />
+      <Hero/>
       <Direction />
     </>
   );

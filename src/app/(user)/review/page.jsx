@@ -163,6 +163,7 @@ import {
 } from "@mui/material";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
+import Loading from "@/src/components/Loading";
 
 export default function ReviewsPage() {
   const [reviews, setReviews] = useState([]);
@@ -191,9 +192,7 @@ export default function ReviewsPage() {
 
   if (loading)
     return (
-      <Container sx={{ py: 6 }}>
-        <Typography align="center">Loading reviews...</Typography>
-      </Container>
+      <Loading open={true}/>
     );
 
   if (error)
