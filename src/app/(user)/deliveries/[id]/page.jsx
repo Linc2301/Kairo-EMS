@@ -1,6 +1,7 @@
 
 "use client";
 
+
 import * as React from "react";
 import {
     Box,
@@ -14,12 +15,16 @@ import {
     DialogTitle,
     DialogContent,
     DialogActions,
+    Grid,
+    Paper
 } from "@mui/material";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { useRouter, useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
 
 function CustomTabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -46,6 +51,7 @@ export default function DeliveryPage() {
     const [venueTypes, setVenueTypes] = useState([]);
     const [floralServices, setFloralServices] = useState([]);
     const [timePackages, setTimePackages] = useState([]);
+    const [datePackages, setDatePackages] = useState([]);
     const [bookingData, setBookingData] = useState({
         venue: null,
         floral: null,
@@ -57,6 +63,7 @@ export default function DeliveryPage() {
         venueTypes: true,
         floralServices: true,
         timePackages: true,
+        datePackages: true,
         confirm: false,
     });
     const [error, setError] = useState("");
@@ -68,25 +75,28 @@ export default function DeliveryPage() {
 
         const fetchData = async () => {
             try {
-                const [venueRes, floralRes, timeRes] = await Promise.all([
+                const [venueRes, floralRes, timeRes, dateRes] = await Promise.all([
                     fetch(`/api/venueType?venueId=${eventId}`),
                     fetch(`/api/floralServices?venue_id=${eventId}`),
                     fetch(`/api/timePackages?venueId=${eventId}`),
+                    fetch(`/api/availability/date?venueId=${eventId}`)
                 ]);
 
-                if (!venueRes.ok || !floralRes.ok || !timeRes.ok) {
+                if (!venueRes.ok || !floralRes.ok || !timeRes.ok || !dateRes.ok) {
                     throw new Error("Failed to fetch some data");
                 }
 
-                const [venueData, floralData, timeData] = await Promise.all([
+                const [venueData, floralData, timeData, dateData] = await Promise.all([
                     venueRes.json(),
                     floralRes.json(),
                     timeRes.json(),
+                    dateRes.json()
                 ]);
 
                 setVenueTypes(venueData);
                 setFloralServices(floralData);
                 setTimePackages(timeData);
+                setDatePackages(dateData);
             } catch (err) {
                 console.error(err);
                 setError("Failed to load delivery data.");
@@ -95,6 +105,7 @@ export default function DeliveryPage() {
                     venueTypes: false,
                     floralServices: false,
                     timePackages: false,
+                    datePackages: false,
                     confirm: false,
                 });
             }
@@ -135,6 +146,30 @@ export default function DeliveryPage() {
             timePackage,
         }));
         setValue(3);
+    };
+
+    const handleDateChange = async (newDate) => {
+        setSelectedDate(newDate);
+        setDateError("");
+
+        try {
+            setLoading(prev => ({ ...prev, timePackages: true }));
+            const dateStr = newDate.toISOString().split('T')[0];
+            const res = await fetch(`/api/availability/timeslots?date=${dateStr}&venueId=${eventId}`);
+            if (!res.ok) throw new Error("Failed to load time slots");
+            const data = await res.json();
+            setTimePackages(data);
+        } catch (err) {
+            console.error(err);
+            setError("Failed to load time slots");
+        } finally {
+            setLoading(prev => ({ ...prev, timePackages: false }));
+        }
+    };
+
+    const formatTime = (timeStr) => {
+        const time = new Date(timeStr);
+        return time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     };
 
     const handleConfirm = async () => {
@@ -199,9 +234,6 @@ export default function DeliveryPage() {
         }
     };
 
-    // UI remains unchanged, so it's omitted here for brevity
-
-
     return (
         <Box sx={{ bgcolor: "black", minHeight: "100vh", py: 4 }}>
             <Box
@@ -238,7 +270,7 @@ export default function DeliveryPage() {
                                 fontSize: "1rem",
                                 textTransform: "none",
                                 padding: "12px 16px",
-                                color: "black", // Make all tabs black
+                                color: "black",
                                 fontWeight: "normal",
                                 cursor: "default",
                                 "&.Mui-selected": {
@@ -418,240 +450,101 @@ export default function DeliveryPage() {
                 </CustomTabPanel>
 
                 {/* Time package selection */}
-                {/* <CustomTabPanel value={value} index={2}>
-                    {loading.timePackages ? (
-                        <Box display="flex" justifyContent="center" py={5}>
-                            <CircularProgress />
-                        </Box>
-                    ) : error ? (
-                        <Typography color="error">{error}</Typography>
-                    ) : (
-                        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
-                            {timePackages.map((tp) => (
-                                <Box
-                                    key={tp.id}
-                                    sx={{
-                                        width: 270,
-                                        bgcolor: "white",
-                                        color: "black",
-                                        borderRadius: 3,
-                                        boxShadow: 3,
-                                        overflow: "hidden",
-                                    }}
-                                >
-                                    <Box sx={{ p: 2 }}>
-                                        <Typography>
-                                            {tp.venueName}: {tp.startTime} - {tp.endTime}
-                                        </Typography>
-                                        <Button
-                                            variant="outlined"
-                                            sx={{
-                                                mt: 2,
-                                                borderColor: "orange",
-                                                color: "orange",
-                                                width: "100%",
-                                                borderRadius: "20px",
-                                                py: 1,
-                                                textTransform: "none",
-                                                fontSize: "0.8rem",
-                                                fontWeight: 500,
-                                                "&:hover": {
-                                                    borderColor: "darkorange",
-                                                    backgroundColor: "rgba(255, 165, 0, 0.08)",
-                                                },
+                <CustomTabPanel value={value} index={2}>
+                    <Box p={4} sx={{ bgcolor: "white", color: "black", borderRadius: 2 }}>
+                        <Typography variant="h5" gutterBottom fontWeight="bold">
+                            Select Date & Time
+                        </Typography>
+                        <Typography variant="body1" mb={4}>
+                            Please select date and time for your booking
+                        </Typography>
+
+                        <Box display="flex" gap={4} mt={4}>
+                            {/* Calendar Section */}
+                            <Box flex={1}>
+                                <Paper elevation={3} sx={{ p: 3 }}>
+                                    <Typography variant="h6" gutterBottom>
+                                        <CalendarMonthIcon sx={{ mr: 1 }} />
+                                        Select a Date
+                                    </Typography>
+                                    <LocalizationProvider dateAdapter={AdapterDateFns}>
+                                        <DatePicker
+                                            value={selectedDate}
+                                            onChange={handleDateChange}
+                                            shouldDisableDate={(date) => {
+                                                const dateStr = date.toISOString().split('T')[0];
+                                                return !datePackages.some(pkg => pkg.date === dateStr);
                                             }}
-                                            onClick={() => selectTimePackage(tp)}
-                                        >
-                                            Select
-                                        </Button>
-                                    </Box>
+                                            renderInput={({ inputRef, inputProps, InputProps }) => (
+                                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                                    <input
+                                                        ref={inputRef}
+                                                        {...inputProps}
+                                                        style={{
+                                                            padding: '10px',
+                                                            border: '1px solid #ccc',
+                                                            borderRadius: '4px',
+                                                            width: '100%'
+                                                        }}
+                                                    />
+                                                    {InputProps?.endAdornment}
+                                                </Box>
+                                            )}
+                                        />
+                                    </LocalizationProvider>
+                                    {dateError && (
+                                        <Typography color="error" mt={1}>
+                                            {dateError}
+                                        </Typography>
+                                    )}
+                                </Paper>
+                            </Box>
+
+                            {/* Time Slot Section */}
+                            {selectedDate && (
+                                <Box flex={1}>
+                                    <Paper elevation={3} sx={{ p: 3 }}>
+                                        <Typography variant="h6" gutterBottom>
+                                            <AccessTimeIcon sx={{ mr: 1 }} />
+                                            Pick a time for {selectedDate.toLocaleDateString()}
+                                        </Typography>
+
+                                        {loading.timePackages ? (
+                                            <Box mt={3} textAlign="center">
+                                                <CircularProgress />
+                                            </Box>
+                                        ) : timePackages.length > 0 ? (
+                                            <Grid container spacing={2} mt={2}>
+                                                {timePackages.map((slot) => (
+                                                    <Grid item xs={6} key={slot.id}>
+                                                        <Button
+                                                            variant={bookingData.timePackage?.id === slot.id ? "contained" : "outlined"}
+                                                            fullWidth
+                                                            onClick={() => selectTimePackage(slot)}
+                                                            sx={{
+                                                                backgroundColor: bookingData.timePackage?.id === slot.id ? "orange" : undefined,
+                                                                color: bookingData.timePackage?.id === slot.id ? "white" : undefined,
+                                                                '&:hover': {
+                                                                    backgroundColor: bookingData.timePackage?.id === slot.id ? "darkorange" : undefined,
+                                                                }
+                                                            }}
+                                                        >
+                                                            {formatTime(slot.startTime)} - {formatTime(slot.endTime)}
+                                                        </Button>
+                                                    </Grid>
+                                                ))}
+                                            </Grid>
+                                        ) : (
+                                            <Typography color="text.secondary" mt={2}>
+                                                No available slots for this date.
+                                            </Typography>
+                                        )}
+                                    </Paper>
                                 </Box>
-                            ))}
-                        </Box>
-                    )}
-                </CustomTabPanel> */}
-                {/* <CustomTabPanel value={value} index={2}>
-    {loading.timePackages ? (
-        <Box display="flex" justifyContent="center" py={5}>
-            <CircularProgress />
-        </Box>
-    ) : error ? (
-        <Typography color="error">{error}</Typography>
-    ) : (
-        <Box sx={{ display: "flex", flexDirection: "column", gap: 4 }}>
-            <LocalizationProvider dateAdapter={AdapterDateFns}>
-                <DatePicker
-                    label="Select Booking Date"
-                    value={selectedDate}
-                    onChange={(newDate) => setSelectedDate(newDate)}
-                    shouldDisableDate={(date) => {
-                        const today = new Date();
-                        return (
-                            date.getDate() === today.getDate() &&
-                            date.getMonth() === today.getMonth() &&
-                            date.getFullYear() === today.getFullYear()
-                        );
-                    }}
-                    slotProps={{
-                        textField: {
-                            fullWidth: true,
-                            size: "small",
-                            sx: { maxWidth: 300 },
-                        },
-                    }}
-                />
-            </LocalizationProvider>
-
-            {dateError && (
-                <Typography color="error" sx={{ mb: 1 }}>
-                    {dateError}
-                </Typography>
-            )}
-
-            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
-                {timePackages.map((tp) => (
-                    <Box
-                        key={tp.id}
-                        sx={{
-                            width: 270,
-                            bgcolor: "white",
-                            color: "black",
-                            borderRadius: 3,
-                            boxShadow: 3,
-                            overflow: "hidden",
-                        }}
-                    >
-                        <Box sx={{ p: 2 }}>
-                            <Typography>
-                                {tp.venueName}: {tp.startTime} - {tp.endTime}
-                            </Typography>
-                            <Button
-                                variant="outlined"
-                                sx={{
-                                    mt: 2,
-                                    borderColor: "orange",
-                                    color: "orange",
-                                    width: "100%",
-                                    borderRadius: "20px",
-                                    py: 1,
-                                    textTransform: "none",
-                                    fontSize: "0.8rem",
-                                    fontWeight: 500,
-                                    "&:hover": {
-                                        borderColor: "darkorange",
-                                        backgroundColor: "rgba(255, 165, 0, 0.08)",
-                                    },
-                                }}
-                                onClick={() => selectTimePackage(tp)}
-                            >
-                                Select
-                            </Button>
+                            )}
                         </Box>
                     </Box>
-                ))}
-            </Box>
-        </Box>
-    )}
-</CustomTabPanel> */}
-                <CustomTabPanel value={value} index={2} >
-                    {loading.timePackages ? (
-                        <Box display="flex" justifyContent="center" py={5}>
-                            <CircularProgress />
-                        </Box>
-                    ) : error ? (
-                        <Typography color="error">{error}</Typography>
-                    ) : (
-                        <Box sx={{ display: "flex", flexDirection: "column", gap: 4, bgcolor: 'white' }}>
-                            <LocalizationProvider dateAdapter={AdapterDateFns}>
-                                <DatePicker
-                                    label="Select Booking Date"
-                                    value={selectedDate}
-                                    onChange={(newDate) => setSelectedDate(newDate)}
-                                    shouldDisableDate={(date) => {
-                                        const today = new Date();
-                                        return (
-                                            date.getDate() === today.getDate() &&
-                                            date.getMonth() === today.getMonth() &&
-                                            date.getFullYear() === today.getFullYear()
-                                        );
-                                    }}
-                                    slotProps={{
-                                        textField: {
-                                            fullWidth: true,
-                                            size: "small",
-                                            sx: { maxWidth: 300 },
-                                        },
-                                    }}
-                                />
-                            </LocalizationProvider>
-
-                            {dateError && (
-                                <Typography color="error" sx={{ mb: 1 }}>
-                                    {dateError}
-                                </Typography>
-                            )}
-
-                            {/* Show time packages only if a date is selected */}
-                            {selectedDate ? (
-                                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
-                                    {timePackages.map((tp) => {
-                                        // Example: You can disable a time package if booked, based on your logic
-                                        const isBooked = false; // TODO: Replace with real availability check
-
-                                        return (
-                                            <Box
-                                                key={tp.id}
-                                                sx={{
-                                                    width: 270,
-                                                    bgcolor: isBooked ? "#f0f0f0" : "white",
-                                                    color: isBooked ? "#999" : "black",
-                                                    borderRadius: 3,
-                                                    boxShadow: 3,
-                                                    overflow: "hidden",
-                                                    opacity: isBooked ? 0.5 : 1,
-                                                }}
-                                            >
-                                                <Box sx={{ p: 2 }}>
-                                                    <Typography>
-                                                        {tp.venueName}: {tp.startTime} - {tp.endTime}
-                                                    </Typography>
-                                                    <Button
-                                                        variant="outlined"
-                                                        sx={{
-                                                            mt: 2,
-                                                            borderColor: "orange",
-                                                            color: "orange",
-                                                            width: "100%",
-                                                            borderRadius: "20px",
-                                                            py: 1,
-                                                            textTransform: "none",
-                                                            fontSize: "0.8rem",
-                                                            fontWeight: 500,
-                                                            "&:hover": {
-                                                                borderColor: "darkorange",
-                                                                backgroundColor: "rgba(255, 165, 0, 0.08)",
-                                                            },
-                                                        }}
-                                                        onClick={() => selectTimePackage(tp)}
-                                                        disabled={isBooked}
-                                                    >
-                                                        {isBooked ? "Unavailable" : "Select"}
-                                                    </Button>
-                                                </Box>
-                                            </Box>
-                                        );
-                                    })}
-                                </Box>
-                            ) : (
-                                <Typography sx={{ mt: 2, fontStyle: "italic", color: "#555" }}>
-                                    Please select a date to see available time packages.
-                                </Typography>
-                            )}
-                        </Box>
-                    )}
                 </CustomTabPanel>
-
-
 
                 {/* Receipt */}
                 <CustomTabPanel value={value} index={3}>
@@ -706,45 +599,6 @@ export default function DeliveryPage() {
 
                         <Divider sx={{ my: 2 }} />
 
-                        {/* <Box mb={3}>
-                            <Typography variant="subtitle1" fontWeight="bold" sx={{ mb: 1 }}>
-                                Date & Time
-                            </Typography>
-                            <LocalizationProvider dateAdapter={AdapterDateFns}>
-                                <DatePicker
-                                    label="Select Booking Date"
-                                    value={selectedDate}
-                                    onChange={(newDate) => setSelectedDate(newDate)}
-                                    shouldDisableDate={(date) => {
-                                        const today = new Date();
-                                        return (
-                                            date.getDate() === today.getDate() &&
-                                            date.getMonth() === today.getMonth() &&
-                                            date.getFullYear() === today.getFullYear()
-                                        );
-                                    }}
-                                    slotProps={{
-                                        textField: {
-                                            fullWidth: true,
-                                            size: "small",
-                                            sx: { mb: 1 },
-                                        },
-                                    }}
-                                />
-                            </LocalizationProvider>
-
-                            {dateError && (
-                                <Typography color="error" sx={{ mb: 1 }}>
-                                    {dateError}
-                                </Typography>
-                            )}
-
-                            <Typography sx={{ fontSize: "0.9rem", color: "#555" }}>
-                                {bookingData.timePackage
-                                    ? `${bookingData.timePackage.venueName}: ${bookingData.timePackage.startTime} - ${bookingData.timePackage.endTime}`
-                                    : "Not selected"}
-                            </Typography>
-                        </Box> */}
                         <Box mb={3}>
                             <Typography variant="subtitle1" fontWeight="bold" sx={{ mb: 1 }}>
                                 Date & Time
@@ -753,14 +607,14 @@ export default function DeliveryPage() {
                             <Typography sx={{ fontSize: "0.9rem", color: "#555" }}>
                                 Date:{" "}
                                 {selectedDate
-                                    ? new Date(selectedDate).toLocaleDateString()
+                                    ? selectedDate.toLocaleDateString()
                                     : "Not selected"}
                             </Typography>
 
                             <Typography sx={{ fontSize: "0.9rem", color: "#555" }}>
                                 Time:{" "}
                                 {bookingData.timePackage
-                                    ? `${bookingData.timePackage.venueName}: ${bookingData.timePackage.startTime} - ${bookingData.timePackage.endTime}`
+                                    ? `${formatTime(bookingData.timePackage.startTime)} - ${formatTime(bookingData.timePackage.endTime)}`
                                     : "Not selected"}
                             </Typography>
                         </Box>
@@ -856,7 +710,7 @@ export default function DeliveryPage() {
                         <Button
                             onClick={() => {
                                 setSuccessDialogOpen(false);
-                                router.push("/events"); // change path
+                                router.push("/events");
                             }}
                             autoFocus
                             sx={{
