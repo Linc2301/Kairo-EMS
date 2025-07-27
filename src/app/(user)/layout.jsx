@@ -25,11 +25,11 @@ export default function RootLayout({ children }) {
         className={`${openSans.variable} ${raleway.variable} antialiased`}>
         <CssBaseline />
         <SessionProvider>
-          <Header />
-
-          <main className="flex-1">{children}</main>
-
+          <div className="min-h-screen flex flex-col">
+          <Header/>
+          <main className="flex-1">{children}</main>  
           <Footer />
+          </div>
         </SessionProvider>
       </body>
     </html>
