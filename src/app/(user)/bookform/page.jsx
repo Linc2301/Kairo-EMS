@@ -119,19 +119,18 @@ export default function Home() {
         });
 
         return (
-            <DateCalendar
-                value={selectedDate}
-                onChange={(newDate) => {
-                    const dateStr = dayjs(newDate).format("YYYY-MM-DD");
-                    const isAvailable = datePackages.some(pkg => dayjs(pkg.date).format("YYYY-MM-DD") === dateStr);
-                    if (isAvailable) {
-                        setSelectedDate(newDate);
-                    } else {
-                        // Ignore or alert invalid date selection
-                        alert("This date is not available.");
-                    }
+            <PickersDay
+                {...other}
+                outsideCurrentMonth={outsideCurrentMonth}
+                day={day}
+                disabled={!isAvailable} // disables the day if not available
+                sx={{
+                    backgroundColor: isAvailable ? 'success.light' : undefined,
+                    color: isAvailable ? 'black' : undefined,
+                    '&:hover': {
+                        backgroundColor: isAvailable ? 'success.main' : undefined,
+                    },
                 }}
-                slots={{ day: CustomDay }}
             />
 
         );
