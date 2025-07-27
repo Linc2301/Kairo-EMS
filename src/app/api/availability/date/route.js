@@ -32,32 +32,37 @@ import { prisma } from '@/src/lib/prisma';
 
 export async function GET(req) {
     const { searchParams } = new URL(req.url);
-    const venueId = searchParams.get('venueId');
+    const venueId = Number(searchParams.get('venueId'));
 
     if (!venueId) {
-        return NextResponse.json({ message: 'venueId query parameter is required' }, { status: 400 });
-    }
-
-    const parsedVenueId = parseInt(venueId);
-    if (isNaN(parsedVenueId)) {
-        return NextResponse.json({ message: 'venueId must be a valid number' }, { status: 400 });
+        return NextResponse.json({ message: 'venueId is required' }, { status: 400 });
     }
 
     try {
         const dates = await prisma.timePackage.findMany({
-            where: { venue_id: parsedVenueId },
-            select: { date: true },
+            where: {
+                venue_id: venueId,
+                booking: null,
+            },
+            select: {
+                date: true,
+            },
             distinct: ['date'],
-            orderBy: { date: 'asc' },
+            orderBy: {
+                date: 'asc',
+            },
         });
 
         const formatted = dates.map(d => ({
-            date: d.date.toISOString().split('T')[0],
+            date: d.date.toLocaleDateString('en-CA'), // always correct in YYYY-MM-DD
+
         }));
+
+
 
         return NextResponse.json(formatted);
     } catch (error) {
-        console.error('API error:', error);
+        console.error('Error fetching available dates:', error);
         return NextResponse.json({ message: 'Server error' }, { status: 500 });
     }
 }

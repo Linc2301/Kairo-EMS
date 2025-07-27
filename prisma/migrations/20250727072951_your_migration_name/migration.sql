@@ -61,7 +61,7 @@ CREATE TABLE `FloralService` (
 -- CreateTable
 CREATE TABLE `TimePackage` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `date` DATETIME(3) NOT NULL,
+    `date` DATE NOT NULL,
     `startTime` DATETIME(3) NOT NULL,
     `endTime` DATETIME(3) NOT NULL,
     `venue_id` INTEGER NOT NULL,

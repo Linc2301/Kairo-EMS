@@ -69,7 +69,7 @@ model FloralService {
 
 model TimePackage {
   id        Int      @id @default(autoincrement())
-  date      DateTime
+  date      DateTime @db.Date
   startTime DateTime
   endTime   DateTime
   venue_id  Int
