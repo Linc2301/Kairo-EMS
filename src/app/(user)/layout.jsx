@@ -1,8 +1,8 @@
 "use client";
 import { Open_Sans, Raleway } from "next/font/google";
 import "./globals.css";
-import Footer from "@/src/components/footer"
-import Header from "@/src/components/navbar"
+import Footer from "@/src/components/footer";
+import Header from "@/src/components/navbar";
 import { Box, CssBaseline } from "@mui/material";
 import { SessionProvider } from "next-auth/react";
 
@@ -26,8 +26,8 @@ export default function RootLayout({ children }) {
         <CssBaseline />
         <SessionProvider>
           <Header />
-          
-            {children}
+
+          <main className="flex-1">{children}</main>
 
           <Footer />
         </SessionProvider>
