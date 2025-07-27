@@ -494,6 +494,7 @@
 
 "use client";
 
+import Loading from "@/src/components/Loading";
 import {
   Box,
   FormControl,
@@ -551,7 +552,7 @@ export default function EventDetailPage() {
     router.push(`/venue/${venueId}`);
   };
 
-  if (!event) return <Typography>Loading...</Typography>;
+  if (!event) return <Loading open={true}/>;
 
   return (
     <Box sx={{ p: 4 , bgcolor: "black"}}>

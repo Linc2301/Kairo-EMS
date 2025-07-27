@@ -110,6 +110,7 @@ import {
   DialogActions,
 } from "@mui/material";
 import Image from "next/image";
+import Loading from "@/src/components/Loading";
 
 export default function VenuePage() {
   const { id } = useParams();
@@ -152,7 +153,7 @@ export default function VenuePage() {
     setDialogOpen(false);
   };
 
-  if (!venue) return <Typography>Loading venue details...</Typography>;
+  if (!venue) return <Loading open={true}/>;
   if (status === "loading")
     return <Typography>Checking login status...</Typography>;
 

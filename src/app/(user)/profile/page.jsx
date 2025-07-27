@@ -623,14 +623,13 @@ import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
+import Loading from "@/src/components/Loading";
 
 const menuItems = ["Profile", "Notification", "History", "Log Out"];
 
-const mockHistory = [
-  { id: 1, action: "Booked 'Floral Package A'", date: "2025-07-01" },
-  { id: 2, action: "Updated profile information", date: "2025-07-15" },
-  { id: 3, action: "Cancelled 'Venue 3'", date: "2025-07-20" },
-];
+const mockBookingIds = [1, 2, 3]; // booking IDs you want to show
+
+
 
 export default function ProfileSettingsPage() {
   const { data: session } = useSession();
@@ -642,6 +641,9 @@ export default function ProfileSettingsPage() {
   const [notifications, setNotifications] = useState([]);
 
   const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
+
+  const [bookingHistory, setBookingHistory] = useState([]);
+
 
   const handleLogout = () => {
     // Clear auth info – depends on how you're storing it
@@ -708,6 +710,26 @@ export default function ProfileSettingsPage() {
 
     fetchProfile();
   }, [session?.user?.id]);
+
+useEffect(() => {
+  const fetchBookings = async () => {
+    try {
+      const results = await Promise.all(
+        mockBookingIds.map(async (id) => {
+          const res = await axios.get(`/api/booking-info/${id}`);
+          return res.data;
+        })
+      );
+      setBookingHistory(results);
+    } catch (error) {
+      console.error("Failed to fetch bookings:", error);
+    }
+  };
+
+  fetchBookings();
+}, []);
+
+
 
   // Poll for notifications
   // useEffect(() => {
@@ -794,11 +816,11 @@ export default function ProfileSettingsPage() {
   };
 
   if (!profile) {
-    return <Typography textAlign="center">Loading...</Typography>;
+    return <Loading open={true}/>;
   }
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 5, mb: 20 }}>
+    <Container maxWidth="lg" sx={{ mt: 5, mb: 20}}>
       <Box sx={{ display: "flex", gap: 4 }}>
         {/* Sidebar Menu */}
         <Box sx={{ width: 260, pr: 4 ,p: 2,
@@ -985,7 +1007,7 @@ export default function ProfileSettingsPage() {
             </Paper>
           )}
 
-          {selectedSection === "History" && (
+          {/* {selectedSection === "History" && (
             <Box>
               <Typography variant="h6" gutterBottom>
                 Your Activity History
@@ -1013,7 +1035,44 @@ export default function ProfileSettingsPage() {
                 <Typography color="text.secondary">No history yet.</Typography>
               )}
             </Box>
-          )}
+          )} */}
+{selectedSection === "History" && (
+  <Box>
+    <Typography variant="h6" gutterBottom>
+      Your Booking History
+    </Typography>
+
+    {bookingHistory.length > 0 ? (
+      bookingHistory.map((booking) => (
+        <Box
+          key={booking.id}
+          sx={{
+            p: 2,
+            mb: 2,
+            border: "1px solid #ccc",
+            borderRadius: 2,
+            backgroundColor: "#f9f9f9",
+          }}
+        >
+          <Typography variant="subtitle1" fontWeight="bold">
+            Venue: {booking.venue?.name || "Unknown"}
+          </Typography>
+          <Typography variant="body2">
+            Floral Service: {booking.floralService?.name || "None"}
+          </Typography>
+          <Typography variant="body2">
+            Time Package: {booking.TimePackage?.label || "N/A"}
+          </Typography>
+          <Typography variant="caption" color="text.secondary">
+            Booked on: {new Date(booking.createdAt).toLocaleDateString()}
+          </Typography>
+        </Box>
+      ))
+    ) : (
+      <Typography color="text.secondary">No booking history found.</Typography>
+    )}
+  </Box>
+)}
 
           {selectedSection === "Log Out" && (
             <>

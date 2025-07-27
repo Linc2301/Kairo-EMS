@@ -39,7 +39,7 @@ export default function HomePage() {
                 sx={{
                     pt: 20,
                     textAlign: 'center',
-                    color: '#fff',
+                    color: '#000',
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
