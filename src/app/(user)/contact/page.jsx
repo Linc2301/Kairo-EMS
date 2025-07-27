@@ -908,7 +908,7 @@ export default function ContactPage() {
           color: "white",
         }}
       >
-        <Box maxWidth="700px">
+        <Box maxWidth="500px">
           <Typography variant="h3" fontWeight="bold" gutterBottom>
             Contact Us
           </Typography>
@@ -921,9 +921,9 @@ export default function ContactPage() {
 
       {/* 🔶 Main Section */}
       <Box sx={{ mt: 8, mb: 2 }}>
-        <Grid container spacing={5} alignItems="flex-start">
+        <Grid container spacing={2} alignItems="flex-start">
           {/* 📞 Contact Info */}
-          <Grid item xs={12} md={6} sx={{ mt: 15, ml: 5 }}>
+          <Grid item xs={12} md={6} sx={{ mt: 23, ml: 4 }}>
             <Typography variant="h3" fontWeight="bold" gutterBottom>
               Contact Info
             </Typography>
@@ -1011,7 +1011,7 @@ export default function ContactPage() {
               sx={{
                 p: { xs: 3, md: 4 },
                 borderRadius: 3,
-                width: 500,
+                width: 430,
               }}
             >
               <Typography

@@ -99,22 +99,25 @@ import BookingCalendar from './components/BookingCalendar';
 import BookingList from './components/BookingList';
 import DashboardStats from './components/DashboardStats';
 import TimePackagePieChart from './components/TImeChart';
+
 import dayjs from 'dayjs';
+import PopularEventsChart from './components/PopularEventChart';
 
 export default function AdminDashboardPage() {
   const [selectedDate, setSelectedDate] = useState(dayjs());
 
   return (
     <Container sx={{ mt: 4 }}>
-      <Box>
+      <Box mb={5}>
              <DashboardStats/>
       </Box>
  
-         <Box flex={1} minWidth="300px">
-          <TimePackagePieChart />
-        </Box>
+         <Box flex={1} minWidth="300px" sx={{mt: 5}}>
+         <PopularEventsChart/>
+         
+        </Box> 
       
-      <Box display="flex" gap={2} flexWrap="wrap" sx={{mt: 5}}>
+      <Box display="flex" gap={2} flexWrap="wrap" mt={5}>
         {/* Left side - Calendar */}
         <Box flex={1} minWidth="300px">
           <BookingCalendar selectedDate={selectedDate} onChange={setSelectedDate} />

@@ -159,7 +159,7 @@ export default function AboutPage() {
           }}
         >
           <img
-            src="/about-us/img1.avif"
+            src="/assets/event2.jpg"
             alt="Our Vision"
             style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
           />
@@ -222,7 +222,7 @@ export default function AboutPage() {
           }}
         >
           <img
-            src="/about-us/img1.avif"
+            src="/assets/event1.jpg"
             alt="Crafting Memories"
             style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
           />

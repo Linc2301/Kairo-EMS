@@ -88,7 +88,7 @@ export default function WhyKairo() {
           Kairo?
         </Typography>
 
-        <Typography sx={{ fontSize: 40, mt:4 }}>
+        <Typography sx={{ fontSize: 40, mt:2 }}>
           New and never-ending <br /> possibilities
         </Typography>
 

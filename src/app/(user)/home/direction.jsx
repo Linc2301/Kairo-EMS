@@ -19,16 +19,16 @@ export default function Direction() {
             >
                 {/* Background Image */}
                 <Image
-                    src="/direction.jpg"
+                    src="/assets/event.jpg"
                     alt="Event Setup"
                     layout="fill"
                     objectFit="cover"
-                    style={{ zIndex: -1, opacity: 0.7 }}
+                    style={{ zIndex: -1,  }}
                 />
 
                 {/* Overlay content */}
                 <Container sx={{ zIndex: 1 }}>
-                    <Typography variant="h2" component="h1" color="black" fontWeight={700} gutterBottom>
+                    <Typography variant="h2" component="h1" color="white" fontWeight={700} gutterBottom>
                         Where
                         <br />
                         Extraordinary

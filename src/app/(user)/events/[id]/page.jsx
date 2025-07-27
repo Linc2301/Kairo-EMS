@@ -588,7 +588,7 @@ export default function EventDetailPage() {
               ml: { md: 8, xs: 0 }, // creates space from the image on medium+ screens
             }}
           >
-            <Typography sx={{ fontSize: 45, fontWeight: "bold", wordBreak: "break-word", color: "#d1d5db" }}>
+            <Typography sx={{ fontSize: 45, fontWeight: "bold", wordBreak: "break-word", color: "#ec7921ff" }}>
               {event.name}
             </Typography>
 
