@@ -1,93 +1,91 @@
+// // "use client";
+// // import Link from "next/link";
+// // import { Box, Typography } from "@mui/material";
+// // import { useRouter } from "next/navigation";
 
+// // export default function EventPage() {
+// //   const pyramidRows = [
+// //     [{ type: "text", name: "Engagement", id: 2, highlighted: true }],
 
-// "use client";
-// import Link from "next/link";
-// import { Box, Typography } from "@mui/material";
-// import { useRouter } from "next/navigation";
+// //     [
+// //       { type: "image", src: "/Event Main Page/cheers.jpg" },
+// //       { type: "text", name: "Bridal Shower", id: 4 },
+// //       { type: "text", name: "Wedding", id: 1 },
+// //       { type: "image", src: "/Event Main Page/balloons.jpg" },
+// //     ],
 
+// //     [
+// //       { type: "text", name: "Birthday", id: 3, highlighted: true },
+// //       { type: "text", name: "Baby Shower", id: 5, highlighted: true },
+// //       { type: "text", name: "Private Party", id: 6, highlighted: true },
+// //     ],
 
-// export default function EventPage() {
-//   const pyramidRows = [
-//     [{ type: "text", name: "Engagement", id: 2, highlighted: true }],
+// //     [
+// //       { type: "image", src: "/Event Main Page/celebrate.jpg" },
+// //       { type: "text", name: "Corporate Events", id: 7 },
+// //       { type: "text", name: "Business Meeting", id: 8 },
+// //       { type: "text", name: "Art Gallery", id: 9 },
+// //       { type: "image", src: "/Event Main Page/gallery.jpg" },
+// //     ],
+// //   ];
+// //    const router = useRouter();
 
-//     [
-//       { type: "image", src: "/Event Main Page/cheers.jpg" },
-//       { type: "text", name: "Bridal Shower", id: 4 },
-//       { type: "text", name: "Wedding", id: 1 },
-//       { type: "image", src: "/Event Main Page/balloons.jpg" },
-//     ],
+// //   return (
+// //     <Box sx={{ backgroundColor: "#000", py: 8, px: 2, textAlign: "center" }}>
+// //       <Typography variant="h4" sx={{ color: "#ccc", fontWeight: "bold", mb: 2 }}>
+// //         A space for every moment
+// //       </Typography>
+// //       <Typography variant="h6" sx={{ color: "#aaa", mb: 15 }}>
+// //         Book a unique space for your activity
+// //       </Typography>
 
-//     [
-//       { type: "text", name: "Birthday", id: 3, highlighted: true },
-//       { type: "text", name: "Baby Shower", id: 5, highlighted: true },
-//       { type: "text", name: "Private Party", id: 6, highlighted: true },
-//     ],
+// //       {pyramidRows.map((row, rowIndex) => (
+// //         <Box
+// //           key={rowIndex}
+// //           sx={{
+// //             display: "flex",
+// //             justifyContent: "center",
+// //             alignItems: "center",
+// //             gap: 8,
+// //             mb: 4,
+// //             flexWrap: "wrap",
+// //           }}
+// //         >
+// //           {row.map((item, idx) =>
+// //             item.type === "text" ? (
+// //               <Link key={idx} href={`/events/${item.id}`} passHref>
+// //                 <Typography
+// //                   sx={{
+// //                     color: item.highlighted ? "#E24C00" : "#fff",
+// //                     fontWeight: item.highlighted ? "bold" : "normal",
+// //                     fontSize: "1.1rem",
+// //                     cursor: "pointer",
+// //                     transition: "color 0.2s",
+// //                     whiteSpace: "nowrap",
+// //                     "&:hover": {
+// //                       color: "#FF6600",
+// //                     },
+// //                   }}
+// //                 >
+// //                   {item.name}
+// //                 </Typography>
+// //               </Link>
+// //             ) : (
+// //               <Box
+// //                 key={idx}
+// //                 component="img"
+// //                 src={item.src}
+// //                 alt=""
+// //                 sx={{ width: 90, height: 90, borderRadius: 7 }}
+// //               />
+// //             )
+// //           )}
+// //         </Box>
+// //       ))}
+// //     </Box>
+// //   );
+// // }
 
-//     [
-//       { type: "image", src: "/Event Main Page/celebrate.jpg" },
-//       { type: "text", name: "Corporate Events", id: 7 },
-//       { type: "text", name: "Business Meeting", id: 8 },
-//       { type: "text", name: "Art Gallery", id: 9 },
-//       { type: "image", src: "/Event Main Page/gallery.jpg" },
-//     ],
-//   ];
-//    const router = useRouter();
-
-//   return (
-//     <Box sx={{ backgroundColor: "#000", py: 8, px: 2, textAlign: "center" }}>
-//       <Typography variant="h4" sx={{ color: "#ccc", fontWeight: "bold", mb: 2 }}>
-//         A space for every moment
-//       </Typography>
-//       <Typography variant="h6" sx={{ color: "#aaa", mb: 15 }}>
-//         Book a unique space for your activity
-//       </Typography>
-
-//       {pyramidRows.map((row, rowIndex) => (
-//         <Box
-//           key={rowIndex}
-//           sx={{
-//             display: "flex",
-//             justifyContent: "center",
-//             alignItems: "center",
-//             gap: 8,
-//             mb: 4,
-//             flexWrap: "wrap",
-//           }}
-//         >
-//           {row.map((item, idx) =>
-//             item.type === "text" ? (
-//               <Link key={idx} href={`/events/${item.id}`} passHref>
-//                 <Typography
-//                   sx={{
-//                     color: item.highlighted ? "#E24C00" : "#fff",
-//                     fontWeight: item.highlighted ? "bold" : "normal",
-//                     fontSize: "1.1rem",
-//                     cursor: "pointer",
-//                     transition: "color 0.2s",
-//                     whiteSpace: "nowrap",
-//                     "&:hover": {
-//                       color: "#FF6600",
-//                     },
-//                   }}
-//                 >
-//                   {item.name}
-//                 </Typography>
-//               </Link>
-//             ) : (
-//               <Box
-//                 key={idx}
-//                 component="img"
-//                 src={item.src}
-//                 alt=""
-//                 sx={{ width: 90, height: 90, borderRadius: 7 }}
-//               />
-//             )
-//           )}
-//         </Box>
-//       ))}
-//     </Box>
-//   );
-// }
 
 "use client";
 import { useEffect, useState } from "react";
@@ -100,9 +98,10 @@ import {
   CardContent,
   Chip,
   IconButton,
-  Button,
 } from "@mui/material";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import Pagination from "@mui/material/Pagination";
+import Stack from "@mui/material/Stack";
 
 export default function EventPage() {
   const [events, setEvents] = useState([]);
@@ -139,7 +138,7 @@ export default function EventPage() {
         boxShadow: "0 2px 8px rgba(234, 226, 226, 0.3)",
         borderRadius: "16px",
         border: "3px solid transparent",
-           borderColor: "white",
+        borderColor: "white",
         transition: "all 0.5s ease",
         "&:hover": {
           transform: "translateY(-5px)",
@@ -161,7 +160,6 @@ export default function EventPage() {
           height: "100%",
         }}
       >
-        {/* Image with fixed height */}
         <Box sx={{ height: 235, overflow: "hidden" }}>
           <CardMedia
             component="img"
@@ -175,7 +173,6 @@ export default function EventPage() {
           />
         </Box>
 
-        {/* Content */}
         <CardContent
           sx={{
             flex: 1,
@@ -275,22 +272,16 @@ export default function EventPage() {
       </Box>
 
       {/* Pagination */}
-      <Box sx={{ display: "flex", justifyContent: "center", gap: 2, mt: 8 }}>
-        <Button
-          variant="outlined"
-          disabled={currentPage === 1}
-          onClick={() => setCurrentPage((prev) => prev - 1)}
-        >
-          Previous
-        </Button>
-        <Typography sx={{ color: "#fff", mt: 1 }}>{`Page ${currentPage}`}</Typography>
-        <Button
-          variant="outlined"
-          disabled={currentPage === pageCount}
-          onClick={() => setCurrentPage((prev) => prev + 1)}
-        >
-          Next
-        </Button>
+      <Box sx={{ display: "flex", justifyContent: "center", mt: 8 }}>
+        <Stack spacing={2}>
+          <Pagination
+            count={pageCount}
+            page={currentPage}
+            onChange={(event, value) => setCurrentPage(value)}
+            variant="outlined"
+            color="primary"
+          />
+        </Stack>
       </Box>
     </Box>
   );

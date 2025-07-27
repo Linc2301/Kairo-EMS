@@ -377,7 +377,7 @@ export default function Navbar() {
             <>
            
               {/* Notification Icon */}
-              <Link href="/notification">
+             <Link href="/profile?section=Notification">
                 <IconButton color="inherit" sx={{ ml: 2 }}>
                   <Badge badgeContent={notificationCount} color="error">
                     <NotificationsNoneIcon />

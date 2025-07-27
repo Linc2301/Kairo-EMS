@@ -1149,6 +1149,8 @@ import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import Loading from "@/src/components/Loading";
+import { useSearchParams } from "next/navigation";
+
 
 const menuItems = ["Profile", "Notification", "History", "Log Out"];
 
@@ -1168,6 +1170,14 @@ const formatTime = (timeString) => {
 export default function ProfileSettingsPage() {
   const { data: session } = useSession();
   const router = useRouter();
+  const searchParams = useSearchParams();
+useEffect(() => {
+  const section = searchParams.get("section");
+  if (section) {
+    setSelectedSection(section);
+  }
+}, [searchParams]);
+
 
   const [editMode, setEditMode] = useState(false);
   const [selectedSection, setSelectedSection] = useState("Profile");
