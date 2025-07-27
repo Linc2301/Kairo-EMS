@@ -592,6 +592,530 @@
 // }
 
 "use client";
+// import {
+//   Avatar,
+//   Box,
+//   Button,
+//   Container,
+//   Card,
+//   Grid,
+//   IconButton,
+//   TextField,
+//   Typography,
+//   ListItem,
+//   Paper,
+//   List,
+//   ListItemText,
+//   Divider,
+// } from "@mui/material";
+
+
+// import EditIcon from "@mui/icons-material/Edit";
+// import SaveIcon from "@mui/icons-material/Save";
+// import CancelIcon from "@mui/icons-material/Close";
+// import UploadIcon from "@mui/icons-material/Upload";
+
+// import { useSession } from "next-auth/react";
+// import { useEffect, useState } from "react";
+// import { useRouter } from "next/navigation";
+// import axios from "axios";
+
+// import Dialog from "@mui/material/Dialog";
+// import DialogTitle from "@mui/material/DialogTitle";
+// import DialogContent from "@mui/material/DialogContent";
+// import DialogActions from "@mui/material/DialogActions";
+// import Loading from "@/src/components/Loading";
+
+// const menuItems = ["Profile", "Notification", "History", "Log Out"];
+
+// const mockBookingIds = [1, 2, 3]; // booking IDs you want to show
+
+
+
+// export default function ProfileSettingsPage() {
+//   const { data: session } = useSession();
+//   const router = useRouter();
+
+//   const [editMode, setEditMode] = useState(false);
+//   const [selectedSection, setSelectedSection] = useState("Profile");
+//   const [profile, setProfile] = useState(null);
+//   const [notifications, setNotifications] = useState([]);
+
+//   const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
+
+
+
+//   const [bookingHistory, setBookingHistory] = useState([]);
+//   const [loading, setLoading] = useState({
+//     // ...other loading states
+//     history: false
+//   });
+
+//   // Fetch booking history
+//   useEffect(() => {
+//     if (selectedSection === "History" && session?.user?.id) {
+//       const fetchBookingHistory = async () => {
+//         try {
+//           setLoading(prev => ({ ...prev, history: true }));
+//           const res = await fetch(`/api/booking-info?userId=${session.user.id}`);
+
+//           if (!res.ok) throw new Error('Failed to fetch booking history');
+
+//           const data = await res.json();
+
+//           // Filter bookings for the current user only
+//           const userBookings = data.filter(
+//             booking => booking.user_id === session.user.id
+//           );
+
+//           setBookingHistory(userBookings);
+//         } catch (error) {
+//           console.error('Error fetching booking history:', error);
+//           setError('Failed to load booking history');
+//         } finally {
+//           setLoading(prev => ({ ...prev, history: false }));
+//         }
+//       };
+
+//       fetchBookingHistory();
+//     }
+//   }, [selectedSection, session?.user?.id]);
+
+
+//   const handleLogout = () => {
+//     // Clear auth info – depends on how you're storing it
+//     localStorage.removeItem("token"); // Example if you're storing a token
+//     sessionStorage.clear(); // optional
+//     router.push("/login"); // Redirect to login page
+//   };
+
+//   const [formData, setFormData] = useState({
+//     name: "",
+//     email: "",
+//     phone: "",
+//     photoFile: null,
+//     password: "",
+//   });
+
+//   const mockNotifications = [
+//     {
+//       id: 1,
+//       title: "New Event Added",
+//       message: "Check out the new event “Summer Gala” happening next week!",
+//       time: "2 hours ago",
+//     },
+//     {
+//       id: 2,
+//       title: "Booking Confirmed",
+//       message: "Your booking for Floral Design has been confirmed.",
+//       time: "Yesterday",
+//     },
+//     {
+//       id: 3,
+//       title: "Profile Updated",
+//       message: "You successfully updated your profile information.",
+//       time: "2 days ago",
+//     },
+//   ];
+
+//   // Protect route
+//   useEffect(() => {
+//     if (!session) {
+//       router.push("/login");
+//     }
+//   }, [session, router]);
+
+//   // Fetch profile
+//   useEffect(() => {
+//     const fetchProfile = async () => {
+//       if (!session?.user?.id) return;
+
+//       try {
+//         const res = await axios.get(`/api/users/${session.user.id}`);
+//         setProfile(res.data);
+//         setFormData({
+//           name: res.data.name || "",
+//           email: res.data.email || "",
+//           phone: res.data.phone || "",
+//           photoFile: null,
+//           password: "",
+//         });
+//       } catch (err) {
+//         console.error("Failed to load profile:", err);
+//       }
+//     };
+
+//     fetchProfile();
+//   }, [session?.user?.id]);
+
+//   useEffect(() => {
+//     const fetchBookings = async () => {
+//       try {
+//         const results = await Promise.all(
+//           mockBookingIds.map(async (id) => {
+//             const res = await axios.get(`/api/booking-info/${id}`);
+//             return res.data;
+//           })
+//         );
+//         setBookingHistory(results);
+//       } catch (error) {
+//         console.error("Failed to fetch bookings:", error);
+//       }
+//     };
+
+//     fetchBookings();
+//   }, []);
+
+
+
+
+
+//   const handleChange = (field) => (e) => {
+//     setFormData({ ...formData, [field]: e.target.value });
+//   };
+
+//   const handlePhotoChange = (e) => {
+//     if (e.target.files.length > 0) {
+//       setFormData({ ...formData, photoFile: e.target.files[0] });
+//     }
+//   };
+
+//   const handleSave = async () => {
+//     try {
+//       const data = new FormData();
+//       data.append("name", formData.name);
+//       data.append("phone", formData.phone);
+//       if (formData.password.trim()) {
+//         data.append("password", formData.password);
+//       }
+//       if (formData.photoFile) {
+//         data.append("photo", formData.photoFile);
+//       }
+
+//       const res = await axios.put(`/api/users/${session.user.id}`, data, {
+//         headers: {
+//           "Content-Type": "multipart/form-data",
+//         },
+//       });
+
+//       const updatedUser = res.data.user;
+//       setProfile(updatedUser);
+
+//       session.user.photo = updatedUser.photo;
+//       session.user.image = updatedUser.photo;
+
+//       window.dispatchEvent(
+//         new CustomEvent("profilePhotoUpdated", {
+//           detail: updatedUser.photo,
+//         })
+//       );
+
+//       setEditMode(false);
+//       setFormData({
+//         name: updatedUser.name || "",
+//         email: updatedUser.email || "",
+//         phone: updatedUser.phone || "",
+//         photoFile: null,
+//         password: "",
+//       });
+//     } catch (error) {
+//       console.error("Failed to update profile:", error);
+//       alert(error?.response?.data?.message || "Something went wrong.");
+//     }
+//   };
+
+//   const handleCancel = () => {
+//     setFormData({
+//       name: profile.name,
+//       email: profile.email,
+//       phone: profile.phone,
+//       photoFile: null,
+//       password: "",
+//     });
+//     setEditMode(false);
+//   };
+
+//   if (!profile) {
+//     return <Loading open={true} />;
+//   }
+
+//   return (
+//     <Container maxWidth="lg" sx={{ mt: 5, mb: 20 }}>
+//       <Box sx={{ display: "flex", gap: 4 }}>
+//         {/* Sidebar Menu */}
+//         <Box sx={{
+//           width: 260, pr: 4, p: 2,
+//           border: "1px solid #ddd",
+//           borderRadius: 2,
+//           backgroundColor: "#f5f5f5",
+//         }}>
+//           {menuItems.map((item, index) => (
+//             <Typography
+//               key={index}
+//               onClick={() => setSelectedSection(item)}
+//               sx={{
+//                 p: 1.5,
+//                 borderRadius: 1,
+//                 fontWeight: selectedSection === item ? "bold" : "normal",
+//                 bgcolor: selectedSection === item ? "#d1d5db" : "transparent",
+//                 cursor: "pointer",
+//                 "&:hover": { bgcolor: "#e5e7eb" },
+//               }}
+//             >
+//               {item}
+//             </Typography>
+//           ))}
+//         </Box>
+
+//         {/* Main Content */}
+//         <Box sx={{
+//           flex: 1,
+//           p: 2,
+//           border: "1px solid #ddd",
+//           borderRadius: 2,
+//           backgroundColor: "#fff",
+//         }}>
+//           {/* === Profile Section === */}
+//           {selectedSection === "Profile" && (
+//             <Card sx={{ p: 5, borderRadius: 4 }}>
+//               <Typography variant="h6" sx={{ mb: 3 }}>
+//                 {editMode ? "Edit Profile" : "Profile"}
+//               </Typography>
+//               <Grid container spacing={4} alignItems="center" minHeight={300}>
+//                 <Grid item xs={12} md={4} textAlign="center">
+//                   <Avatar
+//                     alt="User"
+//                     src={
+//                       editMode
+//                         ? formData.photoFile
+//                           ? URL.createObjectURL(formData.photoFile)
+//                           : profile.photo || "https://i.pravatar.cc/150?img=3"
+//                         : profile.photo || "https://i.pravatar.cc/150?img=3"
+//                     }
+//                     sx={{ width: 130, height: 130, mx: "auto", mb: 2 }}
+//                   />
+//                   {editMode && (
+//                     <IconButton component="label" color="primary">
+//                       <UploadIcon />
+//                       <input
+//                         type="file"
+//                         accept="image/*"
+//                         hidden
+//                         onChange={handlePhotoChange}
+//                       />
+//                     </IconButton>
+//                   )}
+//                 </Grid>
+
+//                 <Grid item xs={12} md={8}>
+//                   {editMode ? (
+//                     <>
+//                       <TextField
+//                         fullWidth
+//                         label="Name"
+//                         value={formData.name}
+//                         onChange={handleChange("name")}
+//                         margin="normal"
+//                       />
+//                       <TextField
+//                         fullWidth
+//                         label="Email"
+//                         value={formData.email}
+//                         margin="normal"
+//                         disabled
+//                       />
+//                       <TextField
+//                         fullWidth
+//                         label="Phone Number"
+//                         value={formData.phone}
+//                         onChange={handleChange("phone")}
+//                         margin="normal"
+//                       />
+//                       <TextField
+//                         fullWidth
+//                         label="New Password"
+//                         type="password"
+//                         value={formData.password}
+//                         onChange={handleChange("password")}
+//                         margin="normal"
+//                         helperText="Leave blank to keep current password"
+//                       />
+//                       <Box mt={3} display="flex" gap={2}>
+//                         <Button
+//                           variant="contained"
+//                           color="primary"
+//                           startIcon={<SaveIcon />}
+//                           onClick={handleSave}
+//                         >
+//                           Save
+//                         </Button>
+//                         <Button
+//                           variant="outlined"
+//                           color="secondary"
+//                           startIcon={<CancelIcon />}
+//                           onClick={handleCancel}
+//                         >
+//                           Cancel
+//                         </Button>
+//                       </Box>
+//                     </>
+//                   ) : (
+//                     <Box display="flex" flexDirection="column" gap={2} mt={2}>
+//                       <Typography>
+//                         <strong>Name:</strong> {profile.name}
+//                       </Typography>
+//                       <Typography>
+//                         <strong>Email:</strong> {profile.email}
+//                       </Typography>
+//                       <Typography>
+//                         <strong>Phone Number:</strong> {profile.phone}
+//                       </Typography>
+//                       <Box mt={4}>
+//                         <Button
+//                           variant="outlined"
+//                           startIcon={<EditIcon />}
+//                           onClick={() => setEditMode(true)}
+//                         >
+//                           Edit Profile
+//                         </Button>
+//                       </Box>
+//                     </Box>
+//                   )}
+//                 </Grid>
+//               </Grid>
+//             </Card>
+//           )}
+
+//           {/* === Notifications Section ===        
+//           ))} */}
+
+//           {/* === Photo (Optional Stub) === */}
+//           {selectedSection === "Notification" && (
+//             <Paper elevation={3} sx={{ mt: 2 }}>
+//               <List>
+//                 {mockNotifications.map((n, index) => (
+//                   <Box key={n.id}>
+//                     <ListItem alignItems="flex-start">
+//                       <ListItemText
+//                         primary={n.title}
+//                         secondary={
+//                           <>
+//                             <Typography
+//                               component="span"
+//                               variant="body2"
+//                               color="text.primary"
+//                             >
+//                               {n.message}
+//                             </Typography>
+//                             <Typography
+//                               variant="caption"
+//                               display="block"
+//                               color="text.secondary"
+//                             >
+//                               {n.time}
+//                             </Typography>
+//                           </>
+//                         }
+//                       />
+//                     </ListItem>
+//                     {index < mockNotifications.length - 1 && <Divider />}
+//                   </Box>
+//                 ))}
+//               </List>
+//             </Paper>
+//           )}
+
+
+
+//           {selectedSection === "History" && (
+//             <Box>
+//               <Typography variant="h6" gutterBottom>
+//                 Your Booking History
+//               </Typography>
+
+//               {loading.history ? (
+//                 <Box display="flex" justifyContent="center" py={3}>
+//                   <CircularProgress />
+//                 </Box>
+//               ) : bookingHistory.length > 0 ? (
+//                 bookingHistory.map((booking) => (
+//                   <Box
+//                     key={booking.id}
+//                     sx={{
+//                       p: 2,
+//                       mb: 2,
+//                       border: "1px solid #ccc",
+//                       borderRadius: 2,
+//                       backgroundColor: "#f9f9f9",
+//                     }}
+//                   >
+//                     <Typography variant="subtitle1" fontWeight="bold">
+//                       Venue: {booking.VenueType?.name || "Unknown"}
+//                     </Typography>
+//                     <Typography variant="body2">
+//                       Location: {booking.venue?.name || "Unknown venue"}
+//                     </Typography>
+//                     <Typography variant="body2">
+//                       Date: {new Date(booking.booking_date).toLocaleDateString()}
+//                     </Typography>
+//                     <Typography variant="body2">
+//                       Time: {booking.TimePackage ?
+//                         `${formatTime(booking.TimePackage.startTime)} - ${formatTime(booking.TimePackage.endTime)}` :
+//                         "N/A"}
+//                     </Typography>
+//                     <Typography variant="body2">
+//                       Floral Service: {booking.floralService?.name || "None selected"}
+//                     </Typography>
+//                     <Typography variant="body2" fontWeight="bold">
+//                       Total: {booking.total_amount?.toLocaleString()} MMK
+//                     </Typography>
+//                     <Typography variant="caption" color="text.secondary">
+//                       Booked on: {new Date(booking.createdAt).toLocaleDateString()}
+//                     </Typography>
+//                     <Typography variant="caption" display="block" color="text.secondary">
+//                       Status: {booking.status || "Confirmed"}
+//                     </Typography>
+//                   </Box>
+//                 ))
+//               ) : (
+//                 <Typography color="text.secondary">No booking history found.</Typography>
+//               )}
+//             </Box>
+//           )}
+
+//           {selectedSection === "Log Out" && (
+//             <>
+//               <Dialog open={true}>
+//                 <DialogTitle>Confirm Logout</DialogTitle>
+//                 <DialogContent>
+//                   <Typography>Are you sure you want to log out?</Typography>
+//                 </DialogContent>
+//                 <DialogActions>
+//                   <Button
+//                     onClick={() => setSelectedSection("Profile")}
+//                     color="inherit"
+//                   >
+//                     Cancel
+//                   </Button>
+//                   <Button
+//                     onClick={handleLogout}
+//                     color="error"
+//                     variant="contained"
+//                   >
+//                     Confirm
+//                   </Button>
+//                 </DialogActions>
+//               </Dialog>
+//             </>
+//           )}
+//         </Box>
+//       </Box>
+//     </Container>
+//   );
+// }
+
+
+"use client";
 import {
   Avatar,
   Box,
@@ -607,6 +1131,7 @@ import {
   List,
   ListItemText,
   Divider,
+  CircularProgress, // Added missing import
 } from "@mui/material";
 
 import EditIcon from "@mui/icons-material/Edit";
@@ -629,7 +1154,16 @@ const menuItems = ["Profile", "Notification", "History", "Log Out"];
 
 const mockBookingIds = [1, 2, 3]; // booking IDs you want to show
 
-
+// Add formatTime function at the top level
+const formatTime = (timeString) => {
+  if (!timeString) return "N/A";
+  const date = new Date(timeString);
+  return isNaN(date) ? "Invalid time" : date.toLocaleTimeString([], {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true,
+  });
+};
 
 export default function ProfileSettingsPage() {
   const { data: session } = useSession();
@@ -639,17 +1173,60 @@ export default function ProfileSettingsPage() {
   const [selectedSection, setSelectedSection] = useState("Profile");
   const [profile, setProfile] = useState(null);
   const [notifications, setNotifications] = useState([]);
-
+  const [error, setError] = useState(null); // Added missing error state
+  const [successMessage, setSuccessMessage] = useState(null); // Added missing success state
   const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
-
   const [bookingHistory, setBookingHistory] = useState([]);
+
+  const [loading, setLoading] = useState({
+    profile: false,
+    history: false,
+    notifications: false,
+  });
+
+  useEffect(() => {
+    const fetchBookingHistory = async () => {
+      if (selectedSection !== "History" || !session?.user?.id) return;
+
+      try {
+        setLoading(prev => ({ ...prev, history: true }));
+        setError(null);
+
+        const userId = session.user.id;
+        const response = await fetch(`/api/booking-info?userId=${userId}`);
+
+        if (!response.ok) {
+          // Try to parse error JSON, but fallback to status text if JSON is invalid
+          let errorData = {};
+          try {
+            errorData = await response.json();
+          } catch (jsonErr) {
+            console.warn("Failed to parse error JSON:", jsonErr);
+          }
+          throw new Error(errorData?.error || response.statusText || 'Unknown error occurred');
+        }
+
+        const data = await response.json();
+        setBookingHistory(data);
+      } catch (error) {
+        console.error("Booking history fetch error:", error);
+        setError(error.message || 'Failed to fetch booking history');
+      } finally {
+        setLoading(prev => ({ ...prev, history: false }));
+      }
+    };
+
+
+    fetchBookingHistory();
+  }, [selectedSection, session?.user?.id]);
+
 
 
   const handleLogout = () => {
-    // Clear auth info – depends on how you're storing it
-    localStorage.removeItem("token"); // Example if you're storing a token
-    sessionStorage.clear(); // optional
-    router.push("/login"); // Redirect to login page
+    // Clear auth info
+    localStorage.removeItem("token");
+    sessionStorage.clear();
+    router.push("/login");
   };
 
   const [formData, setFormData] = useState({
@@ -664,7 +1241,7 @@ export default function ProfileSettingsPage() {
     {
       id: 1,
       title: "New Event Added",
-      message: "Check out the new event “Summer Gala” happening next week!",
+      message: "Check out the new event 'Summer Gala' happening next week!",
       time: "2 hours ago",
     },
     {
@@ -694,6 +1271,7 @@ export default function ProfileSettingsPage() {
       if (!session?.user?.id) return;
 
       try {
+        setLoading(prev => ({ ...prev, profile: true }));
         const res = await axios.get(`/api/users/${session.user.id}`);
         setProfile(res.data);
         setFormData({
@@ -705,50 +1283,15 @@ export default function ProfileSettingsPage() {
         });
       } catch (err) {
         console.error("Failed to load profile:", err);
+        setError("Failed to load profile");
+      } finally {
+        setLoading(prev => ({ ...prev, profile: false }));
       }
     };
 
     fetchProfile();
   }, [session?.user?.id]);
 
-useEffect(() => {
-  const fetchBookings = async () => {
-    try {
-      const results = await Promise.all(
-        mockBookingIds.map(async (id) => {
-          const res = await axios.get(`/api/booking-info/${id}`);
-          return res.data;
-        })
-      );
-      setBookingHistory(results);
-    } catch (error) {
-      console.error("Failed to fetch bookings:", error);
-    }
-  };
-
-  fetchBookings();
-}, []);
-
-
-
-  // Poll for notifications
-  // useEffect(() => {
-  //   const fetchNotifications = async () => {
-  //     if (!session?.user?.id) return;
-
-  //     try {
-  //       const res = await axios.get(`/api/notifications/${session.user.id}`);
-  //       console.log("Notifications fetched:", res.data); // <- Add this
-  //       setNotifications(res.data);
-  //     } catch (err) {
-  //       console.error("Failed to fetch notifications:", err);
-  //     }
-  //   };
-
-  //   fetchNotifications();
-  //   const interval = setInterval(fetchNotifications, 1000);
-  //   return () => clearInterval(interval);
-  // }, [session?.user?.id]);
 
   const handleChange = (field) => (e) => {
     setFormData({ ...formData, [field]: e.target.value });
@@ -762,6 +1305,7 @@ useEffect(() => {
 
   const handleSave = async () => {
     try {
+      setLoading(prev => ({ ...prev, profile: true }));
       const data = new FormData();
       data.append("name", formData.name);
       data.append("phone", formData.phone);
@@ -798,9 +1342,12 @@ useEffect(() => {
         photoFile: null,
         password: "",
       });
+      setSuccessMessage("Profile updated successfully");
     } catch (error) {
       console.error("Failed to update profile:", error);
-      alert(error?.response?.data?.message || "Something went wrong.");
+      setError(error?.response?.data?.message || "Something went wrong.");
+    } finally {
+      setLoading(prev => ({ ...prev, profile: false }));
     }
   };
 
@@ -816,17 +1363,19 @@ useEffect(() => {
   };
 
   if (!profile) {
-    return <Loading open={true}/>;
+    return <Loading open={true} />;
   }
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 5, mb: 20}}>
+    <Container maxWidth="lg" sx={{ mt: 5, mb: 20 }}>
       <Box sx={{ display: "flex", gap: 4 }}>
         {/* Sidebar Menu */}
-        <Box sx={{ width: 260, pr: 4 ,p: 2,
-      border: "1px solid #ddd",
-      borderRadius: 2,
-      backgroundColor: "#f5f5f5",}}>
+        <Box sx={{
+          width: 260, pr: 4, p: 2,
+          border: "1px solid #ddd",
+          borderRadius: 2,
+          backgroundColor: "#f5f5f5",
+        }}>
           {menuItems.map((item, index) => (
             <Typography
               key={index}
@@ -846,13 +1395,26 @@ useEffect(() => {
         </Box>
 
         {/* Main Content */}
-        <Box sx={{ flex: 1,
-           p: 2,
-      border: "1px solid #ddd",
-      borderRadius: 2,
-      backgroundColor: "#fff",
-         }}>
-          {/* === Profile Section === */}
+        <Box sx={{
+          flex: 1,
+          p: 2,
+          border: "1px solid #ddd",
+          borderRadius: 2,
+          backgroundColor: "#fff",
+        }}>
+          {/* Error and Success Messages */}
+          {error && (
+            <Typography color="error" sx={{ mb: 2 }}>
+              {error}
+            </Typography>
+          )}
+          {successMessage && (
+            <Typography color="success.main" sx={{ mb: 2 }}>
+              {successMessage}
+            </Typography>
+          )}
+
+          {/* Profile Section */}
           {selectedSection === "Profile" && (
             <Card sx={{ p: 5, borderRadius: 4 }}>
               <Typography variant="h6" sx={{ mb: 3 }}>
@@ -923,14 +1485,16 @@ useEffect(() => {
                           color="primary"
                           startIcon={<SaveIcon />}
                           onClick={handleSave}
+                          disabled={loading.profile}
                         >
-                          Save
+                          {loading.profile ? <CircularProgress size={24} /> : "Save"}
                         </Button>
                         <Button
                           variant="outlined"
                           color="secondary"
                           startIcon={<CancelIcon />}
                           onClick={handleCancel}
+                          disabled={loading.profile}
                         >
                           Cancel
                         </Button>
@@ -963,15 +1527,7 @@ useEffect(() => {
             </Card>
           )}
 
-          {/* === Notifications Section ===
-          {notifications.map((notif, idx) => (
-            <div key={idx}>
-              <p>{notif.message}</p>
-              <small>{new Date(notif.createdAt).toLocaleString()}</small>
-            </div>
-          ))} */}
-
-          {/* === Photo (Optional Stub) === */}
+          {/* Notifications Section */}
           {selectedSection === "Notification" && (
             <Paper elevation={3} sx={{ mt: 2 }}>
               <List>
@@ -1007,97 +1563,81 @@ useEffect(() => {
             </Paper>
           )}
 
-          {/* {selectedSection === "History" && (
+          {/* History Section */}
+          {selectedSection === "History" && (
             <Box>
               <Typography variant="h6" gutterBottom>
-                Your Activity History
+                Your Booking History
               </Typography>
 
-              {mockHistory.length > 0 ? (
-                mockHistory.map((item) => (
+              {loading.history ? (
+                <Box display="flex" justifyContent="center" py={3}>
+                  <CircularProgress />
+                </Box>
+              ) : bookingHistory.length > 0 ? (
+                bookingHistory.map((booking) => (
                   <Box
-                    key={item.id}
+                    key={booking.id}
                     sx={{
                       p: 2,
-                      mb: 1,
+                      mb: 2,
                       border: "1px solid #ccc",
                       borderRadius: 2,
-                      backgroundColor: "#fafafa",
+                      backgroundColor: "#f9f9f9",
                     }}
                   >
-                    <Typography variant="body1">{item.action}</Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {item.date}
+                    <Typography variant="subtitle1" fontWeight="bold">
+                      Venue: {booking.VenueType?.name || "Unknown"}
                     </Typography>
+                    <Typography variant="body2">
+                      Location: {booking.venue?.name || "Unknown venue"}
+                    </Typography>
+                    <Typography variant="body2">
+                      Date: {new Date(booking.booking_date).toLocaleDateString()}
+                    </Typography>
+                    <Typography variant="body2">
+                      Time: {booking.TimePackage ?
+                        `${formatTime(booking.TimePackage.startTime)} - ${formatTime(booking.TimePackage.endTime)}` :
+                        "N/A"}
+                    </Typography>
+                    <Typography variant="body2">
+                      Floral Service: {booking.floralService?.name || "None selected"}
+                    </Typography>
+                    <Typography variant="body2" fontWeight="bold">
+                      Total: {booking.total_amount?.toLocaleString()} MMK
+                    </Typography>
+
                   </Box>
                 ))
               ) : (
-                <Typography color="text.secondary">No history yet.</Typography>
+                <Typography color="text.secondary">No booking history found.</Typography>
               )}
             </Box>
-          )} */}
-{selectedSection === "History" && (
-  <Box>
-    <Typography variant="h6" gutterBottom>
-      Your Booking History
-    </Typography>
+          )}
 
-    {bookingHistory.length > 0 ? (
-      bookingHistory.map((booking) => (
-        <Box
-          key={booking.id}
-          sx={{
-            p: 2,
-            mb: 2,
-            border: "1px solid #ccc",
-            borderRadius: 2,
-            backgroundColor: "#f9f9f9",
-          }}
-        >
-          <Typography variant="subtitle1" fontWeight="bold">
-            Venue: {booking.venue?.name || "Unknown"}
-          </Typography>
-          <Typography variant="body2">
-            Floral Service: {booking.floralService?.name || "None"}
-          </Typography>
-          <Typography variant="body2">
-            Time Package: {booking.TimePackage?.label || "N/A"}
-          </Typography>
-          <Typography variant="caption" color="text.secondary">
-            Booked on: {new Date(booking.createdAt).toLocaleDateString()}
-          </Typography>
-        </Box>
-      ))
-    ) : (
-      <Typography color="text.secondary">No booking history found.</Typography>
-    )}
-  </Box>
-)}
-
+          {/* Logout Section */}
           {selectedSection === "Log Out" && (
-            <>
-              <Dialog open={true}>
-                <DialogTitle>Confirm Logout</DialogTitle>
-                <DialogContent>
-                  <Typography>Are you sure you want to log out?</Typography>
-                </DialogContent>
-                <DialogActions>
-                  <Button
-                    onClick={() => setSelectedSection("Profile")}
-                    color="inherit"
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    onClick={handleLogout}
-                    color="error"
-                    variant="contained"
-                  >
-                    Confirm
-                  </Button>
-                </DialogActions>
-              </Dialog>
-            </>
+            <Dialog open={true}>
+              <DialogTitle>Confirm Logout</DialogTitle>
+              <DialogContent>
+                <Typography>Are you sure you want to log out?</Typography>
+              </DialogContent>
+              <DialogActions>
+                <Button
+                  onClick={() => setSelectedSection("Profile")}
+                  color="inherit"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleLogout}
+                  color="error"
+                  variant="contained"
+                >
+                  Confirm
+                </Button>
+              </DialogActions>
+            </Dialog>
           )}
         </Box>
       </Box>

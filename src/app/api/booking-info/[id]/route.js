@@ -1,4 +1,3 @@
-// api/booking-info/[id]/route.js
 import { NextResponse } from 'next/server'
 import { prisma } from "@/src/lib/prisma";
 
@@ -6,6 +5,10 @@ export async function GET(_, { params }) {
     const { id } = params;
 
     try {
+        if (isNaN(Number(id))) {
+            return NextResponse.json({ error: 'Invalid booking ID' }, { status: 400 });
+        }
+
         const booking = await prisma.booking.findUnique({
             where: { id: Number(id) },
             include: {
@@ -13,7 +16,13 @@ export async function GET(_, { params }) {
                 VenueType: true,
                 floralService: true,
                 TimePackage: true,
-                user: true,
+                user: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true
+                    }
+                },
             },
         });
 
@@ -23,25 +32,34 @@ export async function GET(_, { params }) {
 
         return NextResponse.json(booking);
     } catch (error) {
-        return NextResponse.json({ error: 'Failed to fetch booking' }, { status: 500 });
+        return NextResponse.json(
+            { error: 'Failed to fetch booking', details: error.message },
+            { status: 500 }
+        );
     }
 }
 
 export async function DELETE(_, { params }) {
-    const { id } = params;
-
     try {
-        const deleted = await prisma.booking.delete({
-            where: { id: Number(id) },
-        });
+        const bookingId = Number(params.id);
 
-        return NextResponse.json({ message: 'Booking deleted successfully', deleted });
-    } catch (error) {
-        if (error.code === 'P2025') {
-            // Prisma error: Record not found
-            return NextResponse.json({ error: 'Booking not found' }, { status: 404 });
+        if (isNaN(bookingId)) {
+            return NextResponse.json({ error: 'Invalid booking ID' }, { status: 400 });
         }
 
-        return NextResponse.json({ error: 'Failed to delete booking' }, { status: 500 });
+        await prisma.booking.delete({
+            where: { id: bookingId },
+        });
+
+        return NextResponse.json(
+            { message: 'Booking deleted successfully' },
+            { status: 200 }
+        );
+    } catch (error) {
+        console.error('Failed to delete booking:', error);
+        return NextResponse.json(
+            { error: 'Failed to delete booking', details: error.message },
+            { status: 500 }
+        );
     }
 }

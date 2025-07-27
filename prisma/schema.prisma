@@ -103,6 +103,8 @@ model Booking {
 
   booking_date DateTime
   total_amount Int
+
+  createdAt DateTime @default(now())
 }
 
 model Contact {
