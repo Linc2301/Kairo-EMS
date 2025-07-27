@@ -26,16 +26,9 @@ export default function RootLayout({ children }) {
         <CssBaseline />
         <SessionProvider>
           <Header />
-          <Box
-            component="main"
-            sx={{
-              flexGrow: 1,
-              bgcolor: '#fff',
-              height: '100%',
-            }}
-          >
+          
             {children}
-          </Box>
+
           <Footer />
         </SessionProvider>
       </body>

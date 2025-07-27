@@ -27,8 +27,6 @@ model Event {
   description String  @db.Text
   photo       String? @db.LongText
   Venue       Venue[]
-
-  TimePackage TimePackage[]
 }
 
 model Venue {
@@ -70,14 +68,18 @@ model FloralService {
 }
 
 model TimePackage {
-  id        Int       @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
+  date      DateTime
   startTime DateTime
   endTime   DateTime
   venue_id  Int
-  Venue     Venue     @relation(fields: [venue_id], references: [id])
-  Booking   Booking[]
-  Event     Event?    @relation(fields: [eventId], references: [id])
-  eventId   Int?
+  Venue     Venue    @relation(fields: [venue_id], references: [id])
+
+  booking Booking? // 1:1 relationship if slot can only have one booking
+
+  @@unique([date, startTime, venue_id])
+  @@index([date])
+  @@index([venue_id])
 }
 
 model Booking {
@@ -91,7 +93,7 @@ model Booking {
   floral_service_id Int
   floralService     FloralService @relation(fields: [floral_service_id], references: [id]) // ADD THIS
 
-  timePackageId Int
+  timePackageId Int         @unique //that is the process of one to one relation
   TimePackage   TimePackage @relation(fields: [timePackageId], references: [id])
 
   user_id Int

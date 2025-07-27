@@ -61,11 +61,14 @@ CREATE TABLE `FloralService` (
 -- CreateTable
 CREATE TABLE `TimePackage` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `date` DATETIME(3) NOT NULL,
     `startTime` DATETIME(3) NOT NULL,
     `endTime` DATETIME(3) NOT NULL,
     `venue_id` INTEGER NOT NULL,
-    `eventId` INTEGER NULL,
 
+    INDEX `TimePackage_date_idx`(`date`),
+    INDEX `TimePackage_venue_id_idx`(`venue_id`),
+    UNIQUE INDEX `TimePackage_date_startTime_venue_id_key`(`date`, `startTime`, `venue_id`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -80,6 +83,7 @@ CREATE TABLE `Booking` (
     `booking_date` DATETIME(3) NOT NULL,
     `total_amount` INTEGER NOT NULL,
 
+    UNIQUE INDEX `Booking_timePackageId_key`(`timePackageId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -126,9 +130,6 @@ ALTER TABLE `FloralService` ADD CONSTRAINT `FloralService_venue_id_fkey` FOREIGN
 
 -- AddForeignKey
 ALTER TABLE `TimePackage` ADD CONSTRAINT `TimePackage_venue_id_fkey` FOREIGN KEY (`venue_id`) REFERENCES `Venue`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `TimePackage` ADD CONSTRAINT `TimePackage_eventId_fkey` FOREIGN KEY (`eventId`) REFERENCES `Event`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Booking` ADD CONSTRAINT `Booking_venue_id_fkey` FOREIGN KEY (`venue_id`) REFERENCES `Venue`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
