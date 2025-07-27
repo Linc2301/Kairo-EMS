@@ -8,25 +8,27 @@ datasource db {
 }
 
 model User {
-  id       Int       @id @default(autoincrement())
-  name     String    @db.VarChar(255)
-  email    String?   @unique @db.VarChar(255)
-  phone    String    @db.VarChar(50)
-  password String    @db.VarChar(255)
-  photo    String?   @db.LongText
-  isAdmin  String    @default("user") @db.VarChar(50)
-  Booking  Booking[]
-  Review   Review[]
+  id        Int         @id @default(autoincrement())
+  name      String      @db.VarChar(255)
+  email     String?     @unique @db.VarChar(255)
+  phone     String      @db.VarChar(50)
+  password  String      @db.VarChar(255)
+  photo     String?     @db.LongText
+  isAdmin   String      @default("user") @db.VarChar(50)
+  Booking   Booking[]
+  Review    Review[]
+  Favourite Favourite[]
 
   @@map("user")
 }
 
 model Event {
-  id          Int     @id @default(autoincrement())
-  name        String  @db.VarChar(50)
-  description String  @db.Text
-  photo       String? @db.LongText
+  id          Int         @id @default(autoincrement())
+  name        String      @db.VarChar(50)
+  description String      @db.Text
+  photo       String?     @db.LongText
   Venue       Venue[]
+  Favourite   Favourite[]
 }
 
 model Venue {
@@ -130,6 +132,15 @@ model Description {
   id          Int     @id @default(autoincrement())
   photo       String? @db.LongText
   description String  @db.Text
+}
+
+model Favourite {
+  id      Int  @id @default(autoincrement())
+  user    User @relation(fields: [user_id], references: [id])
+  user_id Int
+
+  Event   Event? @relation(fields: [eventId], references: [id])
+  eventId Int?
 }
 
 // model Notification {
