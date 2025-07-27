@@ -1,597 +1,5 @@
-// 'use client';
-
-// import {
-//   Avatar,
-//   Box,
-//   Button,
-//   Card,
-//   Container,
-//   Grid,
-//   IconButton,
-//   TextField,
-//   Typography,
-// } from '@mui/material';
-// import EditIcon from '@mui/icons-material/Edit';
-// import SaveIcon from '@mui/icons-material/Save';
-// import CancelIcon from '@mui/icons-material/Close';
-// import UploadIcon from '@mui/icons-material/Upload';
-// import { useSession } from 'next-auth/react';
-// import { useEffect, useState } from 'react';
-// import { useRouter } from 'next/navigation';
-// import axios from 'axios';
-
-// export default function ProfilePage() {
-//   const { data: session } = useSession();
-//   const router = useRouter();
-
-//   const [editMode, setEditMode] = useState(false);
-//   const [profile, setProfile] = useState(null);
-//   const [formData, setFormData] = useState({
-//     name: '',
-//     email: '',
-//     phone: '',
-//     photoFile: null,
-//     password: '',
-//   });
-
-//   useEffect(() => {
-//     if (!session) {
-//       router.push('/login');
-//     }
-//   }, [session, router]);
-
-//   useEffect(() => {
-//     const fetchProfile = async () => {
-//       if (!session?.user?.id) return;
-
-//       try {
-//         const res = await axios.get(`/api/users/${session.user.id}`);
-//         setProfile(res.data);
-//         setFormData({
-//           name: res.data.name || '',
-//           email: res.data.email || '',
-//           phone: res.data.phone || '',
-//           photoFile: null,
-//           password: '',
-//         });
-//       } catch (err) {
-//         console.error('Failed to load profile:', err);
-//       }
-//     };
-
-//     fetchProfile();
-//   }, [session?.user?.id]);
-
-//   const handleChange = (field) => (e) => {
-//     setFormData({ ...formData, [field]: e.target.value });
-//   };
-
-//   const handlePhotoChange = (e) => {
-//     if (e.target.files.length > 0) {
-//       setFormData({ ...formData, photoFile: e.target.files[0] });
-//     }
-//   };
-
-//   const handleSave = async () => {
-//     try {
-//       const data = new FormData();
-//       data.append('name', formData.name);
-//       data.append('phone', formData.phone);
-//       if (formData.password.trim()) {
-//         data.append('password', formData.password);
-//       }
-//       if (formData.photoFile) {
-//         data.append('photo', formData.photoFile);
-//       }
-
-//       const res = await axios.put(`/api/users/${session.user.id}`, data, {
-//         headers: {
-//           'Content-Type': 'multipart/form-data',
-//         },
-//       });
-
-//       const updatedUser = res.data.user;
-//       setProfile(updatedUser);
-
-//       // ✅ Manually patch session user photo (temporary in memory)
-//       session.user.photo = updatedUser.photo;
-//       session.user.image = updatedUser.photo;
-
-//       // Trigger navbar update
-//       window.dispatchEvent(new CustomEvent('profilePhotoUpdated', {
-//         detail: updatedUser.photo
-//       }));
-
-//       setEditMode(false);
-//       setFormData({
-//         name: updatedUser.name || '',
-//         email: updatedUser.email || '',
-//         phone: updatedUser.phone || '',
-//         photoFile: null,
-//         password: '',
-//       });
-//     } catch (error) {
-//       console.error('❌ Failed to update profile:', error);
-//       alert(error?.response?.data?.message || 'Something went wrong.');
-//     }
-//   };
-
-//   const handleCancel = () => {
-//     setFormData({
-//       name: profile.name,
-//       email: profile.email,
-//       phone: profile.phone,
-//       photoFile: null,
-//       password: '',
-//     });
-//     setEditMode(false);
-//   };
-
-//   if (!profile) {
-//     return <Typography textAlign="center">Loading...</Typography>;
-//   }
-
-//   return (
-//     <Container maxWidth="md" sx={{ mt: 5, mb: 5, p: 8 }}>
-//       <Card sx={{ p: 5, borderRadius: 4 }}>
-//         <Typography variant="h6" sx={{ mb: 3 }}>
-//           {editMode ? 'Edit Profile' : 'Profile'}
-//         </Typography>
-
-//         <Grid container spacing={4} alignItems="center" minHeight={300}>
-//           <Grid item xs={12} md={4} textAlign="center">
-//             <Avatar
-//               alt="User"
-//               src={
-//                 editMode
-//                   ? formData.photoFile
-//                     ? URL.createObjectURL(formData.photoFile)
-//                     : profile.photo || 'https://i.pravatar.cc/150?img=3'
-//                   : profile.photo || 'https://i.pravatar.cc/150?img=3'
-//               }
-//               sx={{ width: 130, height: 130, mx: 'auto', mb: 2 }}
-//             />
-//             {editMode && (
-//               <IconButton component="label" color="primary">
-//                 <UploadIcon />
-//                 <input type="file" accept="image/*" hidden onChange={handlePhotoChange} />
-//               </IconButton>
-//             )}
-//           </Grid>
-
-//           <Grid item xs={12} md={8}>
-//             {editMode ? (
-//               <>
-//                 <TextField fullWidth label="Name" value={formData.name} onChange={handleChange('name')} margin="normal" />
-//                 <TextField fullWidth label="Email" value={formData.email} margin="normal" disabled />
-//                 <TextField fullWidth label="Phone Number" value={formData.phone} onChange={handleChange('phone')} margin="normal" />
-//                 <TextField fullWidth label="New Password" type="password" value={formData.password} onChange={handleChange('password')} margin="normal" helperText="Leave blank to keep current password" />
-
-//                 <Box mt={3} display="flex" gap={2}>
-//                   <Button variant="contained" color="primary" startIcon={<SaveIcon />} onClick={handleSave}>
-//                     Save
-//                   </Button>
-//                   <Button variant="outlined" color="secondary" startIcon={<CancelIcon />} onClick={handleCancel}>
-//                     Cancel
-//                   </Button>
-//                 </Box>
-//               </>
-//             ) : (
-//               <Box display="flex" flexDirection="column" gap={2} mt={2}>
-//                 <Typography>
-//                   <strong>Name:</strong> {profile.name}
-//                 </Typography>
-//                 <Typography>
-//                   <strong>Email:</strong> {profile.email}
-//                 </Typography>
-//                 <Typography>
-//                   <strong>Phone Number:</strong> {profile.phone}
-//                 </Typography>
-
-//                 <Box mt={4}>
-//                   <Button variant="outlined" startIcon={<EditIcon />} onClick={() => setEditMode(true)}>
-//                     Edit Profile
-//                   </Button>
-//                 </Box>
-//               </Box>
-//             )}
-//           </Grid>
-//         </Grid>
-//       </Card>
-//     </Container>
-//   );
-// }
-
-// 'use client';
-
-// import {
-//   Avatar,
-//   Box,
-//   Button,
-//   Container,
-//   IconButton,
-//   Typography,
-// } from '@mui/material';
-// import EditIcon from '@mui/icons-material/Edit';
-// import { useState } from 'react';
-
-// export default function FacebookStyleProfile() {
-//   const [coverPhoto, setCoverPhoto] = useState('/card1.jpg');
-//   const [profilePhoto, setProfilePhoto] = useState('/login.jpg');
-
-//   return (
-//     <Box sx={{ bgcolor: '#18191a', color: 'white', pb: 5 }}>
-//       <Box sx={{ position: 'relative', width: '100%', height: 320 }}>
-//         {/* Cover Photo */}
-//         <Box
-//           sx={{
-//             width: '100%',
-//             height: '100%',
-//             backgroundImage: `url(${coverPhoto})`,
-//             backgroundSize: 'cover',
-//             backgroundPosition: 'center',
-//           }}
-//         />
-
-//         {/* Edit Cover Button */}
-//         <Button
-//           variant="contained"
-//           size="small"
-//           sx={{
-//             position: 'absolute',
-//             bottom: 16,
-//             right: 16,
-//             bgcolor: '#3a3b3c',
-//             color: 'white',
-//             textTransform: 'none',
-//             ':hover': { bgcolor: '#4e4f50' },
-//           }}
-//           startIcon={<EditIcon />}
-//         >
-//           Edit cover photo
-//         </Button>
-
-//         {/* Profile Photo */}
-//         <Avatar
-//           src={profilePhoto}
-//           sx={{
-//             position: 'absolute',
-//             bottom: -50,
-//             left: 32,
-//             width: 120,
-//             height: 120,
-//             border: '4px solid #18191a',
-//           }}
-//         />
-//       </Box>
-
-//       {/* Info & Buttons */}
-//       <Container maxWidth="lg">
-//         <Box
-//           sx={{
-//             mt: 6,
-//             display: 'flex',
-//             alignItems: 'center',
-//             justifyContent: 'space-between',
-//             flexWrap: 'wrap',
-//           }}
-//         >
-//           <Box sx={{ ml: 1 }}>
-//             <Typography variant="h5" fontWeight="bold">
-//               Ye Htut Naung
-//             </Typography>
-
-//           </Box>
-
-//           <Box
-//             sx={{
-//               display: 'flex',
-//               gap: 1,
-//               mt: { xs: 2, sm: 0 },
-//               flexWrap: 'wrap',
-//             }}
-//           >
-
-//             <Button
-//               variant="outlined"
-//               sx={{
-//                 textTransform: 'none',
-//                 color: 'white',
-//                 borderColor: '#3e4042',
-//                 bgcolor: '#3a3b3c',
-//                 ':hover': { bgcolor: '#4e4f50' },
-//               }}
-//               startIcon={<EditIcon />}
-//             >
-//               Edit profile
-//             </Button>
-
-//           </Box>
-//         </Box>
-
-//         {/* Tabs Placeholder */}
-//         <Box
-//           sx={{
-//             display: 'flex',
-//             mt: 4,
-//             borderBottom: '1px solid #3e4042',
-//             gap: 3,
-//             pb: 1,
-//           }}
-//         >
-//           {['Notification', 'Review'].map((tab) => (
-//             <Typography
-//               key={tab}
-//               sx={{
-//                 color: '#b0b3b8',
-//                 fontWeight: 500,
-//                 cursor: 'pointer',
-//                 '&:hover': { color: 'white' },
-//               }}
-//             >
-//               {tab}
-//             </Typography>
-//           ))}
-//         </Box>
-//       </Container>
-//     </Box>
-//   );
-// }
 
 // "use client";
-// import {
-//   Avatar,
-//   Box,
-//   Button,
-//   Container,
-//   Divider,
-//   FormControl,
-//   Card,
-//   InputLabel,
-//   MenuItem,
-//   Select,
-//   TextField,
-//   Typography,
-//   Grid,
-//   IconButton,
-// } from '@mui/material';
-
-// import EditIcon from '@mui/icons-material/Edit';
-// import SaveIcon from '@mui/icons-material/Save';
-// import CancelIcon from '@mui/icons-material/Close';
-// import UploadIcon from '@mui/icons-material/Upload';
-// import { useSession } from 'next-auth/react';
-// import { useEffect, useState } from 'react';
-// import { useRouter } from 'next/navigation';
-// import axios from 'axios';
-
-// const menuItems = [
-//   'Profile',
-//   'Photo',
-//   'Notifications',
-//   'History',
-
-//   'Close account',
-// ];
-
-// export default function ProfileSettingsPage() {
-//   const { data: session } = useSession();
-//   const router = useRouter();
-
-//   const [editMode, setEditMode] = useState(false);
-//   const [selectedSection, setSelectedSection] = useState('Profile');
-//   const [profile, setProfile] = useState(null);
-//   const [formData, setFormData] = useState({
-//     name: '',
-//     email: '',
-//     phone: '',
-//     photoFile: null,
-//     password: '',
-//   });
-
-//   useEffect(() => {
-//     if (!session) {
-//       router.push('/login');
-//     }
-//   }, [session, router]);
-
-//   useEffect(() => {
-//     const fetchProfile = async () => {
-//       if (!session?.user?.id) return;
-
-//       try {
-//         const res = await axios.get(`/api/users/${session.user.id}`);
-//         setProfile(res.data);
-//         setFormData({
-//           name: res.data.name || '',
-//           email: res.data.email || '',
-//           phone: res.data.phone || '',
-//           photoFile: null,
-//           password: '',
-//         });
-//       } catch (err) {
-//         console.error('Failed to load profile:', err);
-//       }
-//     };
-
-//     fetchProfile();
-//   }, [session?.user?.id]);
-
-//   const handleChange = (field) => (e) => {
-//     setFormData({ ...formData, [field]: e.target.value });
-//   };
-
-//   const handlePhotoChange = (e) => {
-//     if (e.target.files.length > 0) {
-//       setFormData({ ...formData, photoFile: e.target.files[0] });
-//     }
-//   };
-
-//   const handleSave = async () => {
-//     try {
-//       const data = new FormData();
-//       data.append('name', formData.name);
-//       data.append('phone', formData.phone);
-//       if (formData.password.trim()) {
-//         data.append('password', formData.password);
-//       }
-//       if (formData.photoFile) {
-//         data.append('photo', formData.photoFile);
-//       }
-
-//       const res = await axios.put(`/api/users/${session.user.id}`, data, {
-//         headers: {
-//           'Content-Type': 'multipart/form-data',
-//         },
-//       });
-
-//       const updatedUser = res.data.user;
-//       setProfile(updatedUser);
-
-//       session.user.photo = updatedUser.photo;
-//       session.user.image = updatedUser.photo;
-
-//       window.dispatchEvent(new CustomEvent('profilePhotoUpdated', {
-//         detail: updatedUser.photo,
-//       }));
-
-//       setEditMode(false);
-//       setFormData({
-//         name: updatedUser.name || '',
-//         email: updatedUser.email || '',
-//         phone: updatedUser.phone || '',
-//         photoFile: null,
-//         password: '',
-//       });
-//     } catch (error) {
-//       console.error('Failed to update profile:', error);
-//       alert(error?.response?.data?.message || 'Something went wrong.');
-//     }
-//   };
-
-//   const handleCancel = () => {
-//     setFormData({
-//       name: profile.name,
-//       email: profile.email,
-//       phone: profile.phone,
-//       photoFile: null,
-//       password: '',
-//     });
-//     setEditMode(false);
-//   };
-
-//   if (!profile) {
-//     return <Typography textAlign="center">Loading...</Typography>;
-//   }
-
-//   return (
-//     <Container maxWidth="lg" sx={{ mt: 5, mb: 20 }}>
-//       <Box sx={{ display: 'flex' }}>
-//         <Box sx={{ width: 260, pr: 4 }}>
-//           {menuItems.map((item, index) => (
-//             <Typography
-//               key={index}
-//               onClick={() => setSelectedSection(item)}
-//               sx={{
-//                 p: 1.5,
-//                 borderRadius: 1,
-//                 fontWeight: selectedSection === item ? 'bold' : 'normal',
-//                 bgcolor: selectedSection === item ? '#d1d5db' : 'transparent',
-//                 cursor: 'pointer',
-//                 '&:hover': { bgcolor: '#e5e7eb' },
-//               }}
-//             >
-//               {item}
-//             </Typography>
-//           ))}
-//         </Box>
-
-//         <Box sx={{ flex: 1 }}>
-//           {selectedSection === 'Profile' && (
-//             <Card sx={{ p: 5, borderRadius: 4 }}>
-//               <Typography variant="h6" sx={{ mb: 3 }}>
-//                 {editMode ? 'Edit Profile' : 'Profile'}
-//               </Typography>
-//               <Grid container spacing={4} alignItems="center" minHeight={300}>
-//                 <Grid item xs={12} md={4} textAlign="center">
-//                   <Avatar
-//                     alt="User"
-//                     src={
-//                       editMode
-//                         ? formData.photoFile
-//                           ? URL.createObjectURL(formData.photoFile)
-//                           : profile.photo || 'https://i.pravatar.cc/150?img=3'
-//                         : profile.photo || 'https://i.pravatar.cc/150?img=3'
-//                     }
-//                     sx={{ width: 130, height: 130, mx: 'auto', mb: 2 }}
-//                   />
-//                   {editMode && (
-//                     <IconButton component="label" color="primary">
-//                       <UploadIcon />
-//                       <input type="file" accept="image/*" hidden onChange={handlePhotoChange} />
-//                     </IconButton>
-//                   )}
-//                 </Grid>
-
-//                 <Grid item xs={12} md={8}>
-//                   {editMode ? (
-//                     <>
-//                       <TextField fullWidth label="Name" value={formData.name} onChange={handleChange('name')} margin="normal" />
-//                       <TextField fullWidth label="Email" value={formData.email} margin="normal" disabled />
-//                       <TextField fullWidth label="Phone Number" value={formData.phone} onChange={handleChange('phone')} margin="normal" />
-//                       <TextField fullWidth label="New Password" type="password" value={formData.password} onChange={handleChange('password')} margin="normal" helperText="Leave blank to keep current password" />
-
-//                       <Box mt={3} display="flex" gap={2}>
-//                         <Button variant="contained" color="primary" startIcon={<SaveIcon />} onClick={handleSave}>
-//                           Save
-//                         </Button>
-//                         <Button variant="outlined" color="secondary" startIcon={<CancelIcon />} onClick={handleCancel}>
-//                           Cancel
-//                         </Button>
-//                       </Box>
-//                     </>
-//                   ) : (
-//                     <Box display="flex" flexDirection="column" gap={2} mt={2}>
-//                       <Typography>
-//                         <strong>Name:</strong> {profile.name}
-//                       </Typography>
-//                       <Typography>
-//                         <strong>Email:</strong> {profile.email}
-//                       </Typography>
-//                       <Typography>
-//                         <strong>Phone Number:</strong> {profile.phone}
-//                       </Typography>
-
-//                       <Box mt={4}>
-//                         <Button variant="outlined" startIcon={<EditIcon />} onClick={() => setEditMode(true)}>
-//                           Edit Profile
-//                         </Button>
-//                       </Box>
-//                     </Box>
-//                   )}
-//                 </Grid>
-//               </Grid>
-//             </Card>
-//           )}
-
-//           {selectedSection === 'Photo' && (
-//             <Card sx={{ p: 5, borderRadius: 4 }}>
-//               <Typography variant="h5" fontWeight="bold" mb={3}>
-//                 Profile Photo Settings
-//               </Typography>
-//               <Button variant="contained" component="label">
-//                 Upload New Photo
-//                 <input type="file" hidden />
-//               </Button>
-//             </Card>
-//           )}
-//         </Box>
-//       </Box>
-//     </Container>
-//   );
-// }
-
-"use client";
 // import {
 //   Avatar,
 //   Box,
@@ -607,8 +15,8 @@
 //   List,
 //   ListItemText,
 //   Divider,
+//   CircularProgress, // Added missing import
 // } from "@mui/material";
-
 
 // import EditIcon from "@mui/icons-material/Edit";
 // import SaveIcon from "@mui/icons-material/Save";
@@ -625,68 +33,94 @@
 // import DialogContent from "@mui/material/DialogContent";
 // import DialogActions from "@mui/material/DialogActions";
 // import Loading from "@/src/components/Loading";
+// import { useSearchParams } from "next/navigation";
+
 
 // const menuItems = ["Profile", "Notification", "History", "Log Out"];
 
 // const mockBookingIds = [1, 2, 3]; // booking IDs you want to show
 
-
+// // Add formatTime function at the top level
+// const formatTime = (timeString) => {
+//   if (!timeString) return "N/A";
+//   const date = new Date(timeString);
+//   return isNaN(date) ? "Invalid time" : date.toLocaleTimeString([], {
+//     hour: '2-digit',
+//     minute: '2-digit',
+//     hour12: true,
+//   });
+// };
 
 // export default function ProfileSettingsPage() {
 //   const { data: session } = useSession();
 //   const router = useRouter();
+//   const searchParams = useSearchParams();
+// useEffect(() => {
+//   const section = searchParams.get("section");
+//   if (section) {
+//     setSelectedSection(section);
+//   }
+// }, [searchParams]);
+
 
 //   const [editMode, setEditMode] = useState(false);
 //   const [selectedSection, setSelectedSection] = useState("Profile");
 //   const [profile, setProfile] = useState(null);
 //   const [notifications, setNotifications] = useState([]);
-
+//   const [error, setError] = useState(null); // Added missing error state
+//   const [successMessage, setSuccessMessage] = useState(null); // Added missing success state
 //   const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
-
-
-
 //   const [bookingHistory, setBookingHistory] = useState([]);
+
 //   const [loading, setLoading] = useState({
-//     // ...other loading states
-//     history: false
+//     profile: false,
+//     history: false,
+//     notifications: false,
 //   });
 
-//   // Fetch booking history
 //   useEffect(() => {
-//     if (selectedSection === "History" && session?.user?.id) {
-//       const fetchBookingHistory = async () => {
-//         try {
-//           setLoading(prev => ({ ...prev, history: true }));
-//           const res = await fetch(`/api/booking-info?userId=${session.user.id}`);
+//     const fetchBookingHistory = async () => {
+//       if (selectedSection !== "History" || !session?.user?.id) return;
 
-//           if (!res.ok) throw new Error('Failed to fetch booking history');
+//       try {
+//         setLoading(prev => ({ ...prev, history: true }));
+//         setError(null);
 
-//           const data = await res.json();
+//         const userId = session.user.id;
+//         const response = await fetch(`/api/booking-info?userId=${userId}`);
 
-//           // Filter bookings for the current user only
-//           const userBookings = data.filter(
-//             booking => booking.user_id === session.user.id
-//           );
-
-//           setBookingHistory(userBookings);
-//         } catch (error) {
-//           console.error('Error fetching booking history:', error);
-//           setError('Failed to load booking history');
-//         } finally {
-//           setLoading(prev => ({ ...prev, history: false }));
+//         if (!response.ok) {
+//           // Try to parse error JSON, but fallback to status text if JSON is invalid
+//           let errorData = {};
+//           try {
+//             errorData = await response.json();
+//           } catch (jsonErr) {
+//             console.warn("Failed to parse error JSON:", jsonErr);
+//           }
+//           throw new Error(errorData?.error || response.statusText || 'Unknown error occurred');
 //         }
-//       };
 
-//       fetchBookingHistory();
-//     }
+//         const data = await response.json();
+//         setBookingHistory(data);
+//       } catch (error) {
+//         console.error("Booking history fetch error:", error);
+//         setError(error.message || 'Failed to fetch booking history');
+//       } finally {
+//         setLoading(prev => ({ ...prev, history: false }));
+//       }
+//     };
+
+
+//     fetchBookingHistory();
 //   }, [selectedSection, session?.user?.id]);
 
 
+
 //   const handleLogout = () => {
-//     // Clear auth info – depends on how you're storing it
-//     localStorage.removeItem("token"); // Example if you're storing a token
-//     sessionStorage.clear(); // optional
-//     router.push("/login"); // Redirect to login page
+//     // Clear auth info
+//     localStorage.removeItem("token");
+//     sessionStorage.clear();
+//     router.push("/login");
 //   };
 
 //   const [formData, setFormData] = useState({
@@ -701,7 +135,7 @@
 //     {
 //       id: 1,
 //       title: "New Event Added",
-//       message: "Check out the new event “Summer Gala” happening next week!",
+//       message: "Check out the new event 'Summer Gala' happening next week!",
 //       time: "2 hours ago",
 //     },
 //     {
@@ -731,6 +165,7 @@
 //       if (!session?.user?.id) return;
 
 //       try {
+//         setLoading(prev => ({ ...prev, profile: true }));
 //         const res = await axios.get(`/api/users/${session.user.id}`);
 //         setProfile(res.data);
 //         setFormData({
@@ -742,32 +177,14 @@
 //         });
 //       } catch (err) {
 //         console.error("Failed to load profile:", err);
+//         setError("Failed to load profile");
+//       } finally {
+//         setLoading(prev => ({ ...prev, profile: false }));
 //       }
 //     };
 
 //     fetchProfile();
 //   }, [session?.user?.id]);
-
-//   useEffect(() => {
-//     const fetchBookings = async () => {
-//       try {
-//         const results = await Promise.all(
-//           mockBookingIds.map(async (id) => {
-//             const res = await axios.get(`/api/booking-info/${id}`);
-//             return res.data;
-//           })
-//         );
-//         setBookingHistory(results);
-//       } catch (error) {
-//         console.error("Failed to fetch bookings:", error);
-//       }
-//     };
-
-//     fetchBookings();
-//   }, []);
-
-
-
 
 
 //   const handleChange = (field) => (e) => {
@@ -782,6 +199,7 @@
 
 //   const handleSave = async () => {
 //     try {
+//       setLoading(prev => ({ ...prev, profile: true }));
 //       const data = new FormData();
 //       data.append("name", formData.name);
 //       data.append("phone", formData.phone);
@@ -818,9 +236,12 @@
 //         photoFile: null,
 //         password: "",
 //       });
+//       setSuccessMessage("Profile updated successfully");
 //     } catch (error) {
 //       console.error("Failed to update profile:", error);
-//       alert(error?.response?.data?.message || "Something went wrong.");
+//       setError(error?.response?.data?.message || "Something went wrong.");
+//     } finally {
+//       setLoading(prev => ({ ...prev, profile: false }));
 //     }
 //   };
 
@@ -875,7 +296,19 @@
 //           borderRadius: 2,
 //           backgroundColor: "#fff",
 //         }}>
-//           {/* === Profile Section === */}
+//           {/* Error and Success Messages */}
+//           {error && (
+//             <Typography color="error" sx={{ mb: 2 }}>
+//               {error}
+//             </Typography>
+//           )}
+//           {successMessage && (
+//             <Typography color="success.main" sx={{ mb: 2 }}>
+//               {successMessage}
+//             </Typography>
+//           )}
+
+//           {/* Profile Section */}
 //           {selectedSection === "Profile" && (
 //             <Card sx={{ p: 5, borderRadius: 4 }}>
 //               <Typography variant="h6" sx={{ mb: 3 }}>
@@ -946,14 +379,16 @@
 //                           color="primary"
 //                           startIcon={<SaveIcon />}
 //                           onClick={handleSave}
+//                           disabled={loading.profile}
 //                         >
-//                           Save
+//                           {loading.profile ? <CircularProgress size={24} /> : "Save"}
 //                         </Button>
 //                         <Button
 //                           variant="outlined"
 //                           color="secondary"
 //                           startIcon={<CancelIcon />}
 //                           onClick={handleCancel}
+//                           disabled={loading.profile}
 //                         >
 //                           Cancel
 //                         </Button>
@@ -986,10 +421,7 @@
 //             </Card>
 //           )}
 
-//           {/* === Notifications Section ===        
-//           ))} */}
-
-//           {/* === Photo (Optional Stub) === */}
+//           {/* Notifications Section */}
 //           {selectedSection === "Notification" && (
 //             <Paper elevation={3} sx={{ mt: 2 }}>
 //               <List>
@@ -1025,8 +457,7 @@
 //             </Paper>
 //           )}
 
-
-
+//           {/* History Section */}
 //           {selectedSection === "History" && (
 //             <Box>
 //               <Typography variant="h6" gutterBottom>
@@ -1069,12 +500,7 @@
 //                     <Typography variant="body2" fontWeight="bold">
 //                       Total: {booking.total_amount?.toLocaleString()} MMK
 //                     </Typography>
-//                     <Typography variant="caption" color="text.secondary">
-//                       Booked on: {new Date(booking.createdAt).toLocaleDateString()}
-//                     </Typography>
-//                     <Typography variant="caption" display="block" color="text.secondary">
-//                       Status: {booking.status || "Confirmed"}
-//                     </Typography>
+
 //                   </Box>
 //                 ))
 //               ) : (
@@ -1083,30 +509,29 @@
 //             </Box>
 //           )}
 
+//           {/* Logout Section */}
 //           {selectedSection === "Log Out" && (
-//             <>
-//               <Dialog open={true}>
-//                 <DialogTitle>Confirm Logout</DialogTitle>
-//                 <DialogContent>
-//                   <Typography>Are you sure you want to log out?</Typography>
-//                 </DialogContent>
-//                 <DialogActions>
-//                   <Button
-//                     onClick={() => setSelectedSection("Profile")}
-//                     color="inherit"
-//                   >
-//                     Cancel
-//                   </Button>
-//                   <Button
-//                     onClick={handleLogout}
-//                     color="error"
-//                     variant="contained"
-//                   >
-//                     Confirm
-//                   </Button>
-//                 </DialogActions>
-//               </Dialog>
-//             </>
+//             <Dialog open={true}>
+//               <DialogTitle>Confirm Logout</DialogTitle>
+//               <DialogContent>
+//                 <Typography>Are you sure you want to log out?</Typography>
+//               </DialogContent>
+//               <DialogActions>
+//                 <Button
+//                   onClick={() => setSelectedSection("Profile")}
+//                   color="inherit"
+//                 >
+//                   Cancel
+//                 </Button>
+//                 <Button
+//                   onClick={handleLogout}
+//                   color="error"
+//                   variant="contained"
+//                 >
+//                   Confirm
+//                 </Button>
+//               </DialogActions>
+//             </Dialog>
 //           )}
 //         </Box>
 //       </Box>
@@ -1115,7 +540,8 @@
 // }
 
 
-"use client";
+'use client';
+
 import {
   Avatar,
   Box,
@@ -1131,32 +557,31 @@ import {
   List,
   ListItemText,
   Divider,
-  CircularProgress, // Added missing import
+  CircularProgress,
+  Badge,
+  Alert,
+  Snackbar,
 } from "@mui/material";
-
 import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Close";
 import UploadIcon from "@mui/icons-material/Upload";
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import axios from "axios";
+import { formatDistanceToNow } from 'date-fns';
 
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import Loading from "@/src/components/Loading";
-import { useSearchParams } from "next/navigation";
-
 
 const menuItems = ["Profile", "Notification", "History", "Log Out"];
 
-const mockBookingIds = [1, 2, 3]; // booking IDs you want to show
-
-// Add formatTime function at the top level
 const formatTime = (timeString) => {
   if (!timeString) return "N/A";
   const date = new Date(timeString);
@@ -1171,22 +596,20 @@ export default function ProfileSettingsPage() {
   const { data: session } = useSession();
   const router = useRouter();
   const searchParams = useSearchParams();
-useEffect(() => {
-  const section = searchParams.get("section");
-  if (section) {
-    setSelectedSection(section);
-  }
-}, [searchParams]);
-
 
   const [editMode, setEditMode] = useState(false);
   const [selectedSection, setSelectedSection] = useState("Profile");
   const [profile, setProfile] = useState(null);
   const [notifications, setNotifications] = useState([]);
-  const [error, setError] = useState(null); // Added missing error state
-  const [successMessage, setSuccessMessage] = useState(null); // Added missing success state
+  const [error, setError] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null);
   const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
   const [bookingHistory, setBookingHistory] = useState([]);
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: '',
+    severity: 'success',
+  });
 
   const [loading, setLoading] = useState({
     profile: false,
@@ -1194,6 +617,85 @@ useEffect(() => {
     notifications: false,
   });
 
+  useEffect(() => {
+    const section = searchParams.get("section");
+    if (section) {
+      setSelectedSection(section);
+    }
+  }, [searchParams]);
+
+  // Fetch notifications when Notification section is selected
+  const fetchNotifications = async () => {
+    try {
+      setLoading(prev => ({ ...prev, notifications: true }));
+      setError(null);
+      const response = await axios.get('/api/notifications');
+
+      if (Array.isArray(response.data)) {
+        setNotifications(response.data);
+      } else {
+        throw new Error('Invalid notifications data format');
+      }
+    } catch (err) {
+      console.error('Error fetching notifications:', err);
+      setError(err.response?.data?.error || 'Failed to load notifications');
+      setNotifications([]);
+    } finally {
+      setLoading(prev => ({ ...prev, notifications: false }));
+    }
+  };
+
+  const markAsRead = async (id) => {
+    try {
+      await axios.patch(`/api/notifications/${id}`, { read: true }, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      setNotifications(prev => prev.map(n =>
+        n.id === id ? { ...n, read: true } : n
+      ));
+      showSnackbar('Notification marked as read', 'success');
+    } catch (err) {
+      console.error('Error marking as read:', err);
+      showSnackbar(err.response?.data?.error || 'Failed to mark as read', 'error');
+    }
+  };
+
+  const markAllAsRead = async () => {
+    try {
+      await axios.patch('/api/notifications', {}, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+      showSnackbar('All notifications marked as read', 'success');
+    } catch (err) {
+      console.error('Error marking all as read:', err);
+      showSnackbar(err.response?.data?.error || 'Failed to mark all as read', 'error');
+    }
+  };
+
+  const showSnackbar = (message, severity) => {
+    setSnackbar({
+      open: true,
+      message,
+      severity,
+    });
+  };
+
+  const handleCloseSnackbar = () => {
+    setSnackbar(prev => ({ ...prev, open: false }));
+  };
+
+  useEffect(() => {
+    if (selectedSection === "Notification") {
+      fetchNotifications();
+    }
+  }, [selectedSection]);
+
+  // Fetch booking history
   useEffect(() => {
     const fetchBookingHistory = async () => {
       if (selectedSection !== "History" || !session?.user?.id) return;
@@ -1206,7 +708,6 @@ useEffect(() => {
         const response = await fetch(`/api/booking-info?userId=${userId}`);
 
         if (!response.ok) {
-          // Try to parse error JSON, but fallback to status text if JSON is invalid
           let errorData = {};
           try {
             errorData = await response.json();
@@ -1226,54 +727,8 @@ useEffect(() => {
       }
     };
 
-
     fetchBookingHistory();
   }, [selectedSection, session?.user?.id]);
-
-
-
-  const handleLogout = () => {
-    // Clear auth info
-    localStorage.removeItem("token");
-    sessionStorage.clear();
-    router.push("/login");
-  };
-
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    photoFile: null,
-    password: "",
-  });
-
-  const mockNotifications = [
-    {
-      id: 1,
-      title: "New Event Added",
-      message: "Check out the new event 'Summer Gala' happening next week!",
-      time: "2 hours ago",
-    },
-    {
-      id: 2,
-      title: "Booking Confirmed",
-      message: "Your booking for Floral Design has been confirmed.",
-      time: "Yesterday",
-    },
-    {
-      id: 3,
-      title: "Profile Updated",
-      message: "You successfully updated your profile information.",
-      time: "2 days ago",
-    },
-  ];
-
-  // Protect route
-  useEffect(() => {
-    if (!session) {
-      router.push("/login");
-    }
-  }, [session, router]);
 
   // Fetch profile
   useEffect(() => {
@@ -1302,6 +757,19 @@ useEffect(() => {
     fetchProfile();
   }, [session?.user?.id]);
 
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    photoFile: null,
+    password: "",
+  });
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    sessionStorage.clear();
+    router.push("/login");
+  };
 
   const handleChange = (field) => (e) => {
     setFormData({ ...formData, [field]: e.target.value });
@@ -1376,6 +844,9 @@ useEffect(() => {
     return <Loading open={true} />;
   }
 
+  // Safely check if all notifications are read
+  const allRead = notifications.length > 0 ? notifications.every(n => n.read) : true;
+
   return (
     <Container maxWidth="lg" sx={{ mt: 5, mb: 20 }}>
       <Box sx={{ display: "flex", gap: 4 }}>
@@ -1399,7 +870,18 @@ useEffect(() => {
                 "&:hover": { bgcolor: "#e5e7eb" },
               }}
             >
-              {item}
+              {item === "Notification" ? (
+                <Badge
+                  color="primary"
+                  variant="dot"
+                  invisible={allRead || notifications.length === 0}
+                  sx={{ mr: 1 }}
+                >
+                  {item}
+                </Badge>
+              ) : (
+                item
+              )}
             </Typography>
           ))}
         </Box>
@@ -1414,14 +896,14 @@ useEffect(() => {
         }}>
           {/* Error and Success Messages */}
           {error && (
-            <Typography color="error" sx={{ mb: 2 }}>
+            <Alert severity="error" sx={{ mb: 2 }}>
               {error}
-            </Typography>
+            </Alert>
           )}
           {successMessage && (
-            <Typography color="success.main" sx={{ mb: 2 }}>
+            <Alert severity="success" sx={{ mb: 2 }}>
               {successMessage}
-            </Typography>
+            </Alert>
           )}
 
           {/* Profile Section */}
@@ -1539,40 +1021,106 @@ useEffect(() => {
 
           {/* Notifications Section */}
           {selectedSection === "Notification" && (
-            <Paper elevation={3} sx={{ mt: 2 }}>
-              <List>
-                {mockNotifications.map((n, index) => (
-                  <Box key={n.id}>
-                    <ListItem alignItems="flex-start">
-                      <ListItemText
-                        primary={n.title}
-                        secondary={
-                          <>
-                            <Typography
-                              component="span"
-                              variant="body2"
-                              color="text.primary"
-                            >
-                              {n.message}
-                            </Typography>
-                            <Typography
-                              variant="caption"
-                              display="block"
-                              color="text.secondary"
-                            >
-                              {n.time}
-                            </Typography>
-                          </>
-                        }
-                      />
-                    </ListItem>
-                    {index < mockNotifications.length - 1 && <Divider />}
-                  </Box>
-                ))}
-              </List>
-            </Paper>
-          )}
+            <Box>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                <Typography variant="h6" component="div">Notifications</Typography>
+                <Box>
+                  <Button
+                    variant="outlined"
+                    onClick={fetchNotifications}
+                    sx={{ mr: 2 }}
+                    disabled={loading.notifications}
+                  >
+                    Refresh
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    onClick={markAllAsRead}
+                    disabled={allRead || loading.notifications}
+                    startIcon={<CheckCircleIcon />}
+                  >
+                    Mark All as Read
+                  </Button>
+                </Box>
+              </Box>
 
+              {loading.notifications ? (
+                <Box display="flex" justifyContent="center" py={3}>
+                  <CircularProgress />
+                </Box>
+              ) : notifications.length === 0 ? (
+                <Alert severity="info">
+                  No notifications found. Notifications you create should appear here.
+                </Alert>
+              ) : (
+                <Paper elevation={3}>
+                  <List>
+                    {notifications.map((notification, index) => {
+                      const isRead = notification.read || false;
+                      return (
+                        <Box key={notification.id}>
+                          <ListItem
+                            alignItems="flex-start"
+                            sx={{
+                              backgroundColor: isRead ? 'inherit' : 'rgba(25, 118, 210, 0.08)',
+                              position: 'relative',
+                              '&:hover': {
+                                backgroundColor: 'action.hover',
+                              },
+                            }}
+                            onClick={() => !isRead && markAsRead(notification.id)}
+                          >
+                            <Badge
+                              color="primary"
+                              variant="dot"
+                              invisible={isRead}
+                              sx={{
+                                position: 'absolute',
+                                left: 8,
+                                top: '50%',
+                                transform: 'translateY(-50%)',
+                              }}
+                            />
+                            <ListItemText
+                              primaryTypographyProps={{
+                                component: "div",
+                                fontWeight: isRead ? 'normal' : 'bold',
+                                sx: { ml: 3 }
+                              }}
+                              primary={notification.title}
+                              secondaryTypographyProps={{ component: "div" }}
+                              secondary={
+                                <>
+                                  <Typography component="span" variant="body2" color="text.primary" display="block" gutterBottom sx={{ ml: 3 }}>
+                                    {notification.message}
+                                  </Typography>
+                                  <Typography component="span" variant="caption" display="block" color="text.secondary" sx={{ ml: 3 }}>
+                                    {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}
+                                  </Typography>
+                                </>
+                              }
+                            />
+                            {!isRead && (
+                              <IconButton
+                                edge="end"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  markAsRead(notification.id);
+                                }}
+                              >
+                                <CheckCircleIcon color="primary" />
+                              </IconButton>
+                            )}
+                          </ListItem>
+                          {index < notifications.length - 1 && <Divider />}
+                        </Box>
+                      );
+                    })}
+                  </List>
+                </Paper>
+              )}
+            </Box>
+          )}
           {/* History Section */}
           {selectedSection === "History" && (
             <Box>
@@ -1616,7 +1164,6 @@ useEffect(() => {
                     <Typography variant="body2" fontWeight="bold">
                       Total: {booking.total_amount?.toLocaleString()} MMK
                     </Typography>
-
                   </Box>
                 ))
               ) : (
@@ -1651,6 +1198,21 @@ useEffect(() => {
           )}
         </Box>
       </Box>
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={snackbar.severity}
+          sx={{ width: '100%' }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Container>
   );
 }

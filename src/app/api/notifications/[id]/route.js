@@ -1,80 +1,139 @@
-import { NextResponse } from "next/server";
-import { prisma } from "@/src/lib/prisma";
+import { NextResponse } from 'next/server';
+import { prisma } from '@/src/lib/prisma';
 
-// GET /api/notifications/[id] - Get notifications for a user
-// export async function GET(_request, context) {
-//     const params = context.params;
-//     const userId = Number(params.id);
+// GET single notification
+export async function GET(request, { params }) {
+    try {
+        const { id } = params;
 
-//     if (isNaN(userId)) {
-//         return NextResponse.json({ message: "Invalid user ID" }, { status: 400 });
-//     }
+        // Validate ID
+        if (isNaN(Number(id))) {
+            return NextResponse.json(
+                { error: 'Invalid notification ID' },
+                { status: 400 }
+            );
+        }
 
-//     try {
-//         const notifications = await prisma.notification.findMany({
-//             where: { userId },
-//             orderBy: { createdAt: "desc" },
-//         });
-//         return NextResponse.json(notifications);
-//     } catch (error) {
-//         console.error(" GET /api/notifications/[id] error:", error);
-//         return NextResponse.json({ message: "Failed to fetch notifications" }, { status: 500 });
-//     }
-// }
-// export async function GET(_request, context) {
-//     const params = await context.params;  //  Await this
-//     const userId = Number(params.id);
+        const notification = await prisma.notification.findUnique({
+            where: { id: Number(id) },
+        });
 
-//     if (isNaN(userId)) {
-//         return NextResponse.json({ message: "Invalid user ID" }, { status: 400 });
-//     }
+        if (!notification) {
+            return NextResponse.json(
+                { error: 'Notification not found' },
+                { status: 404 }
+            );
+        }
 
-//     try {
-//         const notifications = await prisma.notification.findMany({
-//             where: { userId },
-//             orderBy: { createdAt: "desc" },
-//         });
-//         return NextResponse.json(notifications);
-//     } catch (error) {
-//         console.error(" GET /api/notifications/[id] error:", error);
-//         return NextResponse.json({ message: "Failed to fetch notifications" }, { status: 500 });
-//     }
-// }
+        return NextResponse.json(notification);
+    } catch (error) {
+        console.error('Error fetching notification:', error);
+        return NextResponse.json(
+            { error: 'Failed to fetch notification', details: error.message },
+            { status: 500 }
+        );
+    }
+}
 
-// console.log("API fetching notifications for userId:", userId);
-// console.log("Result:", notifications);
+// UPDATE notification
+export async function PUT(request, { params }) {
+    try {
+        const { id } = params;
+        const { title, message } = await request.json();
 
+        // Validate ID
+        if (isNaN(Number(id))) {
+            return NextResponse.json(
+                { error: 'Invalid notification ID' },
+                { status: 400 }
+            );
+        }
 
-// // POST /api/notifications/[id] - Create a notification for a user
-// export async function POST(request, context) {
-//     const params = await context.params; //
-//     const userId = Number(params.id);
+        // Validate input
+        if (!title || !message) {
+            return NextResponse.json(
+                { error: 'Title and message are required' },
+                { status: 400 }
+            );
+        }
 
+        const updatedNotification = await prisma.notification.update({
+            where: { id: Number(id) },
+            data: { title, message },
+        });
 
-//     if (isNaN(userId)) {
-//         return NextResponse.json({ message: "Invalid user ID" }, { status: 400 });
-//     }
+        return NextResponse.json(updatedNotification);
+    } catch (error) {
+        console.error('Error updating notification:', error);
 
-//     try {
-//         const body = await request.json();
-//         const { message, eventId } = body;
+        if (error.code === 'P2025') {
+            return NextResponse.json(
+                { error: 'Notification not found' },
+                { status: 404 }
+            );
+        }
 
-//         if (!message) {
-//             return NextResponse.json({ message: "Message is required" }, { status: 400 });
-//         }
+        return NextResponse.json(
+            { error: 'Failed to update notification', details: error.message },
+            { status: 500 }
+        );
+    }
+}
 
-//         const newNotification = await prisma.notification.create({
-//             data: {
-//                 userId,
-//                 message,
-//                 eventId: eventId || null,
-//                 isRead: false,
-//             },
-//         });
+// DELETE notification
+export async function DELETE(request, { params }) {
+    try {
+        const { id } = params;
 
-//         return NextResponse.json(newNotification, { status: 201 });
-//     } catch (error) {
-//         console.error(" POST /api/notifications/[id] error:", error);
-//         return NextResponse.json({ message: "Failed to create notification" }, { status: 500 });
-//     }
-// }
+        // Validate ID
+        if (isNaN(Number(id))) {
+            return NextResponse.json(
+                { error: 'Invalid notification ID' },
+                { status: 400 }
+            );
+        }
+
+        await prisma.notification.delete({
+            where: { id: Number(id) },
+        });
+
+        return NextResponse.json(
+            { message: 'Notification deleted successfully' },
+            { status: 200 }
+        );
+    } catch (error) {
+        console.error('Error deleting notification:', error);
+
+        if (error.code === 'P2025') {
+            return NextResponse.json(
+                { error: 'Notification not found' },
+                { status: 404 }
+            );
+        }
+
+        return NextResponse.json(
+            { error: 'Failed to delete notification', details: error.message },
+            { status: 500 }
+        );
+    }
+}
+
+export async function PATCH(request, { params }) {
+    try {
+        const { id } = params;
+        const { read } = await request.json();
+
+        await prisma.notification.update({
+            where: { id: Number(id) },
+            data: { read },
+        });
+
+        return NextResponse.json({ success: true });
+    } catch (error) {
+        console.error('Error updating notification:', error);
+        return NextResponse.json(
+            { error: 'Failed to update notification' },
+            { status: 500 }
+        );
+    }
+}

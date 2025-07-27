@@ -145,16 +145,14 @@ model Favourite {
   eventId Int?
 }
 
-// model Notification {
-//   id        Int      @id @default(autoincrement())
-//   message   String   @db.Text
-//   userId    Int
-//   user      User     @relation(fields: [userId], references: [id])
-//   isRead    Boolean  @default(false)
-//   createdAt DateTime @default(now())
-//   eventId   Int?
-//   event     Event?   @relation(fields: [eventId], references: [id]) 
-// }
+model Notification {
+  id      Int    @id @default(autoincrement())
+  title   String @db.VarChar(255)
+  message String @db.Text
+
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
 
 enum Role {
   user

@@ -28,7 +28,7 @@ import {
     ExpandLess,
     ExpandMore,
 } from '@mui/icons-material';
-
+import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
@@ -138,6 +138,30 @@ export default function AdminLayout({ children }) {
                                 <Description />
                             </ListItemIcon>
                             <ListItemText primary="Description" />
+                        </ListItemButton>
+                    </ListItem>
+
+                    {/* Notification */}
+                    <ListItem disablePadding>
+                        <ListItemButton
+                            component={Link}
+                            href="/admin/notifications"
+                            selected={isSelected('/admin/notifications')}
+                            sx={{
+                                '&.Mui-selected': {
+                                    color: '#ef6c00',
+                                    borderRight: '4px solid #ef6c00',
+                                },
+                                '&:hover': {
+                                    backgroundColor: '#f5f5f5',
+                                },
+                                pl: 3,
+                            }}
+                        >
+                            <ListItemIcon sx={{ color: isSelected('/admin/notifications') ? '#ef6c00' : 'inherit' }}>
+                                <NotificationsActiveIcon />
+                            </ListItemIcon>
+                            <ListItemText primary="Notification" />
                         </ListItemButton>
                     </ListItem>
 
