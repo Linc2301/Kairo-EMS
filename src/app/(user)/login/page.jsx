@@ -19,7 +19,7 @@ import Link from "next/link";
 import { signIn, getSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
-//  Validation schema
+//Validation schema
 const schema = yup.object().shape({
   email: yup.string().email("Invalid email").required("Email is required"),
   password: yup.string().min(6, "Min 6 characters").required("Password is required"),
@@ -241,3 +241,5 @@ export default function LoginPage() {
     </>
   );
 }
+
+//
