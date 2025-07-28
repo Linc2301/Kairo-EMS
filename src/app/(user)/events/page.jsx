@@ -402,6 +402,8 @@ export default function EventPage() {
             >
               {event.name}
             </Typography>
+
+
             <Typography
               variant="body2"
               sx={{
@@ -414,6 +416,8 @@ export default function EventPage() {
             >
               {event.description}
             </Typography>
+
+
           </Box>
           <Box
             sx={{
@@ -423,6 +427,15 @@ export default function EventPage() {
               mt: 2,
             }}
           >
+
+              <Chip
+              label="Event"
+              size="small"
+              sx={{
+                backgroundColor: "#fff3e0",
+                color: "#ff6f00",
+              }}
+            />
            
             <IconButton
               size="small"
