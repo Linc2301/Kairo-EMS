@@ -477,17 +477,33 @@ export default function EventPage() {
       </Box>
 
       {/* Pagination */}
-      <Box sx={{ display: "flex", justifyContent: "center", mt: 8 }}>
-        <Stack spacing={2}>
-          <Pagination
-            count={pageCount}
-            page={currentPage}
-            onChange={(event, value) => setCurrentPage(value)}
-            variant="outlined"
-            color="primary"
-          />
-        </Stack>
-      </Box>
+<Box sx={{ display: "flex", justifyContent: "center", mt: 8 }}>
+  <Stack spacing={2}>
+    <Pagination 
+      count={pageCount}
+      page={currentPage}
+      onChange={(event, value) => setCurrentPage(value)}
+      color="primary"
+      sx={{
+        '& .MuiPaginationItem-root': {
+          color: 'white', // All page numbers
+        },
+        '& .MuiPaginationItem-icon': {
+          color: 'white', // Arrows < and >
+        },
+        '& .Mui-selected': {
+          backgroundColor: 'primary.main',
+          color: 'white',
+          '&:hover': {
+            backgroundColor: 'primary.dark',
+          },
+        },
+      }}
+    />
+  </Stack>
+</Box>
+
+
     </Box>
   );
 }

@@ -7,11 +7,11 @@ import "slick-carousel/slick/slick-theme.css";
 import "./carousel.css"; // Custom CSS for scale effect
 
 const eventData = [
-  { title: "Baby Shower", image: "/assets/b5.png" },
-  { title: "Private Party", image: "/assets/party.png" },
-  { title: "Wedding Party", image: "/assets/w6.png" },
-  { title: "Birthday Party", image: "/assets/birthday.png" },
-  { title: "Bridal Shower", image: "/assets/birdal.png" },
+  { title: "Baby Shower", image: "/assets/home4.jpg" },
+  { title: "Private Party", image: "/assets/home6.jpg" },
+  { title: "Wedding Party", image: "/assets/home5.jpg" },
+  { title: "Birthday Party", image: "/assets/home2.jpg" },
+  { title: "Bridal Shower", image: "/assets/home1.jpg" },
 ];
 
 const settings = {
@@ -50,19 +50,22 @@ export default function EventCarousel() {
       </Box>
 
       {/* Carousel */}
-      <Box sx={{ py: 5, bgcolor: "#000" }}>
+      <Box sx={{  bgcolor: "#000", px: 18, py: 10}}>
         <Slider {...settings}>
           {eventData.map((event, index) => (
             <Box
               key={index}
               className="carousel-card"
               sx={{
-                width: 350,
-                height: 350,
+                width: 250,
+                height: 370,
                 position: "relative",
                 // borderRadius: "30px",
                 overflow: "hidden",
-                mx: 1,
+                
+                // borderRadius: 10,
+                // borderColo: "white"
+                  borderRadius: 12,// Rounded corners}\
               }}
             >
               <img
@@ -72,7 +75,7 @@ export default function EventCarousel() {
                   width: "100%",
                   height: "100%",
                   objectFit: "cover",
-                  borderRadius: "20",
+                  borderRadius: "inherit",
                 }}
               />
               <Box
