@@ -821,6 +821,9 @@ export default function ProfileSettingsPage() {
         password: "",
       });
       setSuccessMessage("Profile updated successfully");
+      setTimeout(() => {
+        setSuccessMessage("");
+      }, 5000);
     } catch (error) {
       console.error("Failed to update profile:", error);
       setError(error?.response?.data?.message || "Something went wrong.");
