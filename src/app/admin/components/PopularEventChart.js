@@ -61,7 +61,7 @@ export default function PopularEventsChart() {
   return (
     <Paper elevation={3} sx={{ p: 3 }}>
       <Typography variant="h6" gutterBottom>
-        📊 Popular Events by Bookings
+        📊 Popular Venue by Bookings
       </Typography>
 
       {loading ? (

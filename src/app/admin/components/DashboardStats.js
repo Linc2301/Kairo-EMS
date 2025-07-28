@@ -75,7 +75,7 @@ export default function DashboardStats() {
     <Grid container spacing={8}>
       {stats.map((s, i) => (
         <Grid item xs={12} sm={6} md={3} key={i}>
-          <Paper sx={{ p: 2 }}>
+          <Paper sx={{ p: 2, width: 200, height: 100 }}>
             <Typography variant="subtitle2">{s.title}</Typography>
             <Typography variant="h5">{s.value}</Typography>
             {s.change && (

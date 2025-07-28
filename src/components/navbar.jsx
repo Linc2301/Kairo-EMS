@@ -89,13 +89,13 @@ export default function Navbar() {
       <Toolbar sx={{ justifyContent: "space-between" }}>
         {/* Logo */}
         <Link href="/">
-          <Box sx={{ display: "flex", alignItems: "center" }}>
+          <Box sx={{ display: "flex", alignItems: "center", ml: 8  }}>
             <Image 
-              src="/logo-kairo.png" 
+              src="/assets/logo.png" 
               alt="Kairo Logo" 
               width={70} 
               height={40}
-              style={{ cursor: "pointer" }}
+              style={{ cursor: "pointer"}}
             />
           </Box>
         </Link>
