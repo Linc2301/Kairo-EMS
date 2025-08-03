@@ -169,7 +169,7 @@ export default function DeliveryPage() {
 
     const formatTime = (timeStr) => {
         const time = new Date(timeStr);
-        return time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        return time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true, });
     };
 
     const handleConfirm = async () => {
