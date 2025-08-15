@@ -1,93 +1,6 @@
-// // "use client";
-// // import Link from "next/link";
-// // import { Box, Typography } from "@mui/material";
-// // import { useRouter } from "next/navigation";
-
-// // export default function EventPage() {
-// //   const pyramidRows = [
-// //     [{ type: "text", name: "Engagement", id: 2, highlighted: true }],
-
-// //     [
-// //       { type: "image", src: "/Event Main Page/cheers.jpg" },
-// //       { type: "text", name: "Bridal Shower", id: 4 },
-// //       { type: "text", name: "Wedding", id: 1 },
-// //       { type: "image", src: "/Event Main Page/balloons.jpg" },
-// //     ],
-
-// //     [
-// //       { type: "text", name: "Birthday", id: 3, highlighted: true },
-// //       { type: "text", name: "Baby Shower", id: 5, highlighted: true },
-// //       { type: "text", name: "Private Party", id: 6, highlighted: true },
-// //     ],
-
-// //     [
-// //       { type: "image", src: "/Event Main Page/celebrate.jpg" },
-// //       { type: "text", name: "Corporate Events", id: 7 },
-// //       { type: "text", name: "Business Meeting", id: 8 },
-// //       { type: "text", name: "Art Gallery", id: 9 },
-// //       { type: "image", src: "/Event Main Page/gallery.jpg" },
-// //     ],
-// //   ];
-// //    const router = useRouter();
-
-// //   return (
-// //     <Box sx={{ backgroundColor: "#000", py: 8, px: 2, textAlign: "center" }}>
-// //       <Typography variant="h4" sx={{ color: "#ccc", fontWeight: "bold", mb: 2 }}>
-// //         A space for every moment
-// //       </Typography>
-// //       <Typography variant="h6" sx={{ color: "#aaa", mb: 15 }}>
-// //         Book a unique space for your activity
-// //       </Typography>
-
-// //       {pyramidRows.map((row, rowIndex) => (
-// //         <Box
-// //           key={rowIndex}
-// //           sx={{
-// //             display: "flex",
-// //             justifyContent: "center",
-// //             alignItems: "center",
-// //             gap: 8,
-// //             mb: 4,
-// //             flexWrap: "wrap",
-// //           }}
-// //         >
-// //           {row.map((item, idx) =>
-// //             item.type === "text" ? (
-// //               <Link key={idx} href={`/events/${item.id}`} passHref>
-// //                 <Typography
-// //                   sx={{
-// //                     color: item.highlighted ? "#E24C00" : "#fff",
-// //                     fontWeight: item.highlighted ? "bold" : "normal",
-// //                     fontSize: "1.1rem",
-// //                     cursor: "pointer",
-// //                     transition: "color 0.2s",
-// //                     whiteSpace: "nowrap",
-// //                     "&:hover": {
-// //                       color: "#FF6600",
-// //                     },
-// //                   }}
-// //                 >
-// //                   {item.name}
-// //                 </Typography>
-// //               </Link>
-// //             ) : (
-// //               <Box
-// //                 key={idx}
-// //                 component="img"
-// //                 src={item.src}
-// //                 alt=""
-// //                 sx={{ width: 90, height: 90, borderRadius: 7 }}
-// //               />
-// //             )
-// //           )}
-// //         </Box>
-// //       ))}
-// //     </Box>
-// //   );
-// // }
-
 
 // "use client";
+
 // import { useEffect, useState } from "react";
 // import Link from "next/link";
 // import {
@@ -102,20 +15,31 @@
 // import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 // import Pagination from "@mui/material/Pagination";
 // import Stack from "@mui/material/Stack";
+// import Loading from "@/src/components/Loading"; // ✅ loading component import
 
 // export default function EventPage() {
 //   const [events, setEvents] = useState([]);
+//   const [loading, setLoading] = useState(true); // ✅ loading state
 //   const [currentPage, setCurrentPage] = useState(1);
 //   const cardsPerPage = 6;
 
 //   useEffect(() => {
 //     async function fetchEvents() {
-//       const res = await fetch("/api/events");
-//       const data = await res.json();
-//       setEvents(data);
+//       try {
+//         setLoading(true); // ✅ show loading while fetching
+//         const res = await fetch("/api/events");
+//         const data = await res.json();
+//         setEvents(data);
+//       } catch (error) {
+//         console.error("Failed to fetch events:", error);
+//       } finally {
+//         setLoading(false); // ✅ hide loading when done
+//       }
 //     }
 //     fetchEvents();
 //   }, []);
+
+//   if (loading) return <Loading open={true} />; // ✅ render loading component
 
 //   const pageCount = Math.ceil(events.length / cardsPerPage);
 //   const paginatedEvents = events.slice(
@@ -164,7 +88,7 @@
 //           <CardMedia
 //             component="img"
 //             image={event.photo || "/images/default.jpg"}
-//             alt={event.name}
+//             src={event.name}
 //             sx={{
 //               height: "100%",
 //               width: "100%",
@@ -186,10 +110,12 @@
 //           <Box>
 //             <Typography
 //               variant="h6"
-//               sx={{ fontWeight: "bold", color: "#fff", mb: 1 }}
+//               sx={{ fontWeight: "bold", color: "#ec7921ff", mb: 1 }}
 //             >
 //               {event.name}
 //             </Typography>
+
+
 //             <Typography
 //               variant="body2"
 //               sx={{
@@ -202,6 +128,8 @@
 //             >
 //               {event.description}
 //             </Typography>
+
+
 //           </Box>
 //           <Box
 //             sx={{
@@ -211,7 +139,8 @@
 //               mt: 2,
 //             }}
 //           >
-//             <Chip
+
+//               <Chip
 //               label="Event"
 //               size="small"
 //               sx={{
@@ -219,6 +148,7 @@
 //                 color: "#ff6f00",
 //               }}
 //             />
+
 //             <IconButton
 //               size="small"
 //               sx={{
@@ -226,7 +156,7 @@
 //                 "&:hover": { color: "#ff1744" },
 //               }}
 //             >
-//               <FavoriteBorderIcon />
+
 //             </IconButton>
 //           </Box>
 //         </CardContent>
@@ -235,14 +165,14 @@
 //   );
 
 //   return (
-//     <Box sx={{ backgroundColor: "white", py: 8, px: 2, textAlign: "center" }}>
+//     <Box sx={{ backgroundColor: " #0c0c0cff", py: 8, px: 2, textAlign: "center" }}>
 //       <Typography
 //         variant="h4"
-//         sx={{ color: "#ccc", fontWeight: "bold", mb: 2 }}
+//         sx={{ color: "#ffffffff", fontWeight: "bold", mb: 2 }}
 //       >
 //         A space for every moment
 //       </Typography>
-//       <Typography variant="h6" sx={{ color: "#aaa", mb: 10 }}>
+//       <Typography variant="h6" sx={{ color: "#5837ebff", mb: 10 }}>
 //         Book a unique space for your activity
 //       </Typography>
 
@@ -272,20 +202,38 @@
 //       </Box>
 
 //       {/* Pagination */}
-//       <Box sx={{ display: "flex", justifyContent: "center", mt: 8 }}>
-//         <Stack spacing={2}>
-//           <Pagination
-//             count={pageCount}
-//             page={currentPage}
-//             onChange={(event, value) => setCurrentPage(value)}
-//             variant="outlined"
-//             color="primary"
-//           />
-//         </Stack>
-//       </Box>
+// <Box sx={{ display: "flex", justifyContent: "center", mt: 8 }}>
+//   <Stack spacing={2}>
+//     <Pagination 
+//       count={pageCount}
+//       page={currentPage}
+//       onChange={(event, value) => setCurrentPage(value)}
+//       color="primary"
+//       sx={{
+//         '& .MuiPaginationItem-root': {
+//           color: 'white', // All page numbers
+//         },
+//         '& .MuiPaginationItem-icon': {
+//           color: 'white', // Arrows < and >
+//         },
+//         '& .Mui-selected': {
+//           backgroundColor: 'primary.main',
+//           color: 'white',
+//           '&:hover': {
+//             backgroundColor: 'primary.dark',
+//           },
+//         },
+//       }}
+//     />
+//   </Stack>
+// </Box>
+
+
 //     </Box>
 //   );
 // }
+
+
 
 "use client";
 
@@ -299,35 +247,118 @@ import {
   CardContent,
   Chip,
   IconButton,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import FavoriteIcon from "@mui/icons-material/Favorite";
 import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
-import Loading from "@/src/components/Loading"; // ✅ loading component import
+import Loading from "@/src/components/Loading";
 
 export default function EventPage() {
   const [events, setEvents] = useState([]);
-  const [loading, setLoading] = useState(true); // ✅ loading state
+  const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
+  const [favorites, setFavorites] = useState([]);
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
   const cardsPerPage = 6;
 
+  // Fetch events and user favorites
   useEffect(() => {
-    async function fetchEvents() {
+    async function fetchData() {
       try {
-        setLoading(true); // ✅ show loading while fetching
-        const res = await fetch("/api/events");
-        const data = await res.json();
-        setEvents(data);
+        setLoading(true);
+
+        // Fetch events
+        const eventsRes = await fetch("/api/events");
+        const eventsData = await eventsRes.json();
+        setEvents(eventsData);
+
+        // Fetch user favorites (you'll need to implement user auth)
+        // For now, we'll assume we have a user ID
+        const userId = 1; // Replace with actual user ID from your auth system
+        const favRes = await fetch(`/api/favourite?userId=${userId}`);
+        const favData = await favRes.json();
+        setFavorites(favData);
+
       } catch (error) {
-        console.error("Failed to fetch events:", error);
+        console.error("Failed to fetch data:", error);
+        setSnackbar({
+          open: true,
+          message: "Failed to load data",
+          severity: "error",
+        });
       } finally {
-        setLoading(false); // ✅ hide loading when done
+        setLoading(false);
       }
     }
-    fetchEvents();
+    fetchData();
   }, []);
 
-  if (loading) return <Loading open={true} />; // ✅ render loading component
+  const handleCloseSnackbar = () => {
+    setSnackbar({ ...snackbar, open: false });
+  };
+
+  // Check if an event is favorited
+  const isFavorited = (eventId) => {
+    return favorites.some(fav => fav.eventId === eventId);
+  };
+
+  // Toggle favorite status
+  const toggleFavorite = async (eventId) => {
+    try {
+      const userId = 1; // Replace with actual user ID from your auth system
+
+      if (isFavorited(eventId)) {
+        // Remove from favorites
+        const favToRemove = favorites.find(fav => fav.eventId === eventId);
+        await fetch(`/api/favourite/${favToRemove.id}`, {
+          method: "DELETE",
+        });
+
+        setFavorites(favorites.filter(fav => fav.eventId !== eventId));
+        setSnackbar({
+          open: true,
+          message: "Removed from favorites",
+          severity: "info",
+        });
+      } else {
+        // Add to favorites
+        const response = await fetch("/api/favourite", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            user_id: userId,
+            eventId: eventId,
+          }),
+        });
+
+        const newFavorite = await response.json();
+        setFavorites([...favorites, newFavorite]);
+        setSnackbar({
+          open: true,
+          message: "Added to favorites!",
+          severity: "success",
+        });
+      }
+    } catch (error) {
+      console.error("Failed to update favorites:", error);
+      setSnackbar({
+        open: true,
+        message: "Failed to update favorites",
+        severity: "error",
+      });
+    }
+  };
+
+  if (loading) return <Loading open={true} />;
 
   const pageCount = Math.ceil(events.length / cardsPerPage);
   const paginatedEvents = events.slice(
@@ -359,8 +390,31 @@ export default function EventPage() {
         },
         backgroundColor: "#111",
         overflow: "hidden",
+        position: "relative",
       }}
     >
+      {/* Favorite button positioned absolutely */}
+      <IconButton
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          toggleFavorite(event.id);
+        }}
+        sx={{
+          position: "absolute",
+          top: 8,
+          right: 8,
+          zIndex: 2,
+          color: isFavorited(event.id) ? "#ff1744" : "rgba(255, 255, 255, 0.7)",
+          backgroundColor: "rgba(0, 0, 0, 0.5)",
+          "&:hover": {
+            backgroundColor: "rgba(0, 0, 0, 0.7)",
+          },
+        }}
+      >
+        {isFavorited(event.id) ? <FavoriteIcon /> : <FavoriteBorderIcon />}
+      </IconButton>
+
       <Link
         href={`/events/${event.id}`}
         passHref
@@ -403,7 +457,6 @@ export default function EventPage() {
               {event.name}
             </Typography>
 
-
             <Typography
               variant="body2"
               sx={{
@@ -416,8 +469,6 @@ export default function EventPage() {
             >
               {event.description}
             </Typography>
-
-
           </Box>
           <Box
             sx={{
@@ -427,8 +478,7 @@ export default function EventPage() {
               mt: 2,
             }}
           >
-
-              <Chip
+            <Chip
               label="Event"
               size="small"
               sx={{
@@ -436,16 +486,6 @@ export default function EventPage() {
                 color: "#ff6f00",
               }}
             />
-           
-            <IconButton
-              size="small"
-              sx={{
-                color: "rgba(255, 255, 255, 0.7)",
-                "&:hover": { color: "#ff1744" },
-              }}
-            >
-        
-            </IconButton>
           </Box>
         </CardContent>
       </Link>
@@ -490,34 +530,47 @@ export default function EventPage() {
       </Box>
 
       {/* Pagination */}
-<Box sx={{ display: "flex", justifyContent: "center", mt: 8 }}>
-  <Stack spacing={2}>
-    <Pagination 
-      count={pageCount}
-      page={currentPage}
-      onChange={(event, value) => setCurrentPage(value)}
-      color="primary"
-      sx={{
-        '& .MuiPaginationItem-root': {
-          color: 'white', // All page numbers
-        },
-        '& .MuiPaginationItem-icon': {
-          color: 'white', // Arrows < and >
-        },
-        '& .Mui-selected': {
-          backgroundColor: 'primary.main',
-          color: 'white',
-          '&:hover': {
-            backgroundColor: 'primary.dark',
-          },
-        },
-      }}
-    />
-  </Stack>
-</Box>
+      <Box sx={{ display: "flex", justifyContent: "center", mt: 8 }}>
+        <Stack spacing={2}>
+          <Pagination
+            count={pageCount}
+            page={currentPage}
+            onChange={(event, value) => setCurrentPage(value)}
+            color="primary"
+            sx={{
+              '& .MuiPaginationItem-root': {
+                color: 'white',
+              },
+              '& .MuiPaginationItem-icon': {
+                color: 'white',
+              },
+              '& .Mui-selected': {
+                backgroundColor: 'primary.main',
+                color: 'white',
+                '&:hover': {
+                  backgroundColor: 'primary.dark',
+                },
+              },
+            }}
+          />
+        </Stack>
+      </Box>
 
-
+      {/* Snackbar for notifications */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={3000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={snackbar.severity}
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }
-

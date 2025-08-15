@@ -406,6 +406,7 @@ import {
   TableHead,
   TableRow,
   Typography,
+  Pagination,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -423,6 +424,8 @@ function formatDate(isoString) {
 
 export default function TimePackagesPage() {
   const [timePackages, setTimePackages] = useState([]);
+  const [page, setPage] = useState(1);
+  const rowsPerPage = 5;
   const router = useRouter();
 
   useEffect(() => {
@@ -448,6 +451,13 @@ export default function TimePackagesPage() {
     }
   };
 
+  const handlePageChange = (event, value) => {
+    setPage(value);
+  };
+
+  const paginatedPackages = timePackages.slice((page - 1) * rowsPerPage, page * rowsPerPage);
+  const totalPages = Math.ceil(timePackages.length / rowsPerPage);
+
   return (
     <Box sx={{ maxWidth: 1000, mx: "auto", mt: 4 }}>
       <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
@@ -471,15 +481,14 @@ export default function TimePackagesPage() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {timePackages.length === 0 ? (
+              {paginatedPackages.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={6} align="center">
                     No time packages found.
                   </TableCell>
                 </TableRow>
               ) : (
-                timePackages.map((tp) => (
-                
+                paginatedPackages.map((tp) => (
                   <TableRow key={tp.id}>
                     <TableCell align="center">{tp.id}</TableCell>
                     <TableCell align="center">{formatDate(tp.startTime)}</TableCell>
@@ -487,16 +496,8 @@ export default function TimePackagesPage() {
                     <TableCell align="center">{formatTimeToAmPm(tp.endTime)}</TableCell>
                     <TableCell align="center">{tp.venueName || "Unknown"}</TableCell>
                     <TableCell align="center">
-                      <IconButton
-                        color="primary"
-                        onClick={() => router.push(`/admin/timePackages/${tp.id}/edit`)}
-                      >
-                        <EditIcon />
-                      </IconButton>
-                      <IconButton
-                        color="error"
-                        onClick={() => handleDelete(tp.id)}
-                      >
+
+                      <IconButton color="error" onClick={() => handleDelete(tp.id)}>
                         <DeleteIcon />
                       </IconButton>
                     </TableCell>
@@ -507,6 +508,32 @@ export default function TimePackagesPage() {
           </Table>
         </TableContainer>
       </Paper>
+
+      {timePackages.length > rowsPerPage && (
+        <Box
+          sx={{
+            position: 'fixed',
+            bottom: 0,
+            left: 0,
+            width: '100%',
+            bgcolor: 'white',
+            py: 1,
+            display: 'flex',
+            justifyContent: 'center',
+            boxShadow: '0 -2px 8px rgba(0,0,0,0.1)',
+          }}
+        >
+          <Pagination
+            count={totalPages}
+            page={page}
+            onChange={handlePageChange}
+            color="primary"
+            shape="rounded"
+            showFirstButton
+            showLastButton
+          />
+        </Box>
+      )}
     </Box>
   );
 }
