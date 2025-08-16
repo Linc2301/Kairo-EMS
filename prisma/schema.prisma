@@ -8,13 +8,15 @@ datasource db {
 }
 
 model User {
-  id        Int         @id @default(autoincrement())
-  name      String      @db.VarChar(255)
-  email     String?     @unique @db.VarChar(255)
-  phone     String      @db.VarChar(50)
-  password  String      @db.VarChar(255)
-  photo     String?     @db.LongText
+  id       Int     @id @default(autoincrement())
+  name     String  @unique @db.VarChar(255)
+  email    String? @unique @db.VarChar(255)
+  phone    String  @db.VarChar(50)
+  password String  @db.VarChar(255)
+  photo    String? @db.LongText
+
   isAdmin   String      @default("user") @db.VarChar(50)
+  status    UserStatus  @default(active)
   Booking   Booking[]
   Review    Review[]
   Favourite Favourite[]
@@ -85,9 +87,10 @@ model TimePackage {
 }
 
 model Booking {
-  id       Int   @id @default(autoincrement())
-  venue_id Int
-  venue    Venue @relation(fields: [venue_id], references: [id])
+  id        Int    @id @default(autoincrement())
+  bookingId String @unique
+  venue_id  Int
+  venue     Venue  @relation(fields: [venue_id], references: [id])
 
   venueTypeId Int
   VenueType   VenueType @relation(fields: [venueTypeId], references: [id])
@@ -103,6 +106,8 @@ model Booking {
 
   booking_date DateTime
   total_amount Int
+
+  status String @default("pending") @db.VarChar(50)
 
   createdAt DateTime @default(now())
 }
@@ -141,7 +146,7 @@ model Favourite {
   user    User @relation(fields: [user_id], references: [id])
   user_id Int
 
-  Event   Event? @relation(fields: [eventId], references: [id])
+  Event   Event? @relation(fields: [eventId], references: [id], onDelete: Cascade)
   eventId Int?
 }
 
@@ -157,4 +162,14 @@ model Notification {
 enum Role {
   user
   admin
+}
+
+enum UserStatus {
+  active
+  inactive
+}
+
+enum BookingStatus {
+  pending
+  confirmed
 }

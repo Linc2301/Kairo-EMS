@@ -234,10 +234,10 @@
 // }
 
 
-
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import {
   Box,
@@ -257,91 +257,148 @@ import Stack from "@mui/material/Stack";
 import Loading from "@/src/components/Loading";
 
 export default function EventPage() {
+  const { data: session, status } = useSession();
+  const userId = session?.user?.id ?? null;
+
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [favorites, setFavorites] = useState([]); // always keep an array
   const [currentPage, setCurrentPage] = useState(1);
-  const [favorites, setFavorites] = useState([]);
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
     severity: "success",
   });
+
   const cardsPerPage = 6;
 
-  // Fetch events and user favorites
+  // Fetch events
   useEffect(() => {
-    async function fetchData() {
+    let ignore = false;
+    async function fetchEvents() {
       try {
         setLoading(true);
-
-        // Fetch events
-        const eventsRes = await fetch("/api/events");
-        const eventsData = await eventsRes.json();
-        setEvents(eventsData);
-
-        // Fetch user favorites (you'll need to implement user auth)
-        // For now, we'll assume we have a user ID
-        const userId = 1; // Replace with actual user ID from your auth system
-        const favRes = await fetch(`/api/favourite?userId=${userId}`);
-        const favData = await favRes.json();
-        setFavorites(favData);
-
-      } catch (error) {
-        console.error("Failed to fetch data:", error);
-        setSnackbar({
-          open: true,
-          message: "Failed to load data",
-          severity: "error",
-        });
+        const res = await fetch("/api/events", { cache: "no-store" });
+        const data = await res.json();
+        if (!ignore) {
+          setEvents(Array.isArray(data) ? data : []);
+        }
+      } catch (e) {
+        if (!ignore) {
+          setEvents([]);
+          setSnackbar({
+            open: true,
+            message: "Failed to load events",
+            severity: "error",
+          });
+        }
       } finally {
-        setLoading(false);
+        if (!ignore) setLoading(false);
       }
     }
-    fetchData();
+    fetchEvents();
+    return () => {
+      ignore = true;
+    };
   }, []);
 
+  // Fetch user favourites (only when authenticated)
+  useEffect(() => {
+    let ignore = false;
+    async function fetchFavourites() {
+      if (status !== "authenticated" || !userId) {
+        setFavorites([]); // ensure array when logged out / not ready
+        return;
+      }
+      try {
+        const res = await fetch("/api/favourite", { cache: "no-store" });
+        const data = await res.json();
+        if (!ignore) {
+          setFavorites(Array.isArray(data) ? data : []);
+        }
+      } catch (e) {
+        if (!ignore) {
+          setFavorites([]);
+          setSnackbar({
+            open: true,
+            message: "Failed to load favourites",
+            severity: "error",
+          });
+        }
+      }
+    }
+    fetchFavourites();
+    return () => {
+      ignore = true;
+    };
+  }, [status, userId]);
+
   const handleCloseSnackbar = () => {
-    setSnackbar({ ...snackbar, open: false });
+    setSnackbar((s) => ({ ...s, open: false }));
   };
 
-  // Check if an event is favorited
-  const isFavorited = (eventId) => {
-    return favorites.some(fav => fav.eventId === eventId);
-  };
+  // Safe check: favourites is always treated as an array
+  const isFavorited = (eventId) =>
+    Array.isArray(favorites) && favorites.some((f) => f.eventId === eventId);
 
   // Toggle favorite status
   const toggleFavorite = async (eventId) => {
     try {
-      const userId = 1; // Replace with actual user ID from your auth system
+      if (status !== "authenticated" || !userId) {
+        setSnackbar({
+          open: true,
+          message: "You must be logged in to favorite events",
+          severity: "warning",
+        });
+        return;
+      }
 
       if (isFavorited(eventId)) {
-        // Remove from favorites
-        const favToRemove = favorites.find(fav => fav.eventId === eventId);
-        await fetch(`/api/favourite/${favToRemove.id}`, {
+        // Remove favorite
+        const favToRemove = favorites.find((f) => f.eventId === eventId);
+        if (!favToRemove) return; // safety
+        const res = await fetch(`/api/favourite/${favToRemove.id}`, {
           method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include", // ✅ critical
         });
 
-        setFavorites(favorites.filter(fav => fav.eventId !== eventId));
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          setSnackbar({
+            open: true,
+            message: err?.error || "Failed to remove favourite",
+            severity: "error",
+          });
+          return;
+        }
+
+        setFavorites((prev) => prev.filter((f) => f.eventId !== eventId));
         setSnackbar({
           open: true,
           message: "Removed from favorites",
           severity: "info",
         });
       } else {
-        // Add to favorites
-        const response = await fetch("/api/favourite", {
+        // Add favorite
+        const res = await fetch("/api/favourite", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            user_id: userId,
-            eventId: eventId,
-          }),
+          headers: { "Content-Type": "application/json" },
+          credentials: "include", // ✅ critical
+          body: JSON.stringify({ eventId }),
         });
 
-        const newFavorite = await response.json();
-        setFavorites([...favorites, newFavorite]);
+        const json = await res.json().catch(() => ({}));
+        if (!res.ok || json?.error) {
+          setSnackbar({
+            open: true,
+            message: json?.error || "Failed to add favourite",
+            severity: "error",
+          });
+          return;
+        }
+
+        setFavorites((prev) => (Array.isArray(prev) ? [...prev, json] : [json]));
         setSnackbar({
           open: true,
           message: "Added to favorites!",
@@ -349,7 +406,7 @@ export default function EventPage() {
         });
       }
     } catch (error) {
-      console.error("Failed to update favorites:", error);
+      console.error("Error toggling favorite:", error);
       setSnackbar({
         open: true,
         message: "Failed to update favorites",
@@ -358,16 +415,22 @@ export default function EventPage() {
     }
   };
 
+  // Pagination memo
+  const { paginatedEvents, pageCount, topRow, bottomRow } = useMemo(() => {
+    const count = Math.ceil((events?.length || 0) / cardsPerPage);
+    const slice = (events || []).slice(
+      (currentPage - 1) * cardsPerPage,
+      currentPage * cardsPerPage
+    );
+    return {
+      paginatedEvents: slice,
+      pageCount: count || 1,
+      topRow: slice.slice(0, 3),
+      bottomRow: slice.slice(3, 6),
+    };
+  }, [events, currentPage]);
+
   if (loading) return <Loading open={true} />;
-
-  const pageCount = Math.ceil(events.length / cardsPerPage);
-  const paginatedEvents = events.slice(
-    (currentPage - 1) * cardsPerPage,
-    currentPage * cardsPerPage
-  );
-
-  const topRow = paginatedEvents.slice(0, 3);
-  const bottomRow = paginatedEvents.slice(3, 6);
 
   const renderCard = (event) => (
     <Card
@@ -393,7 +456,7 @@ export default function EventPage() {
         position: "relative",
       }}
     >
-      {/* Favorite button positioned absolutely */}
+      {/* Favorite button */}
       <IconButton
         onClick={(e) => {
           e.preventDefault();
@@ -405,7 +468,9 @@ export default function EventPage() {
           top: 8,
           right: 8,
           zIndex: 2,
-          color: isFavorited(event.id) ? "#ff1744" : "rgba(255, 255, 255, 0.7)",
+          color: isFavorited(event.id)
+            ? "#ff1744"
+            : "rgba(255, 255, 255, 0.7)",
           backgroundColor: "rgba(0, 0, 0, 0.5)",
           "&:hover": {
             backgroundColor: "rgba(0, 0, 0, 0.7)",
@@ -430,12 +495,8 @@ export default function EventPage() {
           <CardMedia
             component="img"
             image={event.photo || "/images/default.jpg"}
-            src={event.name}
-            sx={{
-              height: "100%",
-              width: "100%",
-              objectFit: "cover",
-            }}
+            alt={event.name}
+            sx={{ height: "100%", width: "100%", objectFit: "cover" }}
           />
         </Box>
 
@@ -480,10 +541,12 @@ export default function EventPage() {
           >
             <Chip
               label="Event"
-              size="small"
+              size="large"
               sx={{
                 backgroundColor: "#fff3e0",
                 color: "#ff6f00",
+                fontWeight: "bold",
+                fontSize:20
               }}
             />
           </Box>
@@ -538,25 +601,19 @@ export default function EventPage() {
             onChange={(event, value) => setCurrentPage(value)}
             color="primary"
             sx={{
-              '& .MuiPaginationItem-root': {
-                color: 'white',
-              },
-              '& .MuiPaginationItem-icon': {
-                color: 'white',
-              },
-              '& .Mui-selected': {
-                backgroundColor: 'primary.main',
-                color: 'white',
-                '&:hover': {
-                  backgroundColor: 'primary.dark',
-                },
+              "& .MuiPaginationItem-root": { color: "white" },
+              "& .MuiPaginationItem-icon": { color: "white" },
+              "& .Mui-selected": {
+                backgroundColor: "primary.main",
+                color: "white",
+                "&:hover": { backgroundColor: "primary.dark" },
               },
             }}
           />
         </Stack>
       </Box>
 
-      {/* Snackbar for notifications */}
+      {/* Snackbar */}
       <Snackbar
         open={snackbar.open}
         autoHideDuration={3000}

@@ -148,7 +148,7 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import {
   Box,
@@ -160,6 +160,7 @@ import {
   Stack,
   Rating,
   Button,
+  Pagination,
 } from "@mui/material";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
@@ -169,8 +170,11 @@ export default function ReviewsPage() {
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const { data: session, status } = useSession();
+
+  const reviewsPerPage = 6; // 2 rows × 3 per row
 
   // Fetch reviews
   const getReviewList = async () => {
@@ -190,10 +194,22 @@ export default function ReviewsPage() {
     getReviewList();
   }, []);
 
-  if (loading)
-    return (
-      <Loading open={true}/>
+  // Pagination memo
+  const { paginatedReviews, pageCount, topRow, bottomRow } = useMemo(() => {
+    const count = Math.ceil((reviews?.length || 0) / reviewsPerPage);
+    const slice = (reviews || []).slice(
+      (currentPage - 1) * reviewsPerPage,
+      currentPage * reviewsPerPage
     );
+    return {
+      paginatedReviews: slice,
+      pageCount: count || 1,
+      topRow: slice.slice(0, 3),
+      bottomRow: slice.slice(3, 6),
+    };
+  }, [reviews, currentPage]);
+
+  if (loading) return <Loading open={true} />;
 
   if (error)
     return (
@@ -203,6 +219,49 @@ export default function ReviewsPage() {
         </Typography>
       </Container>
     );
+
+  const renderCard = (review) => (
+    <Card
+      key={review.id}
+      sx={{
+        width: { xs: "100%", sm: 350 },
+        bgcolor: "#1E1E1E",
+        color: "white",
+        borderRadius: 2,
+      }}
+    >
+      <CardContent>
+        <Stack direction="row" spacing={2} alignItems="center" mb={1}>
+          <Avatar
+            alt={review.user?.name || "User"}
+            src={review.user?.photo || ""}
+          />
+          <Box>
+            <Typography fontWeight="bold">
+              {review.user?.name || "Anonymous"}
+            </Typography>
+            <Typography variant="body2" color="gray">
+              {review.Venue?.name || "Unknown Venue"}
+            </Typography>
+            <Typography variant="caption" color="gray">
+              {new Date(review.review_date).toLocaleDateString()}
+            </Typography>
+          </Box>
+        </Stack>
+
+        <Rating
+          value={review.rating || 0}
+          readOnly
+          size="small"
+          sx={{ mb: 1 }}
+        />
+
+        <Typography variant="body2" sx={{ whiteSpace: "pre-line" }}>
+          {review.description}
+        </Typography>
+      </CardContent>
+    </Card>
+  );
 
   return (
     <Box
@@ -229,13 +288,10 @@ export default function ReviewsPage() {
           direction="row"
           justifyContent="space-between"
           alignItems="center"
-          mb={2} ml={45}
+          mb={2}
+          ml={45}
         >
-          <Typography
-            variant="h6"
-            fontWeight="bold"
-            sx={{ color: "orange" }}
-          >
+          <Typography variant="h6" fontWeight="bold" sx={{ color: "orange" }}>
             See how our customers are talking about us
           </Typography>
 
@@ -252,56 +308,48 @@ export default function ReviewsPage() {
           )}
         </Stack>
 
-        <Stack direction="row" flexWrap="wrap" gap={2} justifyContent="center">
-          {reviews.length === 0 ? (
-            <Typography>No reviews available.</Typography>
-          ) : (
-            reviews.map((review) => (
-              <Card
-                key={review.id}
-                sx={{
-                  width: { xs: "100%", sm: 350 },
-                  bgcolor: "#1E1E1E",
-                  color: "white",
-                  borderRadius: 2,
-                }}
-              >
-                <CardContent>
-                  <Stack direction="row" spacing={2} alignItems="center" mb={1}>
-                    <Avatar
-                      alt={review.user?.name || "User"}
-                      src={review.user?.photo || ""}
-                    />
-                    <Box>
-                      <Typography fontWeight="bold">
-                        {review.user?.name || "Anonymous"}
-                      </Typography>
-                      <Typography variant="body2" color="gray">
-                        {review.Venue?.name || "Unknown Venue"}
-                      </Typography>
-                      <Typography variant="caption" color="gray">
-                        {new Date(review.review_date).toLocaleDateString()}
-                      </Typography>
-                    </Box>
-                  </Stack>
-
-                  <Rating
-                    value={review.rating || 0}
-                    readOnly
-                    size="small"
-                    sx={{ mb: 1 }}
-                  />
-
-                  <Typography variant="body2" sx={{ whiteSpace: "pre-line" }}>
-                    {review.description}
-                  </Typography>
-                </CardContent>
-              </Card>
-            ))
-          )}
+        {/* Top Row */}
+        <Stack
+          direction="row"
+          flexWrap="wrap"
+          gap={2}
+          justifyContent="center"
+          mb={2}
+        >
+          {topRow.map(renderCard)}
         </Stack>
+
+        {/* Bottom Row */}
+        <Stack
+          direction="row"
+          flexWrap="wrap"
+          gap={2}
+          justifyContent="center"
+          mb={2}
+        >
+          {bottomRow.map(renderCard)}
+        </Stack>
+
+        {/* Pagination */}
+        <Box sx={{ display: "flex", justifyContent: "center", mt: 60 }}>
+          <Pagination
+            count={pageCount}
+            page={currentPage}
+            onChange={(event, value) => setCurrentPage(value)}
+            color="primary"
+            sx={{
+              "& .MuiPaginationItem-root": { color: "white" },
+              "& .MuiPaginationItem-icon": { color: "white" },
+              "& .Mui-selected": {
+                backgroundColor: "primary.main",
+                color: "white",
+                "&:hover": { backgroundColor: "primary.dark" },
+              },
+            }}
+          />
+        </Box>
+
       </Container>
     </Box>
   );
 }
-

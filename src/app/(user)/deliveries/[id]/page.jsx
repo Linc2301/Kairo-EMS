@@ -284,15 +284,112 @@ export default function DeliveryPage() {
                             },
                         }}
                     >
-                        <Tab label="Venue" {...a11yProps(0)} />
-                        <Tab label="Floral Service" {...a11yProps(1)} />
                         <Tab label="Date & Time" {...a11yProps(2)} />
+                        <Tab label="Venue" {...a11yProps(0)} />
+                        <Tab label="Service" {...a11yProps(1)} />
                         <Tab label="Receipt" {...a11yProps(3)} />
                     </Tabs>
                 </Box>
 
-                {/* Venue selection */}
+                {/* Time package selection */}
                 <CustomTabPanel value={value} index={0}>
+                    <Box p={4} sx={{ bgcolor: "white", color: "black", borderRadius: 2 }}>
+                        <Typography variant="h5" gutterBottom fontWeight="bold">
+                            Select Date & Time
+                        </Typography>
+                        <Typography variant="body1" mb={4}>
+                            Please select date and time for your booking
+                        </Typography>
+
+                        <Box display="flex" gap={4} mt={4}>
+                            {/* Calendar Section */}
+                            <Box flex={1}>
+                                <Paper elevation={3} sx={{ p: 3 }}>
+                                    <Typography variant="h6" gutterBottom>
+                                        <CalendarMonthIcon sx={{ mr: 1 }} />
+                                        Select a Date
+                                    </Typography>
+                                    <LocalizationProvider dateAdapter={AdapterDateFns}>
+                                        <DatePicker
+                                            value={selectedDate}
+                                            onChange={handleDateChange}
+                                            shouldDisableDate={(date) => {
+                                                const dateStr = date.toISOString().split('T')[0];
+                                                return !datePackages.some(pkg => pkg.date === dateStr);
+                                            }}
+                                            renderInput={({ inputRef, inputProps, InputProps }) => (
+                                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                                    <input
+                                                        ref={inputRef}
+                                                        {...inputProps}
+                                                        style={{
+                                                            padding: '10px',
+                                                            border: '1px solid #ccc',
+                                                            borderRadius: '4px',
+                                                            width: '100%'
+                                                        }}
+                                                    />
+                                                    {InputProps?.endAdornment}
+                                                </Box>
+                                            )}
+                                        />
+                                    </LocalizationProvider>
+                                    {dateError && (
+                                        <Typography color="error" mt={1}>
+                                            {dateError}
+                                        </Typography>
+                                    )}
+                                </Paper>
+                            </Box>
+
+                            {/* Time Slot Section */}
+                            {selectedDate && (
+                                <Box flex={1}>
+                                    <Paper elevation={3} sx={{ p: 3 }}>
+                                        <Typography variant="h6" gutterBottom>
+                                            <AccessTimeIcon sx={{ mr: 1 }} />
+                                            Pick a time for {selectedDate.toLocaleDateString()}
+                                        </Typography>
+
+                                        {loading.timePackages ? (
+                                            <Box mt={3} textAlign="center">
+                                                <CircularProgress />
+                                            </Box>
+                                        ) : timePackages.length > 0 ? (
+                                            <Grid container spacing={2} mt={2}>
+                                                {timePackages.map((slot) => (
+                                                    <Grid item xs={6} key={slot.id}>
+                                                        <Button
+                                                            variant={bookingData.timePackage?.id === slot.id ? "contained" : "outlined"}
+                                                            fullWidth
+                                                            onClick={() => selectTimePackage(slot)}
+                                                            sx={{
+                                                                backgroundColor: bookingData.timePackage?.id === slot.id ? "orange" : undefined,
+                                                                color: bookingData.timePackage?.id === slot.id ? "white" : undefined,
+                                                                '&:hover': {
+                                                                    backgroundColor: bookingData.timePackage?.id === slot.id ? "darkorange" : undefined,
+                                                                }
+                                                            }}
+                                                        >
+                                                            {formatTime(slot.startTime)} - {formatTime(slot.endTime)}
+                                                        </Button>
+                                                    </Grid>
+                                                ))}
+                                            </Grid>
+                                        ) : (
+                                            <Typography color="text.secondary" mt={2}>
+                                                No available slots for this date.
+                                            </Typography>
+                                        )}
+                                    </Paper>
+                                </Box>
+                            )}
+                        </Box>
+                    </Box>
+                </CustomTabPanel>
+
+                {/* Venue selection */}
+                <CustomTabPanel value={value} index={2}>
                     {loading.venueTypes ? (
                         <Box display="flex" justifyContent="center" py={5}>
                             <CircularProgress />
@@ -449,102 +546,6 @@ export default function DeliveryPage() {
                     )}
                 </CustomTabPanel>
 
-                {/* Time package selection */}
-                <CustomTabPanel value={value} index={2}>
-                    <Box p={4} sx={{ bgcolor: "white", color: "black", borderRadius: 2 }}>
-                        <Typography variant="h5" gutterBottom fontWeight="bold">
-                            Select Date & Time
-                        </Typography>
-                        <Typography variant="body1" mb={4}>
-                            Please select date and time for your booking
-                        </Typography>
-
-                        <Box display="flex" gap={4} mt={4}>
-                            {/* Calendar Section */}
-                            <Box flex={1}>
-                                <Paper elevation={3} sx={{ p: 3 }}>
-                                    <Typography variant="h6" gutterBottom>
-                                        <CalendarMonthIcon sx={{ mr: 1 }} />
-                                        Select a Date
-                                    </Typography>
-                                    <LocalizationProvider dateAdapter={AdapterDateFns}>
-                                        <DatePicker
-                                            value={selectedDate}
-                                            onChange={handleDateChange}
-                                            shouldDisableDate={(date) => {
-                                                const dateStr = date.toISOString().split('T')[0];
-                                                return !datePackages.some(pkg => pkg.date === dateStr);
-                                            }}
-                                            renderInput={({ inputRef, inputProps, InputProps }) => (
-                                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                                    <input
-                                                        ref={inputRef}
-                                                        {...inputProps}
-                                                        style={{
-                                                            padding: '10px',
-                                                            border: '1px solid #ccc',
-                                                            borderRadius: '4px',
-                                                            width: '100%'
-                                                        }}
-                                                    />
-                                                    {InputProps?.endAdornment}
-                                                </Box>
-                                            )}
-                                        />
-                                    </LocalizationProvider>
-                                    {dateError && (
-                                        <Typography color="error" mt={1}>
-                                            {dateError}
-                                        </Typography>
-                                    )}
-                                </Paper>
-                            </Box>
-
-                            {/* Time Slot Section */}
-                            {selectedDate && (
-                                <Box flex={1}>
-                                    <Paper elevation={3} sx={{ p: 3 }}>
-                                        <Typography variant="h6" gutterBottom>
-                                            <AccessTimeIcon sx={{ mr: 1 }} />
-                                            Pick a time for {selectedDate.toLocaleDateString()}
-                                        </Typography>
-
-                                        {loading.timePackages ? (
-                                            <Box mt={3} textAlign="center">
-                                                <CircularProgress />
-                                            </Box>
-                                        ) : timePackages.length > 0 ? (
-                                            <Grid container spacing={2} mt={2}>
-                                                {timePackages.map((slot) => (
-                                                    <Grid item xs={6} key={slot.id}>
-                                                        <Button
-                                                            variant={bookingData.timePackage?.id === slot.id ? "contained" : "outlined"}
-                                                            fullWidth
-                                                            onClick={() => selectTimePackage(slot)}
-                                                            sx={{
-                                                                backgroundColor: bookingData.timePackage?.id === slot.id ? "orange" : undefined,
-                                                                color: bookingData.timePackage?.id === slot.id ? "white" : undefined,
-                                                                '&:hover': {
-                                                                    backgroundColor: bookingData.timePackage?.id === slot.id ? "darkorange" : undefined,
-                                                                }
-                                                            }}
-                                                        >
-                                                            {formatTime(slot.startTime)} - {formatTime(slot.endTime)}
-                                                        </Button>
-                                                    </Grid>
-                                                ))}
-                                            </Grid>
-                                        ) : (
-                                            <Typography color="text.secondary" mt={2}>
-                                                No available slots for this date.
-                                            </Typography>
-                                        )}
-                                    </Paper>
-                                </Box>
-                            )}
-                        </Box>
-                    </Box>
-                </CustomTabPanel>
 
                 {/* Receipt */}
                 <CustomTabPanel value={value} index={3}>

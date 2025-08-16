@@ -73,7 +73,6 @@
 
 // export { handler as GET, handler as POST };
 
-
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
@@ -98,37 +97,24 @@ export const authOptions = {
           where: { email: credentials.email },
         });
 
-        if (!user || !user.password) {
-          throw new Error("Invalid email or password");
-        }
+        if (!user || !user.password) throw new Error("Invalid email or password");
 
         const isValid = await bcrypt.compare(credentials.password, user.password);
-
-        if (!isValid) {
-          throw new Error("Invalid email or password");
-        }
+        if (!isValid) throw new Error("Invalid email or password");
 
         return {
           id: user.id,
           name: user.name,
           email: user.email,
           isAdmin: user.isAdmin,
-          photo: user.photo || null, // ✅ Add this
+          photo: user.photo || null,
         };
       },
     }),
   ],
-
-  session: {
-    strategy: "jwt",
-  },
-
+  session: { strategy: "jwt" },
   secret: process.env.NEXTAUTH_SECRET,
-
-  pages: {
-    signIn: "/login",
-  },
-
+  pages: { signIn: "/login" },
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
@@ -138,12 +124,11 @@ export const authOptions = {
       }
       return token;
     },
-
     async session({ session, token }) {
       if (token && session.user) {
         session.user.id = token.id;
         session.user.isAdmin = token.isAdmin;
-        session.user.photo = token.image || null;
+        session.user.photo = token.photo || null;
       }
       return session;
     },
@@ -151,5 +136,4 @@ export const authOptions = {
 };
 
 const handler = NextAuth(authOptions);
-
 export { handler as GET, handler as POST };
