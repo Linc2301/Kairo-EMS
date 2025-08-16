@@ -10,5 +10,6 @@ export const schema = yup.object().shape({
   password: yup
     .string()
     .required("Password is required")
-    .max(8, "Password must be at most 8 characters"),
+    .max(8, "Password must be at most 8 characters")
+    .matches(/^[A-Za-z0-9]*$/, "Password can only contain letters and numbers"), // ✅ no special chars
 });

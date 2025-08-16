@@ -746,7 +746,6 @@ import {
   CardContent,
   CardActions,
   Grid,
-  IconButton,
   TextField,
   Typography,
   ListItem,
@@ -759,7 +758,9 @@ import {
   Alert,
   Snackbar,
   Pagination,
+
   Chip,
+  IconButton,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
@@ -781,6 +782,11 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import Loading from "@/src/components/Loading";
 import Link from "next/link";
+
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import InputAdornment from '@mui/material/InputAdornment';
+
 
 const formatTime = (timeString) => {
   if (!timeString) return "N/A";
@@ -824,6 +830,10 @@ export default function ProfileSettingsPage() {
     history: { page: 1, itemsPerPage: 3 },
     favourite: { page: 1, itemsPerPage: 3 },
   });
+
+  const [showPassword, setShowPassword] = useState(false);
+const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
+
 
   const menuItems = ["Profile", "Notification", "History", "Favourite", "Log Out"];
 
@@ -1002,6 +1012,18 @@ export default function ProfileSettingsPage() {
   };
 
   const handleSave = async () => {
+
+      // Validate password first
+  if (formData.password) {
+    const passwordRegex = /^[A-Za-z0-9]{1,8}$/; // 1-8 chars, letters & numbers only
+    if (!passwordRegex.test(formData.password)) {
+      showSnackbar(
+        "Password must be 1-8 characters and contain only letters and numbers.",
+        "error"
+      );
+      return; // stop saving
+    }
+  }
     try {
       setLoading(prev => ({ ...prev, profile: true }));
       const data = new FormData();
@@ -1200,11 +1222,20 @@ export default function ProfileSettingsPage() {
                         <TextField
                           fullWidth
                           label="New Password"
-                          type="password"
+                           type={showPassword ? "text" : "password"} // ✅ toggle type
                           value={formData.password}
                           onChange={handleChange("password")}
                           margin="normal"
                           helperText="Leave blank to keep current password"
+                          InputProps={{
+    endAdornment: (
+      <InputAdornment position="end">
+        <IconButton onClick={togglePasswordVisibility} edge="end" size="small">
+          {showPassword ? <VisibilityOff /> : <Visibility />}
+        </IconButton>
+      </InputAdornment>
+    ),
+  }}
                         />
                         <Box mt={3} display="flex" gap={2}>
                           <Button
