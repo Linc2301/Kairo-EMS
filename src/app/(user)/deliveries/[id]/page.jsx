@@ -1,6 +1,4 @@
-
 "use client";
-
 
 import * as React from "react";
 import {
@@ -53,9 +51,9 @@ export default function DeliveryPage() {
     const [timePackages, setTimePackages] = useState([]);
     const [datePackages, setDatePackages] = useState([]);
     const [bookingData, setBookingData] = useState({
+        timePackage: null,
         venue: null,
         floral: null,
-        timePackage: null,
     });
     const [selectedDate, setSelectedDate] = useState(null);
     const [dateError, setDateError] = useState("");
@@ -75,11 +73,11 @@ export default function DeliveryPage() {
 
         const fetchData = async () => {
             try {
-                const [venueRes, floralRes, timeRes, dateRes] = await Promise.all([
-                    fetch(`/api/venueType?venueId=${eventId}`),
-                    fetch(`/api/floralServices?venue_id=${eventId}`),
+                const [timeRes, dateRes, venueRes, floralRes] = await Promise.all([
                     fetch(`/api/timePackages?venueId=${eventId}`),
-                    fetch(`/api/availability/date?venueId=${eventId}`)
+                    fetch(`/api/availability/date?venueId=${eventId}`),
+                    fetch(`/api/venueType?venueId=${eventId}`),
+                    fetch(`/api/floralServices?venue_id=${eventId}`)
                 ]);
 
                 if (!venueRes.ok || !floralRes.ok || !timeRes.ok || !dateRes.ok) {
@@ -121,31 +119,31 @@ export default function DeliveryPage() {
         }
     };
 
+    const selectTimePackage = (timePackage) => {
+        setBookingData((prev) => ({
+            ...prev,
+            timePackage,
+            venue: null,
+            floral: null,
+        }));
+        setValue(1); // Move to Venue selection after time is selected
+    };
+
     const selectVenue = (venue) => {
         setBookingData((prev) => ({
             ...prev,
             venue,
             floral: null,
-            timePackage: null,
         }));
-        setValue(1);
+        setValue(2); // Move to Service selection after venue is selected
     };
 
     const selectFloral = (floral) => {
         setBookingData((prev) => ({
             ...prev,
             floral,
-            timePackage: null,
         }));
-        setValue(2);
-    };
-
-    const selectTimePackage = (timePackage) => {
-        setBookingData((prev) => ({
-            ...prev,
-            timePackage,
-        }));
-        setValue(3);
+        setValue(3); // Move to Receipt after service is selected
     };
 
     const handleDateChange = async (newDate) => {
@@ -169,13 +167,13 @@ export default function DeliveryPage() {
 
     const formatTime = (timeStr) => {
         const time = new Date(timeStr);
-        return time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true, });
+        return time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
     };
 
     const handleConfirm = async () => {
         setError(null);
 
-        if (!bookingData.venue || !bookingData.floral || !bookingData.timePackage) {
+        if (!bookingData.timePackage || !bookingData.venue || !bookingData.floral) {
             alert("Please complete all selections before confirming.");
             return;
         }
@@ -224,7 +222,7 @@ export default function DeliveryPage() {
             const data = await res.json();
             setSuccessMessage("Booking confirmed!");
             setSuccessDialogOpen(true);
-            setBookingData({ venue: null, floral: null, timePackage: null });
+            setBookingData({ timePackage: null, venue: null, floral: null });
             setValue(0);
         } catch (err) {
             setError(err.message);
@@ -284,9 +282,9 @@ export default function DeliveryPage() {
                             },
                         }}
                     >
-                        <Tab label="Date & Time" {...a11yProps(2)} />
-                        <Tab label="Venue" {...a11yProps(0)} />
-                        <Tab label="Service" {...a11yProps(1)} />
+                        <Tab label="Date & Time" {...a11yProps(0)} />
+                        <Tab label="Venue" {...a11yProps(1)} />
+                        <Tab label="Service" {...a11yProps(2)} />
                         <Tab label="Receipt" {...a11yProps(3)} />
                     </Tabs>
                 </Box>
@@ -389,7 +387,7 @@ export default function DeliveryPage() {
                 </CustomTabPanel>
 
                 {/* Venue selection */}
-                <CustomTabPanel value={value} index={2}>
+                <CustomTabPanel value={value} index={1}>
                     {loading.venueTypes ? (
                         <Box display="flex" justifyContent="center" py={5}>
                             <CircularProgress />
@@ -474,7 +472,7 @@ export default function DeliveryPage() {
                 </CustomTabPanel>
 
                 {/* Floral service selection */}
-                <CustomTabPanel value={value} index={1}>
+                <CustomTabPanel value={value} index={2}>
                     {loading.floralServices ? (
                         <Box display="flex" justifyContent="center" py={5}>
                             <CircularProgress />
@@ -546,7 +544,6 @@ export default function DeliveryPage() {
                     )}
                 </CustomTabPanel>
 
-
                 {/* Receipt */}
                 <CustomTabPanel value={value} index={3}>
                     <Box
@@ -574,6 +571,26 @@ export default function DeliveryPage() {
 
                         <Box mb={3}>
                             <Typography variant="subtitle1" fontWeight="bold" sx={{ mb: 1 }}>
+                                Date & Time
+                            </Typography>
+                            <Typography sx={{ fontSize: "0.9rem", color: "#555" }}>
+                                Date:{" "}
+                                {selectedDate
+                                    ? selectedDate.toLocaleDateString()
+                                    : "Not selected"}
+                            </Typography>
+                            <Typography sx={{ fontSize: "0.9rem", color: "#555" }}>
+                                Time:{" "}
+                                {bookingData.timePackage
+                                    ? `${formatTime(bookingData.timePackage.startTime)} - ${formatTime(bookingData.timePackage.endTime)}`
+                                    : "Not selected"}
+                            </Typography>
+                        </Box>
+
+                        <Divider sx={{ my: 2 }} />
+
+                        <Box mb={3}>
+                            <Typography variant="subtitle1" fontWeight="bold" sx={{ mb: 1 }}>
                                 Venue
                             </Typography>
                             <Typography sx={{ fontSize: "0.9rem", color: "#555" }}>
@@ -595,28 +612,6 @@ export default function DeliveryPage() {
                             </Typography>
                             <Typography sx={{ fontSize: "0.9rem", color: "#555" }}>
                                 Price: {bookingData.floral?.price?.toLocaleString() || 0} MMK
-                            </Typography>
-                        </Box>
-
-                        <Divider sx={{ my: 2 }} />
-
-                        <Box mb={3}>
-                            <Typography variant="subtitle1" fontWeight="bold" sx={{ mb: 1 }}>
-                                Date & Time
-                            </Typography>
-
-                            <Typography sx={{ fontSize: "0.9rem", color: "#555" }}>
-                                Date:{" "}
-                                {selectedDate
-                                    ? selectedDate.toLocaleDateString()
-                                    : "Not selected"}
-                            </Typography>
-
-                            <Typography sx={{ fontSize: "0.9rem", color: "#555" }}>
-                                Time:{" "}
-                                {bookingData.timePackage
-                                    ? `${formatTime(bookingData.timePackage.startTime)} - ${formatTime(bookingData.timePackage.endTime)}`
-                                    : "Not selected"}
                             </Typography>
                         </Box>
 
@@ -669,10 +664,10 @@ export default function DeliveryPage() {
                                         backgroundColor: "rgba(255, 165, 0, 0.04)",
                                     },
                                 }}
-                                onClick={() => setValue(0)}
+                                onClick={() => setValue(2)}
                                 disabled={loading.confirm}
                             >
-                                Cancel
+                                Back
                             </Button>
                             <Button
                                 variant="contained"
@@ -697,7 +692,8 @@ export default function DeliveryPage() {
                         </Box>
                     </Box>
                 </CustomTabPanel>
-                <Dialog
+
+                {/* <Dialog
                     open={successDialogOpen}
                     onClose={() => setSuccessDialogOpen(false)}
                 >
@@ -723,9 +719,11 @@ export default function DeliveryPage() {
                             OK
                         </Button>
                     </DialogActions>
-                </Dialog>
+                </Dialog> */}
 
-                {/* Only Back button */}
+                {/* Payment Section */}
+
+                {/* Back button */}
                 <Box display="flex" justifyContent="flex-start" p={2}>
                     <Button
                         disabled={value === 0}

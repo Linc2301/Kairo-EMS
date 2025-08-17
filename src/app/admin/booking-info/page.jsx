@@ -95,7 +95,6 @@
 // }
 
 
-
 "use client";
 import {
     Box,
@@ -116,6 +115,7 @@ import {
 import DeleteIcon from "@mui/icons-material/Delete";
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 
 export default function BookingList() {
     const [bookings, setBookings] = useState([]);
@@ -124,6 +124,7 @@ export default function BookingList() {
     const [page, setPage] = useState(1);
     const rowsPerPage = 5;
 
+    // Fetch bookings
     const fetchBookings = async () => {
         try {
             setLoading(true);
@@ -138,6 +139,7 @@ export default function BookingList() {
         }
     };
 
+    // Delete booking
     const handleDelete = async (id) => {
         const confirmed = window.confirm("Are you sure you want to delete this booking?");
         if (!confirmed) return;
@@ -148,6 +150,28 @@ export default function BookingList() {
         } catch (error) {
             console.error("Failed to delete booking:", error);
             alert("Failed to delete booking. Please try again.");
+        }
+    };
+
+    // Confirm booking (admin action)
+    const handleConfirmBooking = async (id) => {
+        try {
+            const bookingId = `BK-${uuidv4()}`; // Generate bookingId if not present
+            const response = await axios.patch(`/api/booking-info/${id}/confirm`, {
+                bookingId,
+            });
+
+            // Update booking in local state
+            setBookings((prev) =>
+                prev.map((booking) =>
+                    booking.id === id
+                        ? { ...booking, status: "confirmed", bookingId: response.data.bookingId }
+                        : booking
+                )
+            );
+        } catch (error) {
+            console.error("Failed to confirm booking:", error);
+            alert("Failed to confirm booking. Please try again.");
         }
     };
 
@@ -182,7 +206,7 @@ export default function BookingList() {
     }
 
     return (
-        <Box sx={{ p: 3, pb: 10 }}> {/* Add bottom padding to avoid overlap with fixed pagination */}
+        <Box sx={{ p: 3, pb: 10 }}>
             <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
                 <Typography variant="h4">Bookings</Typography>
             </Stack>
@@ -190,65 +214,84 @@ export default function BookingList() {
             {bookings.length === 0 ? (
                 <Typography>No bookings found</Typography>
             ) : (
-                <>
-                    <Paper>
-                        <TableContainer>
-                            <Table>
-                                <TableHead>
-                                    <TableRow>
-                                        <TableCell align="center">No</TableCell>
-                                        <TableCell align="center">User</TableCell>
-                                        <TableCell align="center">Venue</TableCell>
-                                        <TableCell align="center">Venue Type</TableCell>
-                                        <TableCell align="center">Floral Service</TableCell>
-                                        <TableCell align="center">Date</TableCell>
-                                        <TableCell align="center">Total Amount</TableCell>
-                                        <TableCell align="center">Action</TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {paginatedBookings.map((booking, index) => (
-                                        <TableRow key={booking.id}>
-                                            <TableCell align="center">{(page - 1) * rowsPerPage + index + 1}</TableCell>
-                                            <TableCell align="center">{booking.user?.name || "N/A"}</TableCell>
-                                            <TableCell align="center">{booking.venue?.name || "N/A"}</TableCell>
-                                            <TableCell align="center">{booking.VenueType?.name || "N/A"}</TableCell>
-                                            <TableCell align="center">{booking.floralService?.name || "N/A"}</TableCell>
-                                            <TableCell align="center">
-                                                {new Date(booking.booking_date).toLocaleDateString()}
-                                            </TableCell>
-                                            <TableCell align="center">{booking.total_amount} MMK</TableCell>
-                                            <TableCell align="center">
-                                                <IconButton
-                                                    sx={{ color: "red" }}
-                                                    onClick={() => handleDelete(booking.id)}
-                                                    aria-label="delete"
+                <Paper>
+                    <TableContainer>
+                        <Table>
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell align="center">No</TableCell>
+                                    <TableCell align="center">User</TableCell>
+                                    <TableCell align="center">Venue</TableCell>
+                                    <TableCell align="center">Venue Type</TableCell>
+                                    <TableCell align="center">Floral Service</TableCell>
+                                    <TableCell align="center">Date</TableCell>
+                                    <TableCell align="center">Total Amount</TableCell>
+                                    <TableCell align="center">Status</TableCell>
+                                    <TableCell align="center">Action</TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {paginatedBookings.map((booking, index) => (
+                                    <TableRow key={booking.id}>
+                                        <TableCell align="center">{(page - 1) * rowsPerPage + index + 1}</TableCell>
+                                        <TableCell align="center">{booking.user?.name || "N/A"}</TableCell>
+                                        <TableCell align="center">{booking.venue?.name || "N/A"}</TableCell>
+                                        <TableCell align="center">{booking.VenueType?.name || "N/A"}</TableCell>
+                                        <TableCell align="center">{booking.floralService?.name || "N/A"}</TableCell>
+                                        <TableCell align="center">
+                                            {new Date(booking.booking_date).toLocaleDateString()}
+                                        </TableCell>
+                                        <TableCell align="center">{booking.total_amount} MMK</TableCell>
+                                        <TableCell align="center">
+                                            {booking.status === "pending" ? (
+                                                <Button
+                                                    variant="contained"
+                                                    color="primary"
+                                                    onClick={() => handleConfirmBooking(booking.id)}
                                                 >
-                                                    <DeleteIcon />
-                                                </IconButton>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
-                    </Paper>
-                </>
+                                                    Confirm
+                                                </Button>
+                                            ) : (
+                                                <span
+                                                    style={{
+                                                        color: booking.status === "confirmed" ? "green" : "red",
+                                                        fontWeight: "bold",
+                                                    }}
+                                                >
+                                                    {booking.status}
+                                                </span>
+                                            )}
+                                        </TableCell>
+                                        <TableCell align="center">
+                                            <IconButton
+                                                sx={{ color: "red" }}
+                                                onClick={() => handleDelete(booking.id)}
+                                                aria-label="delete"
+                                            >
+                                                <DeleteIcon />
+                                            </IconButton>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                </Paper>
             )}
 
-            {/* Fixed Pagination at Bottom */}
+            {/* Fixed Pagination */}
             {bookings.length >= rowsPerPage && (
                 <Box
                     sx={{
-                        position: 'fixed',
+                        position: "fixed",
                         bottom: 0,
                         left: 0,
-                        width: '100%',
-                        bgcolor: 'white',
+                        width: "100%",
+                        bgcolor: "white",
                         py: 2,
-                        display: 'flex',
-                        justifyContent: 'center',
-                        boxShadow: '0 -2px 8px rgba(0,0,0,0.1)',
+                        display: "flex",
+                        justifyContent: "center",
+                        boxShadow: "0 -2px 8px rgba(0,0,0,0.1)",
                     }}
                 >
                     <Pagination

@@ -49,9 +49,9 @@
 //     }
 // }
 
-
 import { NextResponse } from 'next/server'
 import { prisma } from "@/src/lib/prisma";
+import { v4 as uuidv4 } from 'uuid';
 
 export async function GET(request) {
     try {
@@ -90,28 +90,52 @@ export async function GET(request) {
         );
     }
 }
-
 export async function POST(req) {
     try {
         const data = await req.json();
 
         // Validate required fields
-        if (!data.venue_id || !data.venueTypeId || !data.timePackageId || !data.user_id || !data.booking_date) {
+        if (
+            !data.venue_id ||
+            !data.venueTypeId ||
+            !data.timePackageId ||
+            !data.user_id ||
+            !data.booking_date ||
+            !data.total_amount
+        ) {
             return NextResponse.json(
                 { error: 'Missing required fields' },
                 { status: 400 }
             );
         }
 
+        // Count existing bookings to generate sequential ID
+        const totalBookings = await prisma.booking.count();
+        const nextNumber = totalBookings + 1;
+        const bookingId = `BK${String(nextNumber).padStart(3, '0')}`; // e.g., BK001, BK002
+
         const booking = await prisma.booking.create({
             data: {
+                bookingId,
                 venue_id: Number(data.venue_id),
                 venueTypeId: Number(data.venueTypeId),
                 floral_service_id: Number(data.floral_service_id),
                 timePackageId: Number(data.timePackageId),
                 user_id: Number(data.user_id),
+                eventId: data.eventId ? Number(data.eventId) : null,
                 booking_date: new Date(data.booking_date),
                 total_amount: Number(data.total_amount),
+
+                // ✅ Fill required enums with defaults
+                payment: data.payment ?? "pending",
+                status: data.status ?? "pending",
+            },
+            include: {
+                user: { select: { id: true, name: true, email: true } },
+                venue: true,
+                VenueType: true,
+                floralService: true,
+                TimePackage: true,
             },
         });
 

@@ -112,7 +112,7 @@ export async function GET(_, { params }) {
                         photo: true,
                     },
                 },
-                Venue: {
+                Event: {
                     select: {
                         id: true,
                         name: true,

@@ -15,8 +15,8 @@ model User {
   password String  @db.VarChar(255)
   photo    String? @db.LongText
 
-  isAdmin   String      @default("user") @db.VarChar(50)
-  status    UserStatus  @default(active)
+  isAdmin   Role        @default(user)
+  status    UserStatus  @default(inactive)
   Booking   Booking[]
   Review    Review[]
   Favourite Favourite[]
@@ -31,6 +31,8 @@ model Event {
   photo       String?     @db.LongText
   Venue       Venue[]
   Favourite   Favourite[]
+  Review      Review[]
+  Booking     Booking[]
 }
 
 model Venue {
@@ -45,7 +47,6 @@ model Venue {
   Booking     Booking[]
   TimePackage TimePackage[]
 
-  Review        Review[]
   FloralService FloralService[]
 }
 
@@ -88,7 +89,7 @@ model TimePackage {
 
 model Booking {
   id        Int    @id @default(autoincrement())
-  bookingId String @unique
+  bookingId String @unique @default(uuid())
   venue_id  Int
   venue     Venue  @relation(fields: [venue_id], references: [id])
 
@@ -104,12 +105,18 @@ model Booking {
   user_id Int
   user    User @relation(fields: [user_id], references: [id])
 
+  Event   Event? @relation(fields: [eventId], references: [id])
+  eventId Int?
+
   booking_date DateTime
   total_amount Int
 
-  status String @default("pending") @db.VarChar(50)
+  payment Payment @default(pending)
+
+  status BookingStatus @default(pending)
 
   createdAt DateTime @default(now())
+  Review    Review?
 }
 
 model Contact {
@@ -131,8 +138,11 @@ model Review {
   review_date DateTime
   description String   @db.Text
 
-  venue_id Int
-  Venue    Venue @relation(fields: [venue_id], references: [id])
+  Event   Event? @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  eventId Int?
+
+  bookingId Int     @unique
+  Booking   Booking @relation(fields: [bookingId], references: [id])
 }
 
 model Description {
@@ -172,4 +182,9 @@ enum UserStatus {
 enum BookingStatus {
   pending
   confirmed
+}
+
+enum Payment {
+  pending
+  done
 }

@@ -13,7 +13,7 @@ export async function GET() {
             photo: true,
           },
         },
-        Venue: {   // Make sure this matches your Prisma schema relation name
+        Event: {   // Make sure this matches your Prisma schema relation name
           select: {
             id: true,
             name: true,
@@ -36,15 +36,15 @@ export async function POST(req) {
   try {
     const data = await req.json();
 
-    const { user_id, venue_id, rating, review_date, description } = data;
-    if (!user_id || !venue_id || typeof rating !== "number" || !review_date || !description) {
+    const { user_id, eventId, rating, review_date, description } = data;
+    if (!user_id || !eventId || typeof rating !== "number" || !review_date || !description) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
     const newReview = await prisma.review.create({
       data: {
         user_id,
-        venue_id,
+        eventId,
         rating,
         review_date: new Date(review_date),
         description,

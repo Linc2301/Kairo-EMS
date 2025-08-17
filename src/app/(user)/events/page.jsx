@@ -1,239 +1,4 @@
 
-// "use client";
-
-// import { useEffect, useState } from "react";
-// import Link from "next/link";
-// import {
-//   Box,
-//   Typography,
-//   Card,
-//   CardMedia,
-//   CardContent,
-//   Chip,
-//   IconButton,
-// } from "@mui/material";
-// import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
-// import Pagination from "@mui/material/Pagination";
-// import Stack from "@mui/material/Stack";
-// import Loading from "@/src/components/Loading"; // ✅ loading component import
-
-// export default function EventPage() {
-//   const [events, setEvents] = useState([]);
-//   const [loading, setLoading] = useState(true); // ✅ loading state
-//   const [currentPage, setCurrentPage] = useState(1);
-//   const cardsPerPage = 6;
-
-//   useEffect(() => {
-//     async function fetchEvents() {
-//       try {
-//         setLoading(true); // ✅ show loading while fetching
-//         const res = await fetch("/api/events");
-//         const data = await res.json();
-//         setEvents(data);
-//       } catch (error) {
-//         console.error("Failed to fetch events:", error);
-//       } finally {
-//         setLoading(false); // ✅ hide loading when done
-//       }
-//     }
-//     fetchEvents();
-//   }, []);
-
-//   if (loading) return <Loading open={true} />; // ✅ render loading component
-
-//   const pageCount = Math.ceil(events.length / cardsPerPage);
-//   const paginatedEvents = events.slice(
-//     (currentPage - 1) * cardsPerPage,
-//     currentPage * cardsPerPage
-//   );
-
-//   const topRow = paginatedEvents.slice(0, 3);
-//   const bottomRow = paginatedEvents.slice(3, 6);
-
-//   const renderCard = (event) => (
-//     <Card
-//       key={event.id}
-//       sx={{
-//         width: 260,
-//         height: 400,
-//         display: "flex",
-//         flexDirection: "column",
-//         justifyContent: "flex-start",
-//         boxShadow: "0 2px 8px rgba(234, 226, 226, 0.3)",
-//         borderRadius: "16px",
-//         border: "3px solid transparent",
-//         borderColor: "white",
-//         transition: "all 0.5s ease",
-//         "&:hover": {
-//           transform: "translateY(-5px)",
-//           borderColor: "#ff6f00",
-//           boxShadow: "0 4px 12px rgba(255, 111, 0, 0.9)",
-//         },
-//         backgroundColor: "#111",
-//         overflow: "hidden",
-//       }}
-//     >
-//       <Link
-//         href={`/events/${event.id}`}
-//         passHref
-//         style={{
-//           textDecoration: "none",
-//           color: "inherit",
-//           display: "flex",
-//           flexDirection: "column",
-//           height: "100%",
-//         }}
-//       >
-//         <Box sx={{ height: 235, overflow: "hidden" }}>
-//           <CardMedia
-//             component="img"
-//             image={event.photo || "/images/default.jpg"}
-//             src={event.name}
-//             sx={{
-//               height: "100%",
-//               width: "100%",
-//               objectFit: "cover",
-//             }}
-//           />
-//         </Box>
-
-//         <CardContent
-//           sx={{
-//             flex: 1,
-//             display: "flex",
-//             flexDirection: "column",
-//             justifyContent: "space-between",
-//             px: 2,
-//             py: 1,
-//           }}
-//         >
-//           <Box>
-//             <Typography
-//               variant="h6"
-//               sx={{ fontWeight: "bold", color: "#ec7921ff", mb: 1 }}
-//             >
-//               {event.name}
-//             </Typography>
-
-
-//             <Typography
-//               variant="body2"
-//               sx={{
-//                 color: "#aaa",
-//                 display: "-webkit-box",
-//                 WebkitLineClamp: 3,
-//                 WebkitBoxOrient: "vertical",
-//                 overflow: "hidden",
-//               }}
-//             >
-//               {event.description}
-//             </Typography>
-
-
-//           </Box>
-//           <Box
-//             sx={{
-//               display: "flex",
-//               justifyContent: "space-between",
-//               alignItems: "center",
-//               mt: 2,
-//             }}
-//           >
-
-//               <Chip
-//               label="Event"
-//               size="small"
-//               sx={{
-//                 backgroundColor: "#fff3e0",
-//                 color: "#ff6f00",
-//               }}
-//             />
-
-//             <IconButton
-//               size="small"
-//               sx={{
-//                 color: "rgba(255, 255, 255, 0.7)",
-//                 "&:hover": { color: "#ff1744" },
-//               }}
-//             >
-
-//             </IconButton>
-//           </Box>
-//         </CardContent>
-//       </Link>
-//     </Card>
-//   );
-
-//   return (
-//     <Box sx={{ backgroundColor: " #0c0c0cff", py: 8, px: 2, textAlign: "center" }}>
-//       <Typography
-//         variant="h4"
-//         sx={{ color: "#ffffffff", fontWeight: "bold", mb: 2 }}
-//       >
-//         A space for every moment
-//       </Typography>
-//       <Typography variant="h6" sx={{ color: "#5837ebff", mb: 10 }}>
-//         Book a unique space for your activity
-//       </Typography>
-
-//       {/* Top Row */}
-//       <Box
-//         sx={{
-//           display: "flex",
-//           justifyContent: "center",
-//           gap: 10,
-//           mb: 6,
-//           flexWrap: "wrap",
-//         }}
-//       >
-//         {topRow.map(renderCard)}
-//       </Box>
-
-//       {/* Bottom Row */}
-//       <Box
-//         sx={{
-//           display: "flex",
-//           justifyContent: "center",
-//           gap: 10,
-//           flexWrap: "wrap",
-//         }}
-//       >
-//         {bottomRow.map(renderCard)}
-//       </Box>
-
-//       {/* Pagination */}
-// <Box sx={{ display: "flex", justifyContent: "center", mt: 8 }}>
-//   <Stack spacing={2}>
-//     <Pagination 
-//       count={pageCount}
-//       page={currentPage}
-//       onChange={(event, value) => setCurrentPage(value)}
-//       color="primary"
-//       sx={{
-//         '& .MuiPaginationItem-root': {
-//           color: 'white', // All page numbers
-//         },
-//         '& .MuiPaginationItem-icon': {
-//           color: 'white', // Arrows < and >
-//         },
-//         '& .Mui-selected': {
-//           backgroundColor: 'primary.main',
-//           color: 'white',
-//           '&:hover': {
-//             backgroundColor: 'primary.dark',
-//           },
-//         },
-//       }}
-//     />
-//   </Stack>
-// </Box>
-
-
-//     </Box>
-//   );
-// }
-
-
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
@@ -249,11 +14,14 @@ import {
   IconButton,
   Snackbar,
   Alert,
+  TextField,
+  InputAdornment,
+  Stack,
 } from "@mui/material";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
+import SearchIcon from "@mui/icons-material/Search";
 import Pagination from "@mui/material/Pagination";
-import Stack from "@mui/material/Stack";
 import Loading from "@/src/components/Loading";
 
 export default function EventPage() {
@@ -262,8 +30,9 @@ export default function EventPage() {
 
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [favorites, setFavorites] = useState([]); // always keep an array
+  const [favorites, setFavorites] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
@@ -302,12 +71,12 @@ export default function EventPage() {
     };
   }, []);
 
-  // Fetch user favourites (only when authenticated)
+  // Fetch user favourites
   useEffect(() => {
     let ignore = false;
     async function fetchFavourites() {
       if (status !== "authenticated" || !userId) {
-        setFavorites([]); // ensure array when logged out / not ready
+        setFavorites([]);
         return;
       }
       try {
@@ -337,7 +106,6 @@ export default function EventPage() {
     setSnackbar((s) => ({ ...s, open: false }));
   };
 
-  // Safe check: favourites is always treated as an array
   const isFavorited = (eventId) =>
     Array.isArray(favorites) && favorites.some((f) => f.eventId === eventId);
 
@@ -356,11 +124,11 @@ export default function EventPage() {
       if (isFavorited(eventId)) {
         // Remove favorite
         const favToRemove = favorites.find((f) => f.eventId === eventId);
-        if (!favToRemove) return; // safety
+        if (!favToRemove) return;
         const res = await fetch(`/api/favourite/${favToRemove.id}`, {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },
-          credentials: "include", // ✅ critical
+          credentials: "include",
         });
 
         if (!res.ok) {
@@ -384,7 +152,7 @@ export default function EventPage() {
         const res = await fetch("/api/favourite", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          credentials: "include", // ✅ critical
+          credentials: "include",
           body: JSON.stringify({ eventId }),
         });
 
@@ -415,10 +183,19 @@ export default function EventPage() {
     }
   };
 
-  // Pagination memo
+  // Filter events based on search query
+  // Update the filteredEvents calculation to use startsWith
+  const filteredEvents = useMemo(() => {
+    if (!searchQuery) return events;
+    return events.filter(event =>
+      event.name.toLowerCase().startsWith(searchQuery.toLowerCase())
+    );
+  }, [events, searchQuery]);
+
+  // Pagination calculation
   const { paginatedEvents, pageCount, topRow, bottomRow } = useMemo(() => {
-    const count = Math.ceil((events?.length || 0) / cardsPerPage);
-    const slice = (events || []).slice(
+    const count = Math.ceil((filteredEvents?.length || 0) / cardsPerPage);
+    const slice = (filteredEvents || []).slice(
       (currentPage - 1) * cardsPerPage,
       currentPage * cardsPerPage
     );
@@ -428,7 +205,7 @@ export default function EventPage() {
       topRow: slice.slice(0, 3),
       bottomRow: slice.slice(3, 6),
     };
-  }, [events, currentPage]);
+  }, [filteredEvents, currentPage]);
 
   if (loading) return <Loading open={true} />;
 
@@ -456,7 +233,6 @@ export default function EventPage() {
         position: "relative",
       }}
     >
-      {/* Favorite button */}
       <IconButton
         onClick={(e) => {
           e.preventDefault();
@@ -546,7 +322,7 @@ export default function EventPage() {
                 backgroundColor: "#fff3e0",
                 color: "#ff6f00",
                 fontWeight: "bold",
-                fontSize:20
+                fontSize: 20
               }}
             />
           </Box>
@@ -556,62 +332,128 @@ export default function EventPage() {
   );
 
   return (
-    <Box sx={{ backgroundColor: " #0c0c0cff", py: 8, px: 2, textAlign: "center" }}>
+    <Box sx={{ backgroundColor: "#0c0c0cff", py: 8, px: 2, textAlign: "center" }}>
       <Typography
         variant="h4"
         sx={{ color: "#ffffffff", fontWeight: "bold", mb: 2 }}
       >
         A space for every moment
       </Typography>
-      <Typography variant="h6" sx={{ color: "#5837ebff", mb: 10 }}>
+      <Typography variant="h6" sx={{ color: "#5837ebff", mb: 6 }}>
         Book a unique space for your activity
       </Typography>
 
-      {/* Top Row */}
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          gap: 10,
-          mb: 6,
-          flexWrap: "wrap",
-        }}
-      >
-        {topRow.map(renderCard)}
+      {/* Search Bar */}
+      <Box sx={{
+        display: "flex",
+        justifyContent: "center",
+        mb: 6,
+        width: "100%",
+        px: 2
+      }}>
+        <TextField
+          placeholder="Search events..."
+          variant="outlined"
+          value={searchQuery}
+          onChange={(e) => {
+            setSearchQuery(e.target.value);
+            setCurrentPage(1);
+          }}
+          sx={{
+            width: "100%",
+            maxWidth: 600,
+            "& .MuiOutlinedInput-root": {
+              color: "white",
+              "& fieldset": {
+                borderColor: "#ff6f00",
+                borderRadius: "25px",
+              },
+              "&:hover fieldset": {
+                borderColor: "#ff8f00",
+              },
+              "&.Mui-focused fieldset": {
+                borderColor: "#ff6f00",
+                boxShadow: "0 0 0 2px rgba(255, 111, 0, 0.2)",
+              },
+            },
+            "& .MuiInputLabel-root": {
+              color: "#aaa",
+            },
+            "& .MuiInputLabel-root.Mui-focused": {
+              color: "#ff6f00",
+            },
+          }}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon sx={{ color: "#ff6f00" }} />
+              </InputAdornment>
+            ),
+            sx: {
+              color: "white",
+              fontSize: "1.1rem",
+              paddingLeft: 1,
+            }
+          }}
+        />
       </Box>
 
-      {/* Bottom Row */}
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          gap: 10,
-          flexWrap: "wrap",
-        }}
-      >
-        {bottomRow.map(renderCard)}
-      </Box>
+      {/* Events Display */}
+      {filteredEvents.length > 0 ? (
+        <>
+          {/* Top Row */}
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              gap: 10,
+              mb: 6,
+              flexWrap: "wrap",
+            }}
+          >
+            {topRow.map(renderCard)}
+          </Box>
+
+          {/* Bottom Row */}
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              gap: 10,
+              flexWrap: "wrap",
+            }}
+          >
+            {bottomRow.map(renderCard)}
+          </Box>
+        </>
+      ) : (
+        <Typography variant="h6" sx={{ color: "white", mt: 4 }}>
+          {searchQuery ? `No events found matching "${searchQuery}"` : "No events available"}
+        </Typography>
+      )}
 
       {/* Pagination */}
-      <Box sx={{ display: "flex", justifyContent: "center", mt: 8 }}>
-        <Stack spacing={2}>
-          <Pagination
-            count={pageCount}
-            page={currentPage}
-            onChange={(event, value) => setCurrentPage(value)}
-            color="primary"
-            sx={{
-              "& .MuiPaginationItem-root": { color: "white" },
-              "& .MuiPaginationItem-icon": { color: "white" },
-              "& .Mui-selected": {
-                backgroundColor: "primary.main",
-                color: "white",
-                "&:hover": { backgroundColor: "primary.dark" },
-              },
-            }}
-          />
-        </Stack>
-      </Box>
+      {filteredEvents.length > 0 && (
+        <Box sx={{ display: "flex", justifyContent: "center", mt: 8 }}>
+          <Stack spacing={2}>
+            <Pagination
+              count={pageCount}
+              page={currentPage}
+              onChange={(event, value) => setCurrentPage(value)}
+              color="primary"
+              sx={{
+                "& .MuiPaginationItem-root": { color: "white" },
+                "& .MuiPaginationItem-icon": { color: "white" },
+                "& .Mui-selected": {
+                  backgroundColor: "primary.main",
+                  color: "white",
+                  "&:hover": { backgroundColor: "primary.dark" },
+                },
+              }}
+            />
+          </Stack>
+        </Box>
+      )}
 
       {/* Snackbar */}
       <Snackbar
