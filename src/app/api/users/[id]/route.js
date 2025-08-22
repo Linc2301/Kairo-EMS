@@ -1,184 +1,4 @@
-// import { NextResponse } from "next/server";
-// import { prisma } from "@/src/lib/prisma";
-// import bcrypt from "bcrypt";
-// import formidable from "formidable";
-// import fs from "fs/promises";
-// import { Readable } from "stream";
-// import { getToken } from "next-auth/jwt";
-
-// // Disable built-in body parser
-// export const config = {
-//     api: {
-//         bodyParser: false,
-//     },
-// };
-
-// // Helper to parse multipart/form-data
-// async function parseFormData(req) {
-//     const form = formidable({ multiples: false, keepExtensions: true });
-
-//     // Convert NextRequest to Node-compatible stream
-//     const stream = Readable.from(await req.arrayBuffer());
-//     const fakeReq = Object.assign(stream, {
-//         headers: req.headers,
-//         method: req.method,
-//         url: req.url,
-//     });
-
-//     return new Promise((resolve, reject) => {
-//         form.parse(fakeReq, (err, fields, files) => {
-//             if (err) reject(err);
-//             else {
-//                 const normalizedFields = Object.fromEntries(
-//                     Object.entries(fields).map(([key, val]) => [key, val[0]])
-//                 );
-//                 const normalizedFiles = Object.fromEntries(
-//                     Object.entries(files).map(([key, val]) => [key, val[0]])
-//                 );
-//                 resolve({ fields: normalizedFields, files: normalizedFiles });
-//             }
-//         });
-//     });
-// }
-
-// // ✅ GET user by ID
-// export async function GET(req, context) {
-//     try {
-//         const { params } = context;
-
-//         if (!params?.id) {
-//             return NextResponse.json({ message: "Missing user ID" }, { status: 400 });
-//         }
-
-//         const id = parseInt(params.id);
-//         if (isNaN(id)) {
-//             return NextResponse.json({ message: "Invalid ID" }, { status: 400 });
-//         }
-
-//         const user = await prisma.user.findUnique({
-//             where: { id },
-//             select: { id: true, name: true, email: true, phone: true, photo: true },
-//         });
-
-//         if (!user) {
-//             return NextResponse.json({ message: "User not found" }, { status: 404 });
-//         }
-
-//         return NextResponse.json(user);
-//     } catch (error) {
-//         console.error("GET Error:", error);
-//         return NextResponse.json({ message: "Failed to fetch user" }, { status: 500 });
-//     }
-// }
-
-// export async function PUT(req, context) {
-//   try {
-//     const { params } = context;
-//     const id = parseInt(params.id);
-
-//     if (!id) {
-//       return NextResponse.json({ message: "Invalid ID" }, { status: 400 });
-//     }
-
-//     const { fields, files } = await parseFormData(req);
-
-//     console.log("Fields:", fields);
-//     console.log("Files:", files);
-
-//     const { name, phone, password } = fields;
-
-//     const updateData = {};
-//     if (name) updateData.name = name;
-//     if (phone) updateData.phone = phone;
-//     if (password && password.length >= 6) {
-//       updateData.password = await bcrypt.hash(password, 10);
-//     }
-
-//     if (files?.photo) {
-//       try {
-//         const fileBuffer = await fs.readFile(files.photo.filepath);
-//         const mimeType = files.photo.mimetype || "image/jpeg";
-//         const base64Photo = `data:${mimeType};base64,${fileBuffer.toString("base64")}`;
-//         updateData.photo = base64Photo;
-//       } catch (fileErr) {
-//         console.error("Error reading photo file:", fileErr);
-//         return NextResponse.json({ message: "Failed to process photo" }, { status: 500 });
-//       }
-//     }
-
-//     const updatedUser = await prisma.user.update({
-//       where: { id },
-//       data: updateData,
-//     });
-
-//     return NextResponse.json({ message: "Profile updated", user: updatedUser });
-//   } catch (error) {
-//     console.error("PUT Error:", error); // 👈 This will tell you where it fails
-//     return NextResponse.json({ message: "Failed to update profile", error: error.message }, { status: 500 });
-//   }
-// }
-
-
-// export async function DELETE(req, context) {
-//     try {
-//         const { params } = context;
-//         const id = parseInt(params.id);
-
-//         if (!id) {
-//             return NextResponse.json({ message: "Invalid ID" }, { status: 400 });
-//         }
-
-//         const deleted = await prisma.user.delete({ where: { id } });
-
-//         return NextResponse.json({ message: "User deleted", user: deleted });
-//     } catch (error) {
-//         console.error("DELETE Error:", error);
-//         return NextResponse.json({ message: "Failed to delete user" }, { status: 500 });
-//     }
-// }
-
-// import { NextResponse } from "next/server";
-// import { prisma } from "@/src/lib/prisma";
-// import bcrypt from "bcrypt";
-// import formidable from "formidable";
-// import fs from "fs/promises";
-// import { Readable } from "stream";
-
-// // Disable built-in body parser for file uploads
-// export const config = {
-//     api: {
-//         bodyParser: false,
-//     },
-// };
-
-// // Helper to parse form-data (multipart)
-// async function parseFormData(req) {
-//     const form = formidable({ multiples: false, keepExtensions: true });
-
-//     const stream = Readable.from(await req.arrayBuffer());
-//     const fakeReq = Object.assign(stream, {
-//         headers: req.headers,
-//         method: req.method,
-//         url: "",
-//     });
-
-//     return new Promise((resolve, reject) => {
-//         form.parse(fakeReq, (err, fields, files) => {
-//             if (err) return reject(err);
-
-//             const normalizedFields = Object.fromEntries(
-//                 Object.entries(fields).map(([key, val]) => [key, Array.isArray(val) ? val[0] : val])
-//             );
-//             const normalizedFiles = Object.fromEntries(
-//                 Object.entries(files).map(([key, val]) => [key, Array.isArray(val) ? val[0] : val])
-//             );
-//             resolve({ fields: normalizedFields, files: normalizedFiles });
-//         });
-//     });
-// }
-
 // app/api/users/[id]/route.js
-
 import { prisma } from "@/src/lib/prisma";
 import bcrypt from "bcrypt";
 import { writeFile, mkdir } from "fs/promises";
@@ -186,160 +6,193 @@ import path from "path";
 import { v4 as uuidv4 } from "uuid";
 import { NextResponse } from "next/server";
 
-// Required to disable the default body parsing
-export const config = {
-    api: {
-        bodyParser: false,
-    },
-};
+// Helper function to handle photo upload
+async function handlePhotoUpload(photoFile) {
+  if (!photoFile || typeof photoFile !== "object" || !photoFile.arrayBuffer) {
+    return null;
+  }
 
+  const buffer = Buffer.from(await photoFile.arrayBuffer());
+  const uploadsDir = path.join(process.cwd(), "public", "uploads");
+  await mkdir(uploadsDir, { recursive: true });
+
+  const ext = photoFile.name.split(".").pop();
+  const fileName = `${uuidv4()}.${ext}`;
+  const photoPath = `/uploads/${fileName}`;
+
+  await writeFile(path.join(uploadsDir, fileName), buffer);
+  return photoPath;
+}
+
+// ✅ PUT /api/users/[id] - update user with status management
 export async function PUT(req, { params }) {
-    const userId = params.id;
+  const userId = parseInt(params.id, 10);
 
-    try {
-        // Parse form data manually
-        const formData = await req.formData();
-        const name = formData.get("name");
-        const phone = formData.get("phone");
-        const password = formData.get("password");
-        const photoFile = formData.get("photo");
+  if (isNaN(userId)) {
+    return NextResponse.json({ message: "Invalid ID" }, { status: 400 });
+  }
 
-        let photoPath;
+  try {
+    const formData = await req.formData();
+    const name = formData.get("name");
+    const phone = formData.get("phone");
+    const password = formData.get("password");
+    const status = formData.get("status");
+    const photoFile = formData.get("photo");
 
-        // If user uploaded a photo
-        if (photoFile && typeof photoFile === "object" && photoFile.arrayBuffer) {
-            const buffer = Buffer.from(await photoFile.arrayBuffer());
-            const uploadsDir = path.join(process.cwd(), "public", "uploads");
-
-            // Ensure uploads dir exists
-            await mkdir(uploadsDir, { recursive: true });
-
-            const ext = photoFile.name.split(".").pop();
-            const fileName = `${uuidv4()}.${ext}`;
-            photoPath = `/uploads/${fileName}`;
-
-            await writeFile(path.join(uploadsDir, fileName), buffer);
-        }
-
-        const updateData = {
-            name,
-            phone,
-        };
-
-        if (password) {
-            const hashedPassword = await bcrypt.hash(password, 10);
-            updateData.password = hashedPassword;
-        }
-
-        if (photoPath) {
-            updateData.photo = photoPath;
-        }
-
-        const updatedUser = await prisma.user.update({
-            where: { id: Number(userId) },
-            data: updateData,
-        });
-
-        return NextResponse.json({ user: { ...updatedUser, image: updatedUser.photo } });
-
-    } catch (err) {
-        console.error("PUT Error:", err);
-        return NextResponse.json({ message: "Server error" }, { status: 500 });
+    // Validate status
+    const validStatuses = ["active", "inactive", "suspended"];
+    if (status && !validStatuses.includes(status)) {
+      return NextResponse.json({ message: "Invalid status" }, { status: 400 });
     }
+
+    const photoPath = await handlePhotoUpload(photoFile);
+
+    const updateData = {
+      name,
+      phone,
+      ...(status && { status }),
+    };
+
+    if (password) {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      updateData.password = hashedPassword;
+    }
+
+    if (photoPath) {
+      updateData.photo = photoPath;
+    }
+
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: updateData,
+    });
+
+    return NextResponse.json(updatedUser);
+  } catch (err) {
+    console.error("PUT /api/users/[id] error:", err);
+    return NextResponse.json({ message: "Server error" }, { status: 500 });
+  }
 }
 
+// ✅ GET /api/users/[id] - fetch user with bookings + reviews + status
+export async function GET(request, { params }) {
+  try {
+    const id = parseInt(params.id, 10);
 
-
-
-
-// ✅ GET user by ID
-export async function GET(req, context) {
-    try {
-        const params = await context.params; // <-- await this!
-        const id = parseInt(params.id);
-
-        if (isNaN(id)) {
-            return NextResponse.json({ message: "Invalid ID" }, { status: 400 });
-        }
-
-        const user = await prisma.user.findUnique({
-            where: { id },
-        });
-
-        if (!user) {
-            return NextResponse.json({ message: "User not found" }, { status: 404 });
-        }
-
-        return NextResponse.json(user);
-    } catch (error) {
-        console.error("❌ GET /api/users/[id] error:", error);
-        return NextResponse.json(
-            { message: "Failed to fetch user" },
-            { status: 500 }
-        );
+    if (isNaN(id)) {
+      return NextResponse.json({ message: "Invalid ID" }, { status: 400 });
     }
+
+    const user = await prisma.user.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phone: true,
+        photo: true,
+        status: true,
+        isAdmin: true,
+        // Update these to match your actual Prisma model relations
+        Booking: true,
+        Review: true,
+        Favourite: true
+      },
+    });
+
+    if (!user) {
+      return NextResponse.json({ message: "User not found" }, { status: 404 });
+    }
+
+    return NextResponse.json(user);
+  } catch (error) {
+    console.error("GET /api/users/[id] error:", error);
+    return NextResponse.json(
+      { message: "Failed to fetch user", error: error.message },
+      { status: 500 }
+    );
+  }
 }
-// ✅ UPDATE user by ID (with optional photo and password)
-// export async function PUT(req, context) {
-//     try {
-//         const id = parseInt(context.params.id);
-//         if (isNaN(id)) {
-//             return NextResponse.json({ message: "Invalid ID" }, { status: 400 });
-//         }
+// ✅ PATCH /api/users/[id] - update user status specifically
+export async function PATCH(req, { params }) {
+  try {
+    const userId = parseInt(params.id, 10);
+    const { status } = await req.json();
 
-//         const { fields, files } = await parseFormData(req);
+    if (isNaN(userId)) {
+      return NextResponse.json({ message: "Invalid ID" }, { status: 400 });
+    }
 
-//         console.log("📄 Fields:", fields);
-//         console.log("📁 Files:", files);
+    // Check if user exists first
+    const existingUser = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true, isAdmin: true, status: true }
+    });
 
-//         const { name, phone, password } = fields;
+    if (!existingUser) {
+      return NextResponse.json({ message: "User not found" }, { status: 404 });
+    }
 
-//         const updateData = {};
-//         if (name) updateData.name = name;
-//         if (phone) updateData.phone = phone;
-//         if (password && password.length >= 6) {
-//             updateData.password = await bcrypt.hash(password, 10);
-//         }
+    // Prevent status change for admin users
+    if (existingUser.isAdmin === 'admin') {
+      return NextResponse.json(
+        { message: "Cannot change status of admin users" },
+        { status: 403 }
+      );
+    }
 
-//         if (files?.photo?.filepath) {
-//             try {
-//                 const fileBuffer = await fs.readFile(files.photo.filepath);
-//                 const mimeType = files.photo.mimetype || "image/jpeg";
-//                 const base64Photo = `data:${mimeType};base64,${fileBuffer.toString("base64")}`;
-//                 updateData.photo = base64Photo;
-//             } catch (photoErr) {
-//                 console.error("Photo upload failed:", photoErr);
-//                 return NextResponse.json({ message: "Failed to process photo" }, { status: 500 });
-//             }
-//         }
+    const validStatuses = ["active", "inactive", "suspended"];
+    if (!validStatuses.includes(status)) {
+      return NextResponse.json({ message: "Invalid status" }, { status: 400 });
+    }
 
-//         const updatedUser = await prisma.user.update({
-//             where: { id },
-//             data: updateData,
-//         });
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: { status },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phone: true,
+        status: true,
+        isAdmin: true
+      }
+    });
 
-//         return NextResponse.json({ message: "Profile updated", user: updatedUser });
-//     } catch (error) {
-//         console.error("PUT Error:", error);
-//         return NextResponse.json({ message: "Failed to update profile", error: error.message }, { status: 500 });
-//     }
-// }
+    return NextResponse.json(updatedUser);
+  } catch (error) {
+    console.error("PATCH /api/users/[id] error:", error);
+
+    if (error.code === 'P2025') {
+      return NextResponse.json({ message: "User not found" }, { status: 404 });
+    }
+
+    return NextResponse.json(
+      { message: "Failed to update user status", error: error.message },
+      { status: 500 }
+    );
+  }
+}
 
 // ✅ DELETE user by ID
-export async function DELETE(req, context) {
-    try {
-        const id = parseInt(context.params.id);
-        if (isNaN(id)) {
-            return NextResponse.json({ message: "Invalid ID" }, { status: 400 });
-        }
-
-        const deletedUser = await prisma.user.delete({
-            where: { id },
-        });
-
-        return NextResponse.json({ message: "User deleted", user: deletedUser });
-    } catch (error) {
-        console.error("DELETE Error:", error);
-        return NextResponse.json({ message: "Failed to delete user", error: error.message }, { status: 500 });
+export async function DELETE(req, { params }) {
+  try {
+    const id = parseInt(params.id, 10);
+    if (isNaN(id)) {
+      return NextResponse.json({ message: "Invalid ID" }, { status: 400 });
     }
+
+    const deletedUser = await prisma.user.delete({
+      where: { id },
+    });
+
+    return NextResponse.json({ message: "User deleted", user: deletedUser });
+  } catch (error) {
+    console.error("DELETE Error:", error);
+    return NextResponse.json(
+      { message: "Failed to delete user", error: error.message },
+      { status: 500 }
+    );
+  }
 }

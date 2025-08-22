@@ -26,35 +26,90 @@ const updateSchema = yup.object().shape({
   venue_id: yup.number().integer().required(),
 });
 
-export async function GET(req, { params }) {
-  const id = Number(params.id);
-  if (!id) return NextResponse.json({ message: "Invalid ID" }, { status: 400 });
+// export async function GET(req, { params }) {
+//   const id = Number(params.id);
+//   if (!id) return NextResponse.json({ message: "Invalid ID" }, { status: 400 });
 
+//   try {
+//     const timePackage = await prisma.timePackage.findUnique({
+//       where: { id },
+//       include: { Venue: { select: { name: true } } },
+//     });
+
+//     if (!timePackage)
+//       return NextResponse.json({ message: "Not found" }, { status: 404 });
+
+//     return NextResponse.json({
+//       id: timePackage.id,
+//       startTime: dayjs(timePackage.startTime)
+//         .tz(MYANMAR_TZ)
+//         .format("HH:mm"),
+//       endTime: dayjs(timePackage.endTime)
+//         .tz(MYANMAR_TZ)
+//         .format("HH:mm"),
+//       venue_id: timePackage.venue_id,
+//       venueName: timePackage.Venue?.name || "N/A",
+//     });
+//   } catch (error) {
+//     console.error(error);
+//     return NextResponse.json({ message: "Server error" }, { status: 500 });
+//   }
+// }
+
+
+export async function GET(req) {
+  const { searchParams } = new URL(req.url);
+  const venueId = searchParams.get("venueId");
+  const dateStr = searchParams.get("date");
   try {
-    const timePackage = await prisma.timePackage.findUnique({
-      where: { id },
-      include: { Venue: { select: { name: true } } },
+    // Build where clause
+    let whereClause = {
+      booking: null, // Only show unbooked time packages
+    };
+    // Add venue filter if provided
+    if (venueId) {
+      whereClause.venue_id = parseInt(venueId);
+    }
+    // Add date filter if provided
+    if (dateStr) {
+      const date = new Date(dateStr);
+      whereClause.date = date;
+    }
+    const timePackages = await prisma.timePackage.findMany({
+      where: whereClause,
+      include: {
+        Venue: {
+          select: {
+            name: true,
+            Event: {
+              select: {
+                name: true
+              }
+            }
+          }
+        },
+      },
+      orderBy: { startTime: "asc" },
     });
-
-    if (!timePackage)
-      return NextResponse.json({ message: "Not found" }, { status: 404 });
-
-    return NextResponse.json({
-      id: timePackage.id,
-      startTime: dayjs(timePackage.startTime)
-        .tz(MYANMAR_TZ)
-        .format("HH:mm"),
-      endTime: dayjs(timePackage.endTime)
-        .tz(MYANMAR_TZ)
-        .format("HH:mm"),
-      venue_id: timePackage.venue_id,
-      venueName: timePackage.Venue?.name || "N/A",
-    });
+    const formatted = timePackages.map((tp) => ({
+      id: tp.id,
+      startTime: tp.startTime.toISOString(),
+      endTime: tp.endTime.toISOString(),
+      date: tp.date.toISOString().split('T')[0],
+      venue_id: tp.venue_id,
+      venueName: tp.Venue?.name || "Unknown",
+      eventName: tp.Venue?.Event?.name || "N/A"
+    }));
+    return NextResponse.json(formatted);
   } catch (error) {
-    console.error(error);
-    return NextResponse.json({ message: "Server error" }, { status: 500 });
+    console.error("Error fetching time packages:", error);
+    return NextResponse.json(
+      { message: "Failed to fetch time packages" },
+      { status: 500 }
+    );
   }
 }
+
 
 export async function PUT(req, { params }) {
   const id = Number(params.id);

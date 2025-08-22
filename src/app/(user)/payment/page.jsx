@@ -1,4 +1,3 @@
-// pages/fake-payment.jsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -19,51 +18,48 @@ import {
     ToggleButton,
     Divider,
     InputAdornment,
-    IconButton,
-    Link
+    IconButton
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import Image from "next/image";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 
-// Payment method data with logos
 const paymentMethods = [
     {
         id: "visa",
-        name: "Mastercard",
+        name: "Visa/Mastercard",
         logo: "/master-card.png",
-        supportsCurrency: ['USD'],
-        fields: ['cardNumber', 'expiry', 'cvv'],
-
+        supportsCurrency: ["USD"],
+        fields: ["cardNumber", "expiry", "cvv"],
     },
     {
         id: "kbz",
         name: "KBZ Pay",
         logo: "/kbz.png",
-        supportsCurrency: ['MMK'],
-        fields: ['phone', 'pin'],
-
+        supportsCurrency: ["MMK"],
+        fields: ["phone", "pin"],
     },
     {
         id: "wave",
         name: "Wave Pay",
         logo: "/wave.png",
-        supportsCurrency: ['MMK'],
-        fields: ['phone', 'pin'],
-
+        supportsCurrency: ["MMK"],
+        fields: ["phone", "pin"],
     },
     {
         id: "paypal",
         name: "PayPal",
         logo: "/paypal.png",
-        supportsCurrency: ['USD'],
-        fields: ['paypalEmail'],
-
+        supportsCurrency: ["USD"],
+        fields: ["paypalEmail"],
     }
 ];
 
 const INITIAL_EXCHANGE_RATE = 2100;
 
-export default function FakePayment() {
+export default function FakePayment({ totalAmount, onSuccess }) {
+    const router = useRouter();
     const [method, setMethod] = useState("visa");
     const [currency, setCurrency] = useState("USD");
     const [cardNumber, setCardNumber] = useState("");
@@ -73,18 +69,14 @@ export default function FakePayment() {
     const [pin, setPin] = useState("");
     const [paypalEmail, setPaypalEmail] = useState("");
     const [showPin, setShowPin] = useState(false);
-    const [amount, setAmount] = useState("");
     const [convertedAmount, setConvertedAmount] = useState("");
-    const [status, setStatus] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [exchangeRate, setExchangeRate] = useState(INITIAL_EXCHANGE_RATE);
-    const [isFetchingRate, setIsFetchingRate] = useState(false);
 
     useEffect(() => {
         const fetchExchangeRate = async () => {
-            setIsFetchingRate(true);
             try {
                 await new Promise(resolve => setTimeout(resolve, 500));
                 const randomRate = 2100 + (Math.random() * 100 - 50);
@@ -92,41 +84,30 @@ export default function FakePayment() {
             } catch (err) {
                 console.error("Failed to fetch exchange rate", err);
                 setExchangeRate(INITIAL_EXCHANGE_RATE);
-            } finally {
-                setIsFetchingRate(false);
             }
         };
-
         fetchExchangeRate();
     }, []);
+
+    useEffect(() => {
+        if (totalAmount) {
+            if (currency === "USD") {
+                setConvertedAmount((totalAmount / exchangeRate).toFixed(2));
+            } else {
+                setConvertedAmount(totalAmount);
+            }
+        }
+    }, [totalAmount, currency, exchangeRate]);
 
     const handleCurrencyChange = (event, newCurrency) => {
         if (newCurrency !== null) {
             setCurrency(newCurrency);
-            setAmount("");
-            setConvertedAmount("");
-
             const availableMethods = paymentMethods.filter(m =>
                 m.supportsCurrency.includes(newCurrency)
             );
             if (availableMethods.length > 0 && !availableMethods.some(m => m.id === method)) {
                 setMethod(availableMethods[0].id);
             }
-        }
-    };
-
-    const handleAmountChange = (e) => {
-        const value = e.target.value;
-        setAmount(value);
-
-        if (value && !isNaN(value)) {
-            if (currency === "USD") {
-                setConvertedAmount((value * exchangeRate).toFixed(2));
-            } else {
-                setConvertedAmount((value / exchangeRate).toFixed(2));
-            }
-        } else {
-            setConvertedAmount("");
         }
     };
 
@@ -137,106 +118,59 @@ export default function FakePayment() {
         }
     };
 
-    const validateForm = () => {
-        if (!amount || isNaN(amount) || Number(amount) <= 0) {
-            setError("Please enter a valid amount");
-            return false;
-        }
-
-        const selectedMethod = paymentMethods.find(m => m.id === method);
-
-        if (selectedMethod.fields.includes('cardNumber') &&
-            (!cardNumber || cardNumber.replace(/\s/g, '').length !== 16)) {
-            setError("Please enter a valid 16-digit card number");
-            return false;
-        }
-
-        if (selectedMethod.fields.includes('expiry') &&
-            (!expiry || !expiry.match(/^(0[1-9]|1[0-2])\/?([0-9]{2})$/))) {
-            setError("Please enter a valid expiry date (MM/YY)");
-            return false;
-        }
-
-        if (selectedMethod.fields.includes('cvv') && (!cvv || cvv.length !== 3)) {
-            setError("Please enter a valid 3-digit CVV");
-            return false;
-        }
-
-        if (selectedMethod.fields.includes('phone') &&
-            (!phone || !phone.match(/^09\d{9}$/))) {
-            setError("Please enter a valid Myanmar phone number (09XXXXXXXX)");
-            return false;
-        }
-
-        if (selectedMethod.fields.includes('pin') && pin.length !== 4) {
-            setError("Please enter a valid 4-digit PIN");
-            return false;
-        }
-
-        if (selectedMethod.fields.includes('paypalEmail') &&
-            (!paypalEmail || !paypalEmail.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/))) {
-            setError("Please enter a valid PayPal email address");
-            return false;
-        }
-
-        if (!selectedMethod.supportsCurrency.includes(currency)) {
-            setError(`${selectedMethod.name} doesn't support ${currency} payments`);
-            return false;
-        }
-
-        return true;
-    };
-
-    const simulatePayment = () => {
-        const isSuccess = Math.random() > 0.1;
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                resolve(isSuccess);
-            }, 2000);
-        });
-    };
-
+    // Fixed handlePayment function - remove the PATCH request logic
     const handlePayment = async () => {
-        setError(null);
-        setStatus(null);
-
-        if (!validateForm()) {
-            setOpenSnackbar(true);
-            return;
-        }
-
         setIsLoading(true);
+        setError(null);
 
         try {
-            const isSuccessful = await simulatePayment();
+            // Validate payment fields based on selected method
+            const currentMethod = paymentMethods.find(m => m.id === method);
 
-            if (isSuccessful) {
-                setStatus({
-                    message: `Payment of ${currency === 'USD' ? '$' : ''}${amount}${currency === 'MMK' ? ' MMK' : ''} via ${paymentMethods.find(m => m.id === method).name} successful!`,
-                    severity: "success"
-                });
-                setCardNumber("");
-                setExpiry("");
-                setCvv("");
-                setPhone("");
-                setPin("");
-                setPaypalEmail("");
-                setAmount("");
-                setConvertedAmount("");
-            } else {
-                setStatus({
-                    message: `Payment failed. Please try again or use a different payment method.`,
-                    severity: "error"
-                });
+            if (currentMethod.fields.includes('cardNumber') && !cardNumber) {
+                throw new Error('Please enter card number');
             }
+            if (currentMethod.fields.includes('expiry') && !expiry) {
+                throw new Error('Please enter expiry date');
+            }
+            if (currentMethod.fields.includes('cvv') && !cvv) {
+                throw new Error('Please enter CVV');
+            }
+            if (currentMethod.fields.includes('phone') && !phone) {
+                throw new Error('Please enter phone number');
+            }
+            if (currentMethod.fields.includes('pin') && !pin) {
+                throw new Error('Please enter PIN');
+            }
+            if (currentMethod.fields.includes('paypalEmail') && !paypalEmail) {
+                throw new Error('Please enter PayPal email');
+            }
+
+            // Simulate payment processing delay
+            await new Promise(resolve => setTimeout(resolve, 2000));
+
+            // Simulate payment success (you can add validation logic here)
+            const paymentDetails = {
+                method,
+                currency,
+                amount: currency === "USD" ? convertedAmount : totalAmount,
+                cardNumber: cardNumber ? cardNumber.replace(/\d(?=\d{4})/g, "*") : null,
+                phone: phone || null,
+                paypalEmail: paypalEmail || null,
+                timestamp: new Date().toISOString()
+            };
+
+            // Call the parent component's success handler
+            if (onSuccess) {
+                await onSuccess(paymentDetails);
+            }
+
         } catch (err) {
-            setStatus({
-                message: "An error occurred during payment processing",
-                severity: "error"
-            });
+            console.error("Payment failed:", err);
+            setError(err.message || "Payment processing failed. Please try again.");
+            setOpenSnackbar(true);
         } finally {
             setIsLoading(false);
-            setOpenSnackbar(true);
         }
     };
 
@@ -253,8 +187,24 @@ export default function FakePayment() {
         return parts.length ? parts.join(' ') : value;
     };
 
+    const handleCardNumberChange = (e) => {
+        const formatted = formatCardNumber(e.target.value);
+        if (formatted.length <= 19) { // 16 digits + 3 spaces
+            setCardNumber(formatted);
+        }
+    };
+
+    const handleExpiryChange = (e) => {
+        let value = e.target.value.replace(/\D/g, '');
+        if (value.length >= 2) {
+            value = value.substring(0, 2) + '/' + value.substring(2, 4);
+        }
+        setExpiry(value);
+    };
+
     const handleCloseSnackbar = () => {
         setOpenSnackbar(false);
+        setError(null);
     };
 
     const filteredPaymentMethods = paymentMethods.filter(method =>
@@ -264,18 +214,15 @@ export default function FakePayment() {
     const currentMethod = paymentMethods.find(m => m.id === method);
 
     return (
-        <Container maxWidth="sm" sx={{ mt: 6, mb: 10 }}>
+        <Container maxWidth="sm" sx={{ mt: 2, mb: 4 }}>
             <Typography variant="h4" mb={3} align="center">
                 Payment Gateway
             </Typography>
 
-
             <Card sx={{ boxShadow: 3 }}>
                 <CardContent>
-                    <Typography variant="h6" mb={2}>
-                        Select Currency
-                    </Typography>
-
+                    {/* Currency Selection */}
+                    <Typography variant="h6" mb={2}>Select Currency</Typography>
                     <ToggleButtonGroup
                         value={currency}
                         exclusive
@@ -285,34 +232,35 @@ export default function FakePayment() {
                     >
                         <ToggleButton value="USD" sx={{ py: 1.5 }}>
                             <Stack direction="row" alignItems="center" spacing={1}>
-                                <Image
-                                    src="/USD.png"
-                                    alt="USD"
-                                    width={24}
-                                    height={16}
-                                    style={{ borderRadius: '2px' }}
-                                />
+                                <Image src="/USD.png" alt="USD" width={24} height={16} />
                                 <Typography>USD</Typography>
                             </Stack>
                         </ToggleButton>
                         <ToggleButton value="MMK" sx={{ py: 1.5 }}>
                             <Stack direction="row" alignItems="center" spacing={1}>
-                                <Image
-                                    src="/MMK.png"
-                                    alt="MMK"
-                                    width={24}
-                                    height={16}
-                                    style={{ borderRadius: '2px' }}
-                                />
+                                <Image src="/MMK.png" alt="MMK" width={24} height={16} />
                                 <Typography>MMK</Typography>
                             </Stack>
                         </ToggleButton>
                     </ToggleButtonGroup>
 
-                    <Typography variant="h6" mb={2}>
-                        Select Payment Method
-                    </Typography>
+                    {/* Amount */}
+                    <Box sx={{
+                        mb: 3,
+                        p: 2,
+                        backgroundColor: '#f5f5f5',
+                        borderRadius: 1,
+                        display: 'flex',
+                        justifyContent: 'space-between'
+                    }}>
+                        <Typography fontWeight="bold">Total Amount:</Typography>
+                        <Typography fontWeight="bold">
+                            {currency === "USD" ? `$${convertedAmount}` : `${totalAmount} MMK`}
+                        </Typography>
+                    </Box>
 
+                    {/* Payment Methods */}
+                    <Typography variant="h6" mb={2}>Select Payment Method</Typography>
                     <Stack direction="row" spacing={2} mb={3} flexWrap="wrap">
                         {filteredPaymentMethods.map((pm) => (
                             <Box
@@ -328,70 +276,45 @@ export default function FakePayment() {
                                     alignItems: 'center',
                                     minWidth: 100,
                                     bgcolor: method === pm.id ? '#f0f7ff' : 'background.paper',
-                                    transition: 'all 0.2s',
-                                    '&:hover': {
-                                        borderColor: '#1976d2',
-                                        bgcolor: '#f0f7ff'
-                                    }
                                 }}
                             >
-                                <Avatar
-                                    variant="square"
-                                    sx={{
-                                        width: 60,
-                                        height: 40,
-                                        bgcolor: 'transparent'
-                                    }}
-                                >
-                                    <Image
-                                        src={pm.logo}
-                                        alt={pm.name}
-                                        width={60}
-                                        height={40}
-                                        style={{ objectFit: 'contain' }}
-                                    />
+                                <Avatar variant="square" sx={{ width: 60, height: 40, bgcolor: 'transparent' }}>
+                                    <Image src={pm.logo} alt={pm.name} width={60} height={40} />
                                 </Avatar>
-                                <Typography variant="caption" mt={1}>
-                                    {pm.name}
-                                </Typography>
+                                <Typography variant="caption" mt={1}>{pm.name}</Typography>
                             </Box>
                         ))}
                     </Stack>
 
-
-
+                    {/* Dynamic Fields */}
                     {currentMethod.fields.includes('cardNumber') && (
                         <TextField
                             label="Card Number"
                             fullWidth
-                            value={formatCardNumber(cardNumber)}
-                            onChange={(e) => setCardNumber(e.target.value)}
-                            inputProps={{ maxLength: 19 }}
+                            value={cardNumber}
+                            onChange={handleCardNumberChange}
                             placeholder="4242 4242 4242 4242"
                             sx={{ mb: 2 }}
                         />
                     )}
-
                     {currentMethod.fields.includes('expiry') && (
                         <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
                             <TextField
                                 label="Expiry (MM/YY)"
                                 fullWidth
                                 value={expiry}
-                                onChange={(e) => setExpiry(e.target.value)}
-                                placeholder="12/34"
-                                inputProps={{ maxLength: 5 }}
+                                onChange={handleExpiryChange}
+                                placeholder="12/25"
                             />
                             <TextField
                                 label="CVV"
                                 fullWidth
                                 value={cvv}
-                                onChange={(e) => setCvv(e.target.value.replace(/[^0-9]/g, ''))}
-                                inputProps={{ maxLength: 3 }}
+                                onChange={(e) => setCvv(e.target.value.replace(/[^0-9]/g, '').slice(0, 3))}
+                                placeholder="123"
                             />
                         </Box>
                     )}
-
                     {currentMethod.fields.includes('phone') && (
                         <TextField
                             label="Phone Number"
@@ -399,11 +322,9 @@ export default function FakePayment() {
                             value={phone}
                             onChange={(e) => setPhone(e.target.value)}
                             placeholder="09XXXXXXXX"
-                            inputProps={{ maxLength: 11 }}
                             sx={{ mb: 2 }}
                         />
                     )}
-
                     {currentMethod.fields.includes('pin') && (
                         <TextField
                             label="4-Digit PIN"
@@ -411,15 +332,11 @@ export default function FakePayment() {
                             type={showPin ? "text" : "password"}
                             value={pin}
                             onChange={handlePinChange}
-                            inputProps={{ maxLength: 4 }}
                             sx={{ mb: 2 }}
                             InputProps={{
                                 endAdornment: (
                                     <InputAdornment position="end">
-                                        <IconButton
-                                            onClick={() => setShowPin(!showPin)}
-                                            edge="end"
-                                        >
+                                        <IconButton onClick={() => setShowPin(!showPin)} edge="end">
                                             {showPin ? <VisibilityOff /> : <Visibility />}
                                         </IconButton>
                                     </InputAdornment>
@@ -427,7 +344,6 @@ export default function FakePayment() {
                             }}
                         />
                     )}
-
                     {currentMethod.fields.includes('paypalEmail') && (
                         <TextField
                             label="PayPal Email"
@@ -439,61 +355,55 @@ export default function FakePayment() {
                         />
                     )}
 
-                    <TextField
-                        label={`Amount (${currency})`}
-                        fullWidth
+                    <Divider sx={{ my: 3 }} />
 
-                        value={amount}
-                        onChange={handleAmountChange}
-                        sx={{ mb: 1 }}
-                        InputProps={{
-                            startAdornment: (
-                                <Typography mr={1}>
-                                    {currency === 'USD' ? '$' : 'MMK '}
-                                </Typography>
-                            ),
-                        }}
-                    />
-
-                    {convertedAmount && (
-                        <Typography variant="body2" color="text.secondary" mb={2}>
-                            ≈ {currency === 'USD' ? `${convertedAmount} MMK` : `$${convertedAmount} USD`}
-                        </Typography>
-                    )}
-
-                    <Divider sx={{ my: 2 }} />
-
+                    {/* Loading Progress */}
                     {isLoading && <LinearProgress sx={{ mb: 2 }} />}
 
+                    {/* Pay Button */}
                     <Button
                         variant="contained"
                         fullWidth
+                        size="large"
                         onClick={handlePayment}
                         disabled={isLoading}
-                        size="large"
-                        sx={{ py: 1.5 }}
+                        sx={{
+                            py: 1.5,
+                            fontSize: '1.1rem',
+                            bgcolor: '#1976d2',
+                            '&:hover': {
+                                bgcolor: '#1565c0',
+                            },
+                        }}
                     >
-                        {isLoading ? 'Processing...' : 'Pay Now'}
+                        {isLoading ? 'Processing Payment...' : `Pay ${currency === "USD" ? `$${convertedAmount}` : `${totalAmount} MMK`}`}
                     </Button>
 
-                    <Snackbar
-                        open={openSnackbar}
-                        autoHideDuration={6000}
-                        onClose={handleCloseSnackbar}
-                        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+                    {/* Cancel Button */}
+                    <Button
+                        variant="outlined"
+                        fullWidth
+                        size="large"
+                        onClick={() => window.history.back()}
+                        disabled={isLoading}
+                        sx={{ mt: 2, py: 1.5 }}
                     >
-                        <Alert
-                            onClose={handleCloseSnackbar}
-                            severity={error ? "error" : status?.severity || "info"}
-                            sx={{ width: '100%' }}
-                        >
-                            {error || status?.message}
-                        </Alert>
-                    </Snackbar>
+                        Cancel
+                    </Button>
                 </CardContent>
             </Card>
 
-
+            {/* Error Snackbar */}
+            <Snackbar
+                open={openSnackbar}
+                autoHideDuration={6000}
+                onClose={handleCloseSnackbar}
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+            >
+                <Alert onClose={handleCloseSnackbar} severity="error" sx={{ width: '100%' }}>
+                    {error}
+                </Alert>
+            </Snackbar>
         </Container>
     );
 }

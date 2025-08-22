@@ -53,7 +53,7 @@
 
 //         {/* Task This Month - 4/12 */}
 //         <Grid item md={4}>
-          
+
 //             <TaskChart />
 //         </Grid>
 //       </Grid>
@@ -109,27 +109,27 @@ export default function AdminDashboardPage() {
   return (
     <Container sx={{ mt: 4 }}>
       <Box mb={5}>
-             <DashboardStats/>
+        <DashboardStats />
       </Box>
- 
-         <Box flex={1} minWidth="300px" sx={{mt: 5}}>
-         <PopularEventsChart/>
-         
-        </Box> 
-      
-      <Box display="flex" gap={2} flexWrap="wrap" mt={5}>
+
+      <Box flex={1} minWidth="300px" sx={{ mt: 5 }}>
+        <PopularEventsChart />
+
+      </Box>
+
+      <Box display="flex" gap={2} flexWrap="wrap" mt={5} >
         {/* Left side - Calendar */}
-        <Box flex={1} minWidth="300px">
+        <Box flex={1} minWidth="300px" sx={{ mb: 2 }} >
           <BookingCalendar selectedDate={selectedDate} onChange={setSelectedDate} />
         </Box>
-    
+
         {/* Right side - Booking List */}
         <Box flex={1} minWidth="300px">
           <BookingList selectedDate={selectedDate} />
-       
+
         </Box>
       </Box>
-    
+
     </Container>
   );
 }

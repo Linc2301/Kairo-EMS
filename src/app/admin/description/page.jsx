@@ -64,7 +64,7 @@ export default function UserList() {
             </Stack>
             <TableContainer component={Paper}>
                 <Table>
-                    <TableHead>
+                    <TableHead sx={{ backgroundColor: "primary.main" }}>
                         <TableRow>
                             <TableCell align="center">No</TableCell>
                             <TableCell align="center">Description</TableCell>

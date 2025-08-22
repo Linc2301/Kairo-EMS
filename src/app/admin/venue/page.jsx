@@ -14,6 +14,7 @@ import {
   TableRow,
   Typography,
   Pagination,
+  TextField,
 } from "@mui/material";
 import Link from "next/link";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -22,32 +23,21 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 
 export default function UserList() {
-  const [events, setEvents] = useState([]);
+  const [venues, setVenues] = useState([]);
+  const [filteredVenues, setFilteredVenues] = useState([]);
   const [page, setPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState("");
   const rowsPerPage = 5;
 
-  const getEventList = async () => {
+  const getVenueList = async () => {
     try {
       const response = await axios.get("/api/venue");
-      setEvents(response.data);
+      setVenues(response.data);
+      setFilteredVenues(response.data);
     } catch (error) {
       console.error(error);
     }
   };
-
-  // const handleDelete = async (id) => {
-  //   const confirmed = window.confirm("Are you sure you want to delete this venue?");
-  //   if (!confirmed) return;
-
-  //   try {
-  //     await axios.delete(`/api/venue/${id}`);
-  //     setEvents((prev) => prev.filter((event) => event.id !== id));
-  //     alert("Venue deleted successfully!");
-  //   } catch (error) {
-  //     console.error("Failed to delete:", error);
-  //     alert("Something went wrong while deleting.");
-  //   }
-  // };
 
   const handleDelete = async (id) => {
     const confirmed = window.confirm("Are you sure you want to delete this venue?");
@@ -55,7 +45,8 @@ export default function UserList() {
 
     try {
       await axios.delete(`/api/venue/${id}`);
-      setEvents((prev) => prev.filter((event) => event.id !== id)); //  OK if you're storing venues in `setEvents`
+      setVenues((prev) => prev.filter((venue) => venue.id !== id));
+      setFilteredVenues((prev) => prev.filter((venue) => venue.id !== id));
       alert("Venue deleted successfully!");
     } catch (error) {
       console.error("Failed to delete:", error);
@@ -67,21 +58,42 @@ export default function UserList() {
     setPage(value);
   };
 
+  const handleSearch = (e) => {
+    const term = e.target.value;
+    setSearchTerm(term);
 
+    if (term === "") {
+      setFilteredVenues(venues);
+    } else {
+      const filtered = venues.filter(venue =>
+        venue.Event?.name?.toLowerCase().includes(term.toLowerCase())
+      );
+      setFilteredVenues(filtered);
+    }
+    setPage(1);
+  };
 
   useEffect(() => {
-    getEventList();
+    getVenueList();
   }, []);
 
-  // Calculate which events to show on the current page
-  const paginatedEvents = events.slice((page - 1) * rowsPerPage, page * rowsPerPage);
-  const totalPages = Math.ceil(events.length / rowsPerPage);
-
+  // Calculate which venues to show on the current page
+  const paginatedVenues = filteredVenues.slice((page - 1) * rowsPerPage, page * rowsPerPage);
+  const totalPages = Math.ceil(filteredVenues.length / rowsPerPage);
 
   return (
     <Box sx={{ p: 3 }}>
       <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
-        <Typography variant="h4">Venues</Typography>
+        <Stack direction="row" alignItems="center" spacing={2}>
+          <Typography variant="h4" sx={{ fontWeight: "bold", color: "primary.main" }}>Venues</Typography>
+          <TextField
+            size="small"
+            placeholder="Search by event name..."
+            value={searchTerm}
+            onChange={handleSearch}
+            sx={{ width: 300 }}
+          />
+        </Stack>
         <Link passHref href="/admin/venue/create">
           <Button sx={{ mb: 2 }} variant="contained">
             ADD Venue
@@ -91,7 +103,7 @@ export default function UserList() {
 
       <TableContainer component={Paper}>
         <Table>
-          <TableHead>
+          <TableHead sx={{ backgroundColor: "rgba(255, 160, 0, 0.8)" }}>
             <TableRow>
               <TableCell align="center">No</TableCell>
               <TableCell align="center">Venue</TableCell>
@@ -104,7 +116,7 @@ export default function UserList() {
           </TableHead>
 
           <TableBody>
-            {paginatedEvents.map((venue, index) => (
+            {paginatedVenues.map((venue, index) => (
               <TableRow key={venue.id}>
                 <TableCell align="center">{(page - 1) * rowsPerPage + index + 1}</TableCell>
                 <TableCell align="center">{venue.name}</TableCell>
@@ -160,7 +172,7 @@ export default function UserList() {
                   )}
                 </TableCell>
 
-                <TableCell align="center">{venue.Event.name}</TableCell>
+                <TableCell align="center">{venue.Event?.name || 'N/A'}</TableCell>
 
                 <TableCell align="center">
                   <Link passHref href={`/admin/venue/${venue.id}/edit`}>
@@ -182,18 +194,18 @@ export default function UserList() {
       </TableContainer>
 
       {/* Pagination Control */}
-      {events.length > rowsPerPage && (
+      {filteredVenues.length > rowsPerPage && (
         <Box
           sx={{
             position: 'fixed',
             bottom: 0,
             left: 0,
             width: '100%',
-            bgcolor: 'white', // Optional: match page background
+            bgcolor: 'white',
             py: 2,
             display: 'flex',
             justifyContent: 'center',
-            boxShadow: '0 -2px 8px rgba(0,0,0,0.1)', // optional: subtle shadow
+            boxShadow: '0 -2px 8px rgba(0,0,0,0.1)',
           }}
         >
           <Pagination

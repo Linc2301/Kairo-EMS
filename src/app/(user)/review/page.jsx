@@ -241,8 +241,9 @@ export default function ReviewsPage() {
               {review.user?.name || "Anonymous"}
             </Typography>
             <Typography variant="body2" color="gray">
-              {review.Venue?.name || "Unknown Venue"}
+              {review.Booking.venue.Event?.name || "No Event"}
             </Typography>
+
             <Typography variant="caption" color="gray">
               {new Date(review.review_date).toLocaleDateString()}
             </Typography>

@@ -6,8 +6,10 @@ CREATE TABLE `user` (
     `phone` VARCHAR(50) NOT NULL,
     `password` VARCHAR(255) NOT NULL,
     `photo` LONGTEXT NULL,
-    `isAdmin` VARCHAR(50) NOT NULL DEFAULT 'user',
+    `isAdmin` ENUM('user', 'admin') NOT NULL DEFAULT 'user',
+    `status` ENUM('active', 'inactive') NOT NULL DEFAULT 'inactive',
 
+    UNIQUE INDEX `user_name_key`(`name`),
     UNIQUE INDEX `user_email_key`(`email`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -75,15 +77,19 @@ CREATE TABLE `TimePackage` (
 -- CreateTable
 CREATE TABLE `Booking` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `bookingId` VARCHAR(191) NOT NULL,
     `venue_id` INTEGER NOT NULL,
     `venueTypeId` INTEGER NOT NULL,
     `floral_service_id` INTEGER NOT NULL,
     `timePackageId` INTEGER NOT NULL,
     `user_id` INTEGER NOT NULL,
+    `eventId` INTEGER NULL,
     `booking_date` DATETIME(3) NOT NULL,
     `total_amount` INTEGER NOT NULL,
+    `status` ENUM('pending', 'confirmed') NOT NULL DEFAULT 'pending',
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
+    UNIQUE INDEX `Booking_bookingId_key`(`bookingId`),
     UNIQUE INDEX `Booking_timePackageId_key`(`timePackageId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -106,8 +112,10 @@ CREATE TABLE `Review` (
     `rating` INTEGER NOT NULL,
     `review_date` DATETIME(3) NOT NULL,
     `description` TEXT NOT NULL,
-    `venue_id` INTEGER NOT NULL,
+    `eventId` INTEGER NULL,
+    `bookingId` INTEGER NOT NULL,
 
+    UNIQUE INDEX `Review_bookingId_key`(`bookingId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -168,13 +176,19 @@ ALTER TABLE `Booking` ADD CONSTRAINT `Booking_timePackageId_fkey` FOREIGN KEY (`
 ALTER TABLE `Booking` ADD CONSTRAINT `Booking_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE `Booking` ADD CONSTRAINT `Booking_eventId_fkey` FOREIGN KEY (`eventId`) REFERENCES `Event`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE `Review` ADD CONSTRAINT `Review_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Review` ADD CONSTRAINT `Review_venue_id_fkey` FOREIGN KEY (`venue_id`) REFERENCES `Venue`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Review` ADD CONSTRAINT `Review_eventId_fkey` FOREIGN KEY (`eventId`) REFERENCES `Event`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Review` ADD CONSTRAINT `Review_bookingId_fkey` FOREIGN KEY (`bookingId`) REFERENCES `Booking`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Favourite` ADD CONSTRAINT `Favourite_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Favourite` ADD CONSTRAINT `Favourite_eventId_fkey` FOREIGN KEY (`eventId`) REFERENCES `Event`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `Favourite` ADD CONSTRAINT `Favourite_eventId_fkey` FOREIGN KEY (`eventId`) REFERENCES `Event`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;

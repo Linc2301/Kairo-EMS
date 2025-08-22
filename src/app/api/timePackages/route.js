@@ -10,7 +10,8 @@ dayjs.extend(utc);
 dayjs.extend(timezone);
 dayjs.extend(isSameOrBefore);
 
-// GET API
+
+
 export async function GET(req) {
   const { searchParams } = new URL(req.url);
   const venueId = searchParams.get("venueId");
@@ -19,7 +20,16 @@ export async function GET(req) {
     const timePackages = await prisma.timePackage.findMany({
       where: venueId ? { venue_id: parseInt(venueId) } : {},
       include: {
-        Venue: { select: { name: true } },
+        Venue: {
+          select: {
+            name: true,
+            Event: {
+              select: {
+                name: true
+              }
+            }
+          }
+        },
       },
       orderBy: { id: "asc" },
     });
@@ -30,6 +40,7 @@ export async function GET(req) {
       endTime: tp.endTime.toISOString(),
       venue_id: tp.venue_id,
       venueName: tp.Venue?.name || "Unknown",
+      eventName: tp.Venue?.Event?.name || "N/A"
     }));
 
     return NextResponse.json(formatted);
@@ -42,13 +53,16 @@ export async function GET(req) {
   }
 }
 
+
+
+
 export async function POST(request) {
   try {
     const { date, startTime, endTime, venue_id } = await request.json();
 
     if (!date || !startTime || !endTime || !venue_id) {
       return NextResponse.json(
-        { message: "အချက်အလက်ပြည့်စုံမှုမရှိပါ။" },
+        { message: "Require Information" },
         { status: 400 }
       );
     }
@@ -57,7 +71,7 @@ export async function POST(request) {
     const timeRegex = /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/;
     if (!timeRegex.test(startTime) || !timeRegex.test(endTime)) {
       return NextResponse.json(
-        { message: "အချိန်ဖော်ပြပုံမှားနေပါသည် (HH:mm format လိုအပ်သည်)" },
+        { message: "Time format is wrong (HH:mm format need to fix)" },
         { status: 400 }
       );
     }
@@ -99,14 +113,14 @@ export async function POST(request) {
       return NextResponse.json(
         {
           message:
-            "ဒီနေ့၊ ဒီအချိန်၊ ဒီနေရာအတွက် Time Package ရှိပြီးသားဖြစ်သည်။",
+            "This Time package is already taken for the day.",
         },
         { status: 400 }
       );
     }
 
     return NextResponse.json(
-      { message: error.message || "Time Package ဖန်တီးမှု မအောင်မြင်ပါ" },
+      { message: error.message || "Time Package creation Fail." },
       { status: 500 }
     );
   }

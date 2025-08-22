@@ -67,35 +67,35 @@ export default function CreateTimePackagePage() {
 
     return newErrors;
   };
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  const validationErrors = validate();
-  setErrors(validationErrors);
-  if (Object.keys(validationErrors).length > 0) return;
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const validationErrors = validate();
+    setErrors(validationErrors);
+    if (Object.keys(validationErrors).length > 0) return;
 
-  setIsSubmitting(true);
-  try {
-    const payload = {
-      date: dayjs(formData.date).tz(MYANMAR_TZ).format("YYYY-MM-DD"),
-      startTime: dayjs(formData.startTime).tz(MYANMAR_TZ).format("HH:mm"),
-      endTime: dayjs(formData.endTime).tz(MYANMAR_TZ).format("HH:mm"),
-      venue_id: parseInt(formData.venue_id, 10),
-    };
+    setIsSubmitting(true);
+    try {
+      const payload = {
+        date: dayjs(formData.date).tz(MYANMAR_TZ).format("YYYY-MM-DD"),
+        startTime: dayjs(formData.startTime).tz(MYANMAR_TZ).format("HH:mm"),
+        endTime: dayjs(formData.endTime).tz(MYANMAR_TZ).format("HH:mm"),
+        venue_id: parseInt(formData.venue_id, 10),
+      };
 
-    const response = await axios.post("/api/timePackages", payload);
+      const response = await axios.post("/api/timePackages", payload);
 
-    if (response.status === 201) {
-      alert("Time Package ကို အောင်မြင်စွာ ဖန်တီးပြီးပါပြီ။");
-      router.push("/admin/timePackages");
+      if (response.status === 201) {
+        alert("Time Package Create Successful!");
+        router.push("/admin/timePackages");
+      }
+    } catch (error) {
+      const msg =
+        error?.response?.data?.message || "Error in the  Time Package Creation! ";
+      alert(msg);
+    } finally {
+      setIsSubmitting(false);
     }
-  } catch (error) {
-    const msg =
-      error?.response?.data?.message || "Time Package ဖန်တီးရာတွင် အမှားရှိပါသည်။";
-    alert(msg);
-  } finally {
-    setIsSubmitting(false);
-  }
-};
+  };
   return (
     <Box sx={{ maxWidth: 600, mx: "auto", mt: 4 }}>
       <Paper sx={{ p: 4, borderRadius: 2 }}>

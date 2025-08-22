@@ -27,19 +27,55 @@ export async function POST(req) {
     }
 }
 
+// api/floralServices/route.js
+// export async function GET(req) {
+//     const { searchParams } = new URL(req.url);
+//     const venueId = searchParams.get("venue_id");
+
+//     try {
+//         const services = await prisma.floralService.findMany({
+//             where: venueId
+//                 ? {
+//                     venue_id: parseInt(venueId),
+//                 }
+//                 : {},
+//             include: {
+//                 Venue: {
+//                     include: {
+//                         Event: {
+//                             select: { name: true },
+//                         },
+//                     },
+//                 },
+//             },
+//         });
+
+//         const formatted = services.map((service) => ({
+//             ...service,
+//             venueName: service.Venue?.name || null,
+//             eventName: service.Venue?.Event?.name || null,
+//         }));
+
+//         return NextResponse.json(formatted);
+//     } catch (error) {
+//         console.error("GET /floralServices error:", error);
+//         return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
+//     }
+// }
 
 export async function GET(req) {
     const { searchParams } = new URL(req.url);
-    const venueId = searchParams.get("venue_id");
+    const venueId = searchParams.get('venueId');
 
     try {
-        const services = await prisma.floralService.findMany({
-            where: venueId
-                ? {
-                    venue_id: parseInt(venueId),
-                }
-                : {},
+        let whereClause = {};
 
+        if (venueId) {
+            whereClause.venue_id = parseInt(venueId);
+        }
+
+        const services = await prisma.floralService.findMany({
+            where: whereClause,
             select: {
                 id: true,
                 name: true,
@@ -53,97 +89,9 @@ export async function GET(req) {
             },
         });
 
-        const formatted = services.map((service) => ({
-            ...service,
-            venueName: service.Venue?.name || null,
-        }));
-
-        return NextResponse.json(formatted);
+        return NextResponse.json(services);
     } catch (error) {
         console.error("GET /floralServices error:", error);
         return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
     }
 }
-
-
-// export async function GET(req) {
-//     const { searchParams } = new URL(req.url);
-//     const eventId = searchParams.get("eventId");
-
-//     try {
-//         // Enhanced validation
-//         if (eventId) {
-//             const parsedId = parseInt(eventId);
-//             if (isNaN(parsedId)) {
-//                 return NextResponse.json(
-//                     { message: "Invalid eventId parameter" },
-//                     { status: 400 }
-//                 );
-//             }
-
-//             // Verify event exists
-//             const eventExists = await prisma.event.findUnique({
-//                 where: { id: parsedId }
-//             });
-
-//             if (!eventExists) {
-//                 return NextResponse.json(
-//                     { message: "Event not found" },
-//                     { status: 404 }
-//                 );
-//             }
-//         }
-
-//         const services = await prisma.floralService.findMany({
-//             where: eventId ? { eventId: parseInt(eventId) } : {},
-//             select: {
-//                 id: true,
-//                 name: true,
-//                 description: true,
-//                 photo: true,
-//                 price: true,
-//                 eventId: true,
-//                 Event: {
-//                     select: { name: true },
-//                 },
-//             },
-//             orderBy: { name: "asc" },
-//         });
-
-//         const formatted = services.map((service) => ({
-//             ...service,
-//             venueName: service.Event?.name || null,
-//             price: Number(service.price),
-//         }));
-
-//         return NextResponse.json(formatted);
-//     } catch (error) {
-//         console.error("GET /floralServices error:", error);
-//         return NextResponse.json(
-//             { message: "Internal Server Error" },
-//             { status: 500 }
-//         );
-//     }
-// }
-
-// export async function GET(req) {
-//     const { searchParams } = new URL(req.url);
-//     const eventId = searchParams.get("eventId");
-
-//     if (!eventId || isNaN(eventId)) {
-//         return NextResponse.json({ message: "Invalid eventId" }, { status: 400 });
-//     }
-
-//     try {
-//         const floralServices = await prisma.floralService.findMany({
-//             where: {
-//                 eventId: parseInt(eventId),
-//             },
-//         });
-
-//         return NextResponse.json(floralServices);
-//     } catch (error) {
-//         console.error("Error fetching floral services:", error);
-//         return NextResponse.json({ message: "Failed to load floral services" }, { status: 500 });
-//     }
-// }

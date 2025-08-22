@@ -1,128 +1,5 @@
 "use client";
 
-// import {
-//     Box,
-//     Button,
-//     IconButton,
-//     Paper,
-//     Stack,
-//     Table,
-//     TableBody,
-//     TableCell,
-//     TableContainer,
-//     TableHead,
-//     TableRow,
-//     Typography,
-// } from "@mui/material";
-// import Link from "next/link";
-// import DeleteIcon from "@mui/icons-material/Delete";
-// import EditIcon from "@mui/icons-material/Edit";
-// import axios from "axios";
-// import { useEffect, useState } from "react";
-
-// export default function UserList() {
-//     const [events, setEvents] = useState([]);
-
-//     const getEventList = async () => {
-//         try {
-//             const response = await axios.get("/api/venueType");
-//             setEvents(response.data);
-//         } catch (error) {
-//             console.error(error);
-//         }
-//     };
-//     console.log("events", events);
-//     const handleDelete = async (id) => {
-//         const confirmed = window.confirm("Are you sure you want to delete this event?");
-//         if (!confirmed) return;
-
-//         try {
-//             await axios.delete(`/api/venueType/${id}`);
-//             setEvents((prev) => prev.filter((event) => event.id !== id));
-//             alert("Event deleted successfully!");
-//         } catch (error) {
-//             console.error("Failed to delete:", error);
-//             alert("Something went wrong while deleting.");
-//         }
-//     };
-
-//     useEffect(() => {
-//         getEventList();
-//     }, []);
-
-//     return (
-//         <Box sx={{ p: 3 }}>
-//             <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
-//                     <Typography variant="h4">Venue Types</Typography>
-//                 <Link passHref href="/admin/venueType/create">
-//                     <Button sx={{ mb: 2 }} variant="contained">
-//                         ADD New Venue
-//                     </Button>
-//                 </Link>
-//             </Stack>
-//             <TableContainer component={Paper}>
-//                 <Table>
-//                     <TableHead>
-//                         <TableRow>
-//                             <TableCell align="center">No</TableCell>
-//                             <TableCell align="center">Name</TableCell>
-//                             <TableCell align="center">Photo</TableCell>
-//                             <TableCell align="center">Description</TableCell>
-//                             <TableCell align="center">Price</TableCell>
-//                             <TableCell align="center">Venue Type</TableCell>
-//                             <TableCell align="center">Action</TableCell>
-//                         </TableRow>
-//                     </TableHead>
-//                     <TableBody>
-//                         {events.map((event, index) => (
-//                             <TableRow key={event.id}>
-//                                 <TableCell align="center">{index + 1}</TableCell>
-//                                 <TableCell align="center">{event.name}</TableCell>
-//                                 <TableCell align="center">
-//                                     {event.photo ? (
-//                                         <img
-//                                             src={event.photo}
-//                                             alt="event"
-//                                             style={{
-//                                                 width: 80,
-//                                                 height: 60,
-//                                                 objectFit: "cover",
-//                                                 borderRadius: 4,
-//                                             }}
-//                                         />
-//                                     ) : (
-//                                         "No Photo"
-//                                     )}
-//                                 </TableCell>
-
-//                                 <TableCell align="center">{event.description}</TableCell>
-//                                 <TableCell align="center">{event.price}</TableCell>
-//                                 <TableCell align="center">{event.Venue.name}</TableCell>
-
-//                                 <TableCell align="center">
-
-//                                     <Link passHref href={`/admin/venueType/${event.id}/edit`}>
-//                                         <IconButton sx={{ color: "blue" }}>
-//                                             <EditIcon />
-//                                         </IconButton>
-
-//                                     </Link>
-//                                     <IconButton sx={{ color: "red" }} onClick={() => handleDelete(event.id)}>
-//                                         <DeleteIcon />
-//                                     </IconButton>
-//                                 </TableCell>
-//                             </TableRow>
-//                         ))}
-//                     </TableBody>
-//                 </Table>
-//             </TableContainer>
-//         </Box>
-//     );
-// }
-
-
-// "use client";
-
 import {
     Box,
     Button,
@@ -137,6 +14,7 @@ import {
     TableRow,
     Typography,
     Pagination,
+    TextField,
 } from "@mui/material";
 import Link from "next/link";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -146,13 +24,16 @@ import { useEffect, useState } from "react";
 
 export default function UserList() {
     const [events, setEvents] = useState([]);
+    const [filteredEvents, setFilteredEvents] = useState([]);
     const [page, setPage] = useState(1);
+    const [searchTerm, setSearchTerm] = useState("");
     const rowsPerPage = 5;
 
     const getEventList = async () => {
         try {
             const response = await axios.get("/api/venueType");
             setEvents(response.data);
+            setFilteredEvents(response.data);
         } catch (error) {
             console.error(error);
         }
@@ -165,6 +46,7 @@ export default function UserList() {
         try {
             await axios.delete(`/api/venueType/${id}`);
             setEvents((prev) => prev.filter((event) => event.id !== id));
+            setFilteredEvents((prev) => prev.filter((event) => event.id !== id));
             alert("Event deleted successfully!");
         } catch (error) {
             console.error("Failed to delete:", error);
@@ -176,18 +58,42 @@ export default function UserList() {
         setPage(value);
     };
 
+    const handleSearch = (e) => {
+        const term = e.target.value;
+        setSearchTerm(term);
+
+        if (term === "") {
+            setFilteredEvents(events);
+        } else {
+            const filtered = events.filter(event =>
+                event.name.toLowerCase().includes(term.toLowerCase())
+            );
+            setFilteredEvents(filtered);
+        }
+        setPage(1);
+    };
+
     useEffect(() => {
         getEventList();
     }, []);
 
     // Calculate which events to show on the current page
-    const paginatedEvents = events.slice((page - 1) * rowsPerPage, page * rowsPerPage);
-    const totalPages = Math.ceil(events.length / rowsPerPage);
+    const paginatedEvents = filteredEvents.slice((page - 1) * rowsPerPage, page * rowsPerPage);
+    const totalPages = Math.ceil(filteredEvents.length / rowsPerPage);
 
     return (
         <Box sx={{ p: 3 }}>
             <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
-                <Typography variant="h4">Venue Types</Typography>
+                <Stack direction="row" alignItems="center" spacing={2}>
+                    <Typography variant="h4" sx={{ fontWeight: "bold", color: "primary.main" }}>Venue Types</Typography>
+                    <TextField
+                        size="small"
+                        placeholder="Search by event name..."
+                        value={searchTerm}
+                        onChange={handleSearch}
+                        sx={{ width: 300 }}
+                    />
+                </Stack>
                 <Link passHref href="/admin/venueType/create">
                     <Button sx={{ mb: 2 }} variant="contained">
                         ADD New Venue
@@ -196,7 +102,7 @@ export default function UserList() {
             </Stack>
             <TableContainer component={Paper}>
                 <Table>
-                    <TableHead>
+                    <TableHead sx={{ backgroundColor: "primary.main" }}>
                         <TableRow>
                             <TableCell align="center">No</TableCell>
                             <TableCell align="center">Name</TableCell>
@@ -248,18 +154,18 @@ export default function UserList() {
             </TableContainer>
 
             {/* Pagination Control */}
-            {events.length > rowsPerPage && (
+            {filteredEvents.length > rowsPerPage && (
                 <Box
                     sx={{
                         position: 'fixed',
                         bottom: 0,
                         left: 0,
                         width: '100%',
-                        bgcolor: 'white', // Optional: match page background
+                        bgcolor: 'white',
                         py: 2,
                         display: 'flex',
                         justifyContent: 'center',
-                        boxShadow: '0 -2px 8px rgba(0,0,0,0.1)', // optional: subtle shadow
+                        boxShadow: '0 -2px 8px rgba(0,0,0,0.1)',
                     }}
                 >
                     <Pagination

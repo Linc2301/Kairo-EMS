@@ -1,28 +1,58 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/src/lib/prisma";
 
-export async function DELETE(req, { params }) {
+export async function GET(request, { params }) {
     try {
-        const id = parseInt(params.id); // only if your ID is a number
-        if (!id) {
-            return NextResponse.json({ message: "ID is required" }, { status: 400 });
+        const id = parseInt(params.id);
+        if (isNaN(id)) {
+            return NextResponse.json({ message: "Invalid ID" }, { status: 400 });
         }
 
-        const deleted = await prisma.contact.delete({
-            where: { id }, //need to mark this
+        const contact = await prisma.contact.findUnique({
+            where: { id },
+        });
+
+        if (!contact) {
+            return NextResponse.json({ message: "Contact not found" }, { status: 404 });
+        }
+
+        return NextResponse.json(contact);
+    } catch (error) {
+        console.error("GET /api/contact/[id] error:", error);
+        return NextResponse.json(
+            { message: "Failed to fetch contact", error: error.message },
+            { status: 500 }
+        );
+    }
+}
+
+export async function DELETE(request, { params }) {
+    try {
+        const id = parseInt(params.id);
+        if (isNaN(id)) {
+            return NextResponse.json({ message: "Invalid ID" }, { status: 400 });
+        }
+
+        const deletedContact = await prisma.contact.delete({
+            where: { id },
         });
 
         return NextResponse.json({
-            message: "Contact successfully deleted",
-            contact: deleted,
+            message: "Contact deleted successfully",
+            contact: deletedContact,
         });
     } catch (error) {
-        console.error("Delete API Error:", error);
+        console.error("DELETE /api/contact/[id] error:", error);
+
+        if (error.code === "P2025") {
+            return NextResponse.json(
+                { message: "Contact not found" },
+                { status: 404 }
+            );
+        }
+
         return NextResponse.json(
-            {
-                message: "Failed to delete contact",
-                error: error.message,
-            },
+            { message: "Failed to delete contact", error: error.message },
             { status: 500 }
         );
     }

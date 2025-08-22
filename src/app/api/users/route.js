@@ -71,12 +71,16 @@ export async function GET() {
         phone: true,
         password: true,
         photo: true,
+        status: true,
         isAdmin: true,
       },
+      orderBy: {
+        id: 'asc'
+      }
     });
-
     return NextResponse.json(users);
   } catch (error) {
+    console.error("Failed to fetch users:", error);
     return NextResponse.json(
       { message: "Failed to fetch users", error: error.message },
       { status: 500 }

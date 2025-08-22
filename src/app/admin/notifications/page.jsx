@@ -92,7 +92,7 @@ export default function NotificationList() {
             ) : (
                 <TableContainer component={Paper}>
                     <Table>
-                        <TableHead>
+                        <TableHead sx={{ backgroundColor: "primary.main" }}>
                             <TableRow>
                                 <TableCell align="center">No</TableCell>
                                 <TableCell align="center">Title</TableCell>

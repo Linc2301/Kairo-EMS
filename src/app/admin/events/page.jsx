@@ -14,6 +14,7 @@ import {
     TableRow,
     Typography,
     Pagination,
+    TextField,
 } from "@mui/material";
 import Link from "next/link";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -23,18 +24,21 @@ import { useEffect, useState } from "react";
 
 export default function UserList() {
     const [events, setEvents] = useState([]);
+    const [filteredEvents, setFilteredEvents] = useState([]);
     const [page, setPage] = useState(1);
+    const [searchTerm, setSearchTerm] = useState("");
     const rowsPerPage = 5;
 
     const getEventList = async () => {
         try {
             const response = await axios.get("/api/events");
             setEvents(response.data);
+            setFilteredEvents(response.data);
         } catch (error) {
             console.error(error);
         }
     };
-    console.log("events", events);
+
     const handleDelete = async (id) => {
         const confirmed = window.confirm("Are you sure you want to delete this event?");
         if (!confirmed) return;
@@ -42,6 +46,7 @@ export default function UserList() {
         try {
             await axios.delete(`/api/events/${id}`);
             setEvents((prev) => prev.filter((event) => event.id !== id));
+            setFilteredEvents((prev) => prev.filter((event) => event.id !== id));
             alert("Event deleted successfully!");
         } catch (error) {
             console.error("Failed to delete:", error);
@@ -53,18 +58,42 @@ export default function UserList() {
         setPage(value);
     };
 
+    const handleSearch = (e) => {
+        const term = e.target.value;
+        setSearchTerm(term);
+
+        if (term === "") {
+            setFilteredEvents(events);
+        } else {
+            const filtered = events.filter(event =>
+                event.name.toLowerCase().startsWith(term.toLowerCase())
+            );
+            setFilteredEvents(filtered);
+        }
+        setPage(1);
+    };
+
     useEffect(() => {
         getEventList();
     }, []);
 
     // Calculate which events to show on the current page
-    const paginatedEvents = events.slice((page - 1) * rowsPerPage, page * rowsPerPage);
-    const totalPages = Math.ceil(events.length / rowsPerPage);
+    const paginatedEvents = filteredEvents.slice((page - 1) * rowsPerPage, page * rowsPerPage);
+    const totalPages = Math.ceil(filteredEvents.length / rowsPerPage);
 
     return (
         <Box sx={{ p: 3 }}>
             <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
-                <Typography variant="h4">Events</Typography>
+                <Stack direction="row" alignItems="center" spacing={2}>
+                    <Typography variant="h4">Events</Typography>
+                    <TextField
+                        size="small"
+                        placeholder="Search by name..."
+                        value={searchTerm}
+                        onChange={handleSearch}
+                        sx={{ width: 300 }}
+                    />
+                </Stack>
                 <Link passHref href="/admin/events/create">
                     <Button sx={{ mb: 2 }} variant="contained">
                         ADD Events
@@ -73,7 +102,7 @@ export default function UserList() {
             </Stack>
             <TableContainer component={Paper}>
                 <Table>
-                    <TableHead>
+                    <TableHead sx={{ backgroundColor: "primary.main" }}>
                         <TableRow>
                             <TableCell align="center">No</TableCell>
                             <TableCell align="center">Name</TableCell>
@@ -105,12 +134,10 @@ export default function UserList() {
                                     )}
                                 </TableCell>
                                 <TableCell align="center">
-
                                     <Link passHref href={`/admin/events/${event.id}/edit`}>
                                         <IconButton sx={{ color: "blue" }}>
                                             <EditIcon />
                                         </IconButton>
-
                                     </Link>
                                     <IconButton sx={{ color: "red" }} onClick={() => handleDelete(event.id)}>
                                         <DeleteIcon />
@@ -123,18 +150,18 @@ export default function UserList() {
             </TableContainer>
 
             {/* Pagination Control */}
-            {events.length > rowsPerPage && (
+            {filteredEvents.length > rowsPerPage && (
                 <Box
                     sx={{
                         position: 'fixed',
                         bottom: 0,
                         left: 0,
                         width: '100%',
-                        bgcolor: 'white', // Optional: match page background
+                        bgcolor: 'white',
                         py: 2,
                         display: 'flex',
                         justifyContent: 'center',
-                        boxShadow: '0 -2px 8px rgba(0,0,0,0.1)', // optional: subtle shadow
+                        boxShadow: '0 -2px 8px rgba(0,0,0,0.1)',
                     }}
                 >
                     <Pagination
@@ -149,7 +176,6 @@ export default function UserList() {
                     />
                 </Box>
             )}
-
         </Box>
     );
 }

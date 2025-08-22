@@ -12,7 +12,9 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
+import Link from 'next/link';
 import DeleteIcon from "@mui/icons-material/Delete";
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import axios from "axios";
 import { useEffect, useState } from "react";
 
@@ -54,12 +56,12 @@ export default function UserList() {
 
   return (
     <Box sx={{ p: 3 }}>
-      <Typography variant="h4" gutterBottom>
+      <Typography variant="h4" gutterBottom sx={{ fontWeight: "bold", color: "primary.main" }}>
         Contacts
       </Typography>
       <TableContainer component={Paper}>
         <Table>
-          <TableHead>
+          <TableHead sx={{ backgroundColor: "primary.main" }}>
             <TableRow>
               <TableCell align="center">No</TableCell>
               <TableCell align="center">User Name</TableCell>
@@ -78,6 +80,12 @@ export default function UserList() {
                 <TableCell align="center">{contact.subject}</TableCell>
                 <TableCell align="center">{contact.message}</TableCell>
                 <TableCell align="center">
+                  <Link href={`/admin/contact-info/${contact.id}`} passHref>
+                    <IconButton color="primary">
+                      <VisibilityIcon />
+                    </IconButton>
+                  </Link>
+
                   <IconButton
                     sx={{ color: "red" }}
                     onClick={() => handleDelete(contact.id)}

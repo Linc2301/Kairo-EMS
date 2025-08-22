@@ -32,7 +32,7 @@ model Event {
   Venue       Venue[]
   Favourite   Favourite[]
   Review      Review[]
-  Booking     Booking[]
+
 }
 
 model Venue {
@@ -105,18 +105,14 @@ model Booking {
   user_id Int
   user    User @relation(fields: [user_id], references: [id])
 
-  Event   Event? @relation(fields: [eventId], references: [id])
-  eventId Int?
-
   booking_date DateTime
   total_amount Int
-
-  payment Payment @default(pending)
 
   status BookingStatus @default(pending)
 
   createdAt DateTime @default(now())
   Review    Review?
+
 }
 
 model Contact {
@@ -182,9 +178,4 @@ enum UserStatus {
 enum BookingStatus {
   pending
   confirmed
-}
-
-enum Payment {
-  pending
-  done
 }
